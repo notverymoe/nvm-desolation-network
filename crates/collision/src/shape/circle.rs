@@ -1,0 +1,53 @@
+// Copyright 2023 Natalie Baker // AGPLv3 //
+
+use bevy::math::Vec2;
+
+use crate::{Sweepable, HasBoundingBox, shape::Rect, Projection, SATShape};
+
+#[derive(Clone, Copy)]
+pub struct Circle {
+    pub origin: Vec2,
+    pub radius: f32,
+}
+
+impl SATShape for Circle {
+    fn project_on_axis(&self, axis: Vec2) -> Projection {
+        let origin = axis.dot(self.origin);
+        Projection([origin - self.radius, origin + self.radius])
+    }
+
+    fn get_points(&self, out_points: &mut Vec<Vec2>) {
+        out_points.push(self.origin)
+    }
+
+    fn get_axes(&self, _out_axes: &mut Vec<Vec2>, _out_cache: &mut Vec<Projection>) {
+        // Has no axes itself
+    }
+
+    fn get_axes_derived(&self, other: &[Vec2], out_axes: &mut Vec<Vec2>) {
+        out_axes.extend(other.iter().map(|&v| (v - self.origin).normalize()));
+    }
+}
+
+impl Sweepable for Circle {
+
+    const CAN_SMEAR_PROJECTION: bool = false;
+
+    fn with_offset(mut self, offset: Vec2) -> Self {
+        self.origin += offset;
+        self
+    }
+
+}
+
+impl HasBoundingBox for Circle {
+
+    fn get_bounding_box(&self) -> Rect {
+        let offset = Vec2::new(self.radius, self.radius);
+        Rect { 
+            min: self.origin - offset, 
+            max: self.origin + offset,
+        }
+    }
+
+}
