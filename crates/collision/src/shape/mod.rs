@@ -3,6 +3,9 @@
 mod circle;
 pub use circle::*;
 
+mod line;
+pub use line::*;
+
 mod rect;
 pub use rect::*;
 
