@@ -3,9 +3,6 @@
 mod circle;
 pub use circle::*;
 
-mod line;
-pub use line::*;
-
 mod rect;
 pub use rect::*;
 
@@ -20,3 +17,6 @@ pub use slope_oriented::*;
 
 mod capsule;
 pub use capsule::*;
+
+mod capsule_oriented;
+pub use capsule_oriented::*;
