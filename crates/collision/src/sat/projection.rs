@@ -34,7 +34,7 @@ impl Projection {
         self
     }
 
-    pub fn smear_by(mut self, a: f32) -> Self {
+    pub fn smeared_by(mut self, a: f32) -> Self {
         self.smear(a);
         self
     }

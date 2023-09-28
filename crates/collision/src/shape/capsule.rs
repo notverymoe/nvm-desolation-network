@@ -55,7 +55,7 @@ impl HasBoundingBox for Capsule {
     fn get_bounding_box(&self) -> Rect {
         Rect{
             min: Vec2::new(self.origin.x-self.radius, self.origin.y-self.radius),
-            max: Vec2::new(self.origin.x+self.radius, self.origin.y+self.height+self.radius),
+            max: Vec2::new(self.origin.x+self.radius, self.origin.y+self.radius+self.height),
         }
     }
 

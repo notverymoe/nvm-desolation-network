@@ -37,7 +37,7 @@ impl<T: Sweepable> SATShape for Sweep<T> {
     fn project_on_axis(&self, axis: Vec2) -> crate::Projection {
         let result = self.start.project_on_axis(axis);
         if T::CAN_SMEAR_PROJECTION {
-            result.smear_by(axis.dot(self.motion))
+            result.smeared_by(axis.dot(self.motion))
         } else {
             result.merged_with(self.end.project_on_axis(axis))
         }

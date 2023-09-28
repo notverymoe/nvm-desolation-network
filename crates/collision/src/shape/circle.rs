@@ -4,6 +4,8 @@ use bevy::math::Vec2;
 
 use crate::{Sweepable, HasBoundingBox, shape::Rect, Projection, SATShape};
 
+use super::{CapsuleOriented, Capsule};
+
 #[derive(Clone, Copy)]
 pub struct Circle {
     pub origin: Vec2,
@@ -48,6 +50,20 @@ impl HasBoundingBox for Circle {
             min: self.origin - offset, 
             max: self.origin + offset,
         }
+    }
+
+}
+
+impl Circle {
+
+    pub fn extrude_into_capsule(self, height: f32) -> Capsule {
+        let Circle{radius, origin} = self;
+        Capsule { origin, radius, height }
+    }
+
+    pub fn sweep_into_capsule(self, height: f32, up: Vec2) -> CapsuleOriented {
+        let Circle{radius, origin} = self;
+        CapsuleOriented { origin, radius, height, up }
     }
 
 }
