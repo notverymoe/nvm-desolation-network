@@ -2,7 +2,7 @@
 
 use bevy::math::Vec2;
 
-use crate::{Sweepable, HasBoundingBox, shape::Rect, Projection, SATShape};
+use crate::{HasBoundingBox, shape::Rect, Projection, SATShape};
 
 #[derive(Clone, Copy)]
 pub struct CapsuleOriented {
@@ -13,6 +13,9 @@ pub struct CapsuleOriented {
 }
 
 impl SATShape for CapsuleOriented {
+
+    const CAN_SMEAR_PROJECTION: bool = false;
+
     fn project_on_axis(&self, axis: Vec2) -> Projection {
         Projection([
             axis.dot(self.origin),
@@ -37,11 +40,6 @@ impl SATShape for CapsuleOriented {
         let end = self.origin + self.up*self.height;
         out_axes.extend(other.iter().flat_map(|&p| [p - self.origin, p - end]))
     }
-}
-
-impl Sweepable for CapsuleOriented {
-
-    const CAN_SMEAR_PROJECTION: bool = false;
 
     fn with_offset(mut self, offset: Vec2) -> Self {
         self.origin += offset;

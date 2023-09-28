@@ -4,18 +4,13 @@ use bevy::prelude::Vec2;
 
 use crate::SATShape;
 
-pub trait Sweepable: Copy + SATShape {
-    const CAN_SMEAR_PROJECTION: bool;
-    fn with_offset(self, offset: Vec2) -> Self;
-}
-
-pub struct Sweep<T: Sweepable> {
+pub struct Sweep<T: SATShape + Copy> {
     motion: Vec2,
     start: T,
     end:   T,
 }
 
-impl<T: Sweepable> Sweep<T> {
+impl<T: SATShape + Copy> Sweep<T> {
     pub fn new(shape: T, motion: Vec2) -> Self {
         Self{motion, start: shape, end: shape.with_offset(motion)}
     }
@@ -33,7 +28,9 @@ impl<T: Sweepable> Sweep<T> {
     }
 }
 
-impl<T: Sweepable> SATShape for Sweep<T> {
+impl<T: SATShape + Copy> SATShape for Sweep<T> {
+    const CAN_SMEAR_PROJECTION: bool = T::CAN_SMEAR_PROJECTION;
+
     fn project_on_axis(&self, axis: Vec2) -> crate::Projection {
         let result = self.start.project_on_axis(axis);
         if T::CAN_SMEAR_PROJECTION {
@@ -58,5 +55,13 @@ impl<T: Sweepable> SATShape for Sweep<T> {
             self.end.get_axes_derived(other, out_axes);
         }
         // Smearable projections can't have derived axes, no-op
+    }
+
+    fn with_offset(self, offset: Vec2) -> Self {
+        Self { 
+            motion: self.motion, 
+            start: self.start.with_offset(offset), 
+            end: self.end.with_offset(offset) 
+        }
     }
 }

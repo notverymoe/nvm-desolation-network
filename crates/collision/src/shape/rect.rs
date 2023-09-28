@@ -2,7 +2,7 @@
 
 use bevy::math::Vec2;
 
-use crate::{Sweepable, HasBoundingBox, shape::RectOriented, Projection, SATShape};
+use crate::{HasBoundingBox, shape::RectOriented, Projection, SATShape};
 
 #[derive(Clone, Copy)]
 pub struct Rect {
@@ -11,6 +11,9 @@ pub struct Rect {
 }
 
 impl SATShape for Rect {
+
+    const CAN_SMEAR_PROJECTION: bool = true;
+
     fn project_on_axis(&self, axis: Vec2) -> Projection {
         Projection::from_points_iter(axis, self.points())
     }
@@ -30,11 +33,6 @@ impl SATShape for Rect {
     fn get_axes_derived(&self, _other: &[Vec2], _out_axes: &mut Vec<Vec2>) {
         // no derived axes
     }
-}
-
-impl Sweepable for Rect {
-
-    const CAN_SMEAR_PROJECTION: bool = true;
 
     fn with_offset(mut self, offset: Vec2) -> Self {
         self.min += offset;

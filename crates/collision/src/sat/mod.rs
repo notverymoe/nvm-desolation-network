@@ -9,8 +9,15 @@ mod sweep;
 pub use sweep::*;
 
 pub trait SATShape {
+    const CAN_SMEAR_PROJECTION: bool;
+
     fn project_on_axis(&self, axis: Vec2) -> Projection;
+    
     fn get_points(&self, out_points: &mut Vec<Vec2>);
+    
     fn get_axes(&self, out_axes: &mut Vec<Vec2>, out_cache: &mut Vec<Projection>);
+    
     fn get_axes_derived(&self, other: &[Vec2], out_axes: &mut Vec<Vec2>);
+
+    fn with_offset(self, offset: Vec2) -> Self;
 }

@@ -2,7 +2,7 @@
 
 use bevy::math::Vec2;
 
-use crate::{Sweepable, HasBoundingBox, shape::Rect, Projection, SATShape};
+use crate::{HasBoundingBox, shape::Rect, Projection, SATShape};
 
 use super::{CapsuleOriented, Capsule};
 
@@ -13,6 +13,9 @@ pub struct Circle {
 }
 
 impl SATShape for Circle {
+
+    const CAN_SMEAR_PROJECTION: bool = false;
+
     fn project_on_axis(&self, axis: Vec2) -> Projection {
         let origin = axis.dot(self.origin);
         Projection([origin - self.radius, origin + self.radius])
@@ -29,11 +32,6 @@ impl SATShape for Circle {
     fn get_axes_derived(&self, other: &[Vec2], out_axes: &mut Vec<Vec2>) {
         out_axes.extend(other.iter().map(|&v| (v - self.origin).normalize()));
     }
-}
-
-impl Sweepable for Circle {
-
-    const CAN_SMEAR_PROJECTION: bool = false;
 
     fn with_offset(mut self, offset: Vec2) -> Self {
         self.origin += offset;

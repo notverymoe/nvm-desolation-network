@@ -2,7 +2,7 @@
 
 use bevy::math::Vec2;
 
-use crate::{Sweepable, HasBoundingBox, shape::Rect, Projection, SATShape};
+use crate::{HasBoundingBox, shape::Rect, Projection, SATShape};
 
 #[derive(Clone, Copy)]
 pub struct SlopeOriented {
@@ -13,6 +13,8 @@ pub struct SlopeOriented {
 }
 
 impl SATShape for SlopeOriented {
+
+    const CAN_SMEAR_PROJECTION: bool = true;
 
     fn project_on_axis(&self, axis: Vec2) -> Projection {
         Projection::from_points_iter(axis, self.points())
@@ -37,12 +39,6 @@ impl SATShape for SlopeOriented {
     fn get_axes_derived(&self, _other: &[Vec2], _out_axes: &mut Vec<Vec2>) {
         // no derived axes
     }
-
-}
-
-impl Sweepable for SlopeOriented {
-
-    const CAN_SMEAR_PROJECTION: bool = true;
 
     fn with_offset(mut self, offset: Vec2) -> Self {
         self.origin += offset;
