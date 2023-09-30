@@ -44,6 +44,11 @@ impl Projection {
         self
     }
 
+    pub fn reversed(mut self) -> Self {
+        self.reverse();
+        self
+    }
+
 }
 
 impl Projection {
@@ -74,6 +79,10 @@ impl Projection {
     pub fn offset(&mut self, a: f32) {
         self.0[0] += a;
         self.0[1] += a;
+    }
+
+    pub fn reverse(&mut self) {
+        self.0 = [-self.0[1], -self.0[0]];
     }
 
     pub fn min(&self) -> f32 {
