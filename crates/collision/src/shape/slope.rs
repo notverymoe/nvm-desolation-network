@@ -2,7 +2,7 @@
 
 use bevy::math::Vec2;
 
-use crate::{HasBoundingBox, shape::{SlopeOriented, Rect}, Projection, SATShape};
+use crate::{HasBoundingBox, shape::{SlopeOriented, Rect}, Projection, SATShape, VecLike};
 
 #[derive(Clone, Copy)]
 pub struct Slope {
@@ -19,23 +19,23 @@ impl SATShape for Slope {
         Projection::from_points_iter(axis, self.points())
     }
 
-    fn get_points(&self, out_points: &mut Vec<Vec2>) {
+    fn get_points(&self, out_points: &mut impl VecLike<Vec2>) {
         out_points.extend_from_slice(&self.points())
     }
 
-    fn get_axes(&self, out_axes: &mut Vec<Vec2>, out_cache: &mut Vec<Projection>) {
+    fn get_axes(&self, out_axes: &mut impl VecLike<Vec2>, out_projections: &mut impl VecLike<Projection>) {
         // OPT
         let norms  = [Vec2::X, Vec2::Y, Vec2::new(self.rise, self.run).normalize()];
         let points = self.points();
         out_axes.extend_from_slice(&norms);
-        out_cache.extend_from_slice(&[
+        out_projections.extend_from_slice(&[
             Projection::from_points_iter(norms[0], points),
             Projection::from_points_iter(norms[1], points),
             Projection::from_points_iter(norms[2], points),
         ])
     }
 
-    fn get_axes_derived(&self, _other: &[Vec2], _out_axes: &mut Vec<Vec2>) {
+    fn get_axes_derived(&self, _other: &[Vec2], _out_axes: &mut impl VecLike<Vec2>) {
         // no derived axes
     }
 

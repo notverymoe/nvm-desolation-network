@@ -2,7 +2,7 @@
 
 use bevy::math::Vec2;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Default)]
 pub struct Projection(pub [f32; 2]);
 
 impl Projection {
@@ -39,6 +39,11 @@ impl Projection {
         self
     }
 
+    pub fn offset_by(mut self, a: f32) -> Self {
+        self.offset(a);
+        self
+    }
+
 }
 
 impl Projection {
@@ -64,6 +69,11 @@ impl Projection {
         } else {
             self.0[0] += a;
         }
+    }
+
+    pub fn offset(&mut self, a: f32) {
+        self.0[0] += a;
+        self.0[1] += a;
     }
 
     pub fn min(&self) -> f32 {

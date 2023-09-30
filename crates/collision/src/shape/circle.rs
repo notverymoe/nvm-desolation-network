@@ -2,7 +2,7 @@
 
 use bevy::math::Vec2;
 
-use crate::{HasBoundingBox, shape::Rect, Projection, SATShape};
+use crate::{HasBoundingBox, shape::Rect, Projection, SATShape, VecLike};
 
 use super::{CapsuleOriented, Capsule};
 
@@ -21,15 +21,15 @@ impl SATShape for Circle {
         Projection([origin - self.radius, origin + self.radius])
     }
 
-    fn get_points(&self, out_points: &mut Vec<Vec2>) {
+    fn get_points(&self, out_points: &mut impl VecLike<Vec2>) {
         out_points.push(self.origin)
     }
 
-    fn get_axes(&self, _out_axes: &mut Vec<Vec2>, _out_cache: &mut Vec<Projection>) {
+    fn get_axes(&self, _out_axes: &mut impl VecLike<Vec2>, _out_projections: &mut impl VecLike<Projection>) {
         // Has no axes itself
     }
 
-    fn get_axes_derived(&self, other: &[Vec2], out_axes: &mut Vec<Vec2>) {
+    fn get_axes_derived(&self, other: &[Vec2], out_axes: &mut impl VecLike<Vec2>) {
         out_axes.extend(other.iter().map(|&v| (v - self.origin).normalize()));
     }
 

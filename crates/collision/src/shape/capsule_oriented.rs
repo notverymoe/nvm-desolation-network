@@ -2,7 +2,7 @@
 
 use bevy::math::Vec2;
 
-use crate::{HasBoundingBox, shape::Rect, Projection, SATShape};
+use crate::{HasBoundingBox, shape::Rect, Projection, SATShape, VecLike};
 
 #[derive(Clone, Copy)]
 pub struct CapsuleOriented {
@@ -23,20 +23,20 @@ impl SATShape for CapsuleOriented {
         ]).inflated_by(self.radius)
     }
 
-    fn get_points(&self, out_points: &mut Vec<Vec2>) {
+    fn get_points(&self, out_points: &mut impl VecLike<Vec2>) {
         out_points.extend_from_slice(&[
             self.origin,
             self.origin + self.up*self.height
         ]);
     }
 
-    fn get_axes(&self, out_axes: &mut Vec<Vec2>, out_cache: &mut Vec<Projection>) {
+    fn get_axes(&self, out_axes: &mut impl VecLike<Vec2>, out_projections: &mut impl VecLike<Projection>) {
         out_axes.push(self.up.perp());
         let origin_dp = self.up.perp().dot(self.origin);
-        out_cache.push(Projection([origin_dp-self.radius, origin_dp+self.radius]));
+        out_projections.push(Projection([origin_dp-self.radius, origin_dp+self.radius]));
     }
 
-    fn get_axes_derived(&self, other: &[Vec2], out_axes: &mut Vec<Vec2>) {
+    fn get_axes_derived(&self, other: &[Vec2], out_axes: &mut impl VecLike<Vec2>) {
         let end = self.origin + self.up*self.height;
         out_axes.extend(other.iter().flat_map(|&p| [p - self.origin, p - end]))
     }

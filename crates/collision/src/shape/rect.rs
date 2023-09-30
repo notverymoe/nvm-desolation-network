@@ -2,7 +2,7 @@
 
 use bevy::math::Vec2;
 
-use crate::{HasBoundingBox, shape::RectOriented, Projection, SATShape};
+use crate::{HasBoundingBox, shape::RectOriented, Projection, SATShape, VecLike};
 
 #[derive(Clone, Copy)]
 pub struct Rect {
@@ -18,19 +18,19 @@ impl SATShape for Rect {
         Projection::from_points_iter(axis, self.points())
     }
 
-    fn get_points(&self, out_points: &mut Vec<Vec2>) {
+    fn get_points(&self, out_points: &mut impl VecLike<Vec2>) {
         out_points.extend_from_slice(&self.points())
     }
 
-    fn get_axes(&self, out_axes: &mut Vec<Vec2>, out_cache: &mut Vec<Projection>) {
+    fn get_axes(&self, out_axes: &mut impl VecLike<Vec2>, out_projections: &mut impl VecLike<Projection>) {
         out_axes.extend_from_slice(&[Vec2::X, Vec2::Y]);
-        out_cache.extend_from_slice(&[
+        out_projections.extend_from_slice(&[
             Projection([self.min.x, self.max.x]),
             Projection([self.min.y, self.max.y]),
         ])
     }
 
-    fn get_axes_derived(&self, _other: &[Vec2], _out_axes: &mut Vec<Vec2>) {
+    fn get_axes_derived(&self, _other: &[Vec2], _out_axes: &mut impl VecLike<Vec2>) {
         // no derived axes
     }
 

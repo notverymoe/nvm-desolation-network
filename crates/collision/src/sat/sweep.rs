@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::SATShape;
+use crate::{SATShape, VecLike};
 
 pub struct Sweep<T: SATShape + Copy> {
     motion: Vec2,
@@ -40,16 +40,16 @@ impl<T: SATShape + Copy> SATShape for Sweep<T> {
         }
     }
 
-    fn get_points(&self, out_points: &mut Vec<Vec2>) {
+    fn get_points(&self, out_points: &mut impl VecLike<Vec2>) {
         self.start.get_points(out_points);
         self.end.get_points(out_points);
     }
 
-    fn get_axes(&self, out_axes: &mut Vec<Vec2>, out_cache: &mut Vec<crate::Projection>) {
-        self.start.get_axes(out_axes, out_cache);
+    fn get_axes(&self, out_axes: &mut impl VecLike<Vec2>, out_projections: &mut impl VecLike<crate::Projection>) {
+        self.start.get_axes(out_axes, out_projections);
     }
 
-    fn get_axes_derived(&self, other: &[Vec2], out_axes: &mut Vec<Vec2>) {
+    fn get_axes_derived(&self, other: &[Vec2], out_axes: &mut impl VecLike<Vec2>) {
         if !T::CAN_SMEAR_PROJECTION {
             self.start.get_axes_derived(other, out_axes);
             self.end.get_axes_derived(other, out_axes);
@@ -60,8 +60,8 @@ impl<T: SATShape + Copy> SATShape for Sweep<T> {
     fn with_offset(self, offset: Vec2) -> Self {
         Self { 
             motion: self.motion, 
-            start: self.start.with_offset(offset), 
-            end: self.end.with_offset(offset) 
+            start:  self.start.with_offset(offset), 
+            end:    self.end.with_offset(offset) 
         }
     }
 }
