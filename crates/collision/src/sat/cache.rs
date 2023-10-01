@@ -3,13 +3,13 @@
 use bevy::prelude::Vec2;
 use tinyvec::ArrayVec;
 
-use crate::{SATShape, Projection, VecLike};
+use crate::{Shape, Projection, VecLike};
 
 // Slope has 3 axes + 1 for sweep
 pub const CACHE_DEFAULT_CAP: usize = 4;
 
 #[derive(Clone, Copy)]
-pub struct Cache<T: SATShape, const CAP: usize = CACHE_DEFAULT_CAP> 
+pub struct Cache<T: Shape, const CAP: usize = CACHE_DEFAULT_CAP> 
 where 
     [Vec2;       CAP] : tinyvec::Array<Item = Vec2      > + Copy,
     [Projection; CAP] : tinyvec::Array<Item = Projection> + Copy,
@@ -19,7 +19,7 @@ where
     pub projections: ArrayVec<[Projection; CAP]>,
 }
 
-impl<T: SATShape, const CAP: usize> Cache<T, CAP> 
+impl<T: Shape, const CAP: usize> Cache<T, CAP> 
 where 
     [Vec2;       CAP] : tinyvec::Array<Item = Vec2      > + Copy,
     [Projection; CAP] : tinyvec::Array<Item = Projection> + Copy,
@@ -34,7 +34,7 @@ where
 
 }
 
-impl<T: SATShape, const CAP: usize> SATShape for Cache<T, CAP> 
+impl<T: Shape, const CAP: usize> Shape for Cache<T, CAP> 
 where 
     [Vec2;       CAP] : tinyvec::Array<Item = Vec2      > + Copy,
     [Projection; CAP] : tinyvec::Array<Item = Projection> + Copy,
@@ -67,7 +67,7 @@ where
     }
 }
 
-impl<T: SATShape> From<T> for Cache<T> {
+impl<T: Shape> From<T> for Cache<T> {
     fn from(value: T) -> Self {
         Self::new(value)
     }

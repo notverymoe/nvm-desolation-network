@@ -2,7 +2,7 @@
 
 use bevy::math::Vec2;
 
-use crate::{HasBoundingBox, shape::RectOriented, Projection, SATShape, VecLike};
+use crate::{HasBoundingBox, shape::RectOriented, Projection, Shape, VecLike};
 
 #[derive(Clone, Copy)]
 pub struct Rect {
@@ -10,7 +10,7 @@ pub struct Rect {
     pub max: Vec2,
 }
 
-impl SATShape for Rect {
+impl Shape for Rect {
 
     const CAN_SMEAR_PROJECTION: bool = true;
 

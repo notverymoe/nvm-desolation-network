@@ -2,7 +2,7 @@
 
 use bevy::math::Vec2;
 
-use crate::{HasBoundingBox, shape::Rect, Projection, SATShape, VecLike};
+use crate::{HasBoundingBox, shape::Rect, Projection, Shape, VecLike};
 
 use super::{CapsuleOriented, Capsule};
 
@@ -12,7 +12,7 @@ pub struct Circle {
     pub radius: f32,
 }
 
-impl SATShape for Circle {
+impl Shape for Circle {
 
     const CAN_SMEAR_PROJECTION: bool = false;
 

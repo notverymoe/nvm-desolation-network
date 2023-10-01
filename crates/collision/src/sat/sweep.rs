@@ -2,15 +2,15 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{SATShape, VecLike};
+use crate::{Shape, VecLike};
 
-pub struct Sweep<T: SATShape + Copy> {
+pub struct Sweep<T: Shape + Copy> {
     motion: Vec2,
     start: T,
     end:   T,
 }
 
-impl<T: SATShape + Copy> Sweep<T> {
+impl<T: Shape + Copy> Sweep<T> {
     pub fn new(shape: T, motion: Vec2) -> Self {
         Self{motion, start: shape, end: shape.with_offset(motion)}
     }
@@ -28,7 +28,7 @@ impl<T: SATShape + Copy> Sweep<T> {
     }
 }
 
-impl<T: SATShape + Copy> SATShape for Sweep<T> {
+impl<T: Shape + Copy> Shape for Sweep<T> {
     const CAN_SMEAR_PROJECTION: bool = T::CAN_SMEAR_PROJECTION;
 
     fn project_on_axis(&self, axis: Vec2) -> crate::Projection {

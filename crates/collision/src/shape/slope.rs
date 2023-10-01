@@ -2,7 +2,7 @@
 
 use bevy::math::Vec2;
 
-use crate::{HasBoundingBox, shape::{SlopeOriented, Rect}, Projection, SATShape, VecLike};
+use crate::{HasBoundingBox, shape::{SlopeOriented, Rect}, Projection, Shape, VecLike};
 
 #[derive(Clone, Copy)]
 pub struct Slope {
@@ -11,7 +11,7 @@ pub struct Slope {
     pub rise:   f32,
 }
 
-impl SATShape for Slope {
+impl Shape for Slope {
 
     const CAN_SMEAR_PROJECTION: bool = true;
 

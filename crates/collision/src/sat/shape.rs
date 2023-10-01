@@ -4,7 +4,7 @@ use bevy::math::Vec2;
 
 use crate::{Projection, VecLike};
 
-pub trait SATShape {
+pub trait Shape {
     const CAN_SMEAR_PROJECTION: bool;
 
     fn project_on_axis(&self, axis: Vec2) -> Projection;
@@ -18,7 +18,7 @@ pub trait SATShape {
     fn with_offset(self, offset: Vec2) -> Self;
 }
 
-impl SATShape for Vec2 {
+impl Shape for Vec2 {
     const CAN_SMEAR_PROJECTION: bool = true;
 
     fn project_on_axis(&self, axis: Vec2) -> Projection {

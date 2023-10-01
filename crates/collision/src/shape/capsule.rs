@@ -2,7 +2,7 @@
 
 use bevy::math::Vec2;
 
-use crate::{HasBoundingBox, shape::Rect, Projection, SATShape, VecLike};
+use crate::{HasBoundingBox, shape::Rect, Projection, Shape, VecLike};
 
 use super::CapsuleOriented;
 
@@ -13,7 +13,7 @@ pub struct Capsule {
     pub radius: f32,
 }
 
-impl SATShape for Capsule {
+impl Shape for Capsule {
 
     const CAN_SMEAR_PROJECTION: bool = false;
 
