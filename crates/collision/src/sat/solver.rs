@@ -9,10 +9,12 @@ use crate::{Contact, Projection, VecLike, Shape};
 // Swept rect                  = 8 points
 const SOLVER_BUFFER_CAP: usize = 8;
 
-pub const CONTACT_ALL:       usize = 0;
-pub const CONTACT_PENETRATE: usize = 1;
-pub const CONTACT_SEPERATE:  usize = 2;
+pub const CONTACTS_ALL:           usize = 0;
+pub const CONTACTS_PENETRATE:     usize = 1;
+pub const CONTACTS_SEPERATE:      usize = 2;
+pub const CONTACTS_PENETRATE_REQ: usize = 3;
 
+#[derive(Default)]
 pub struct Solver {
     pub contacts: Vec<Contact>,
     buffer_points:      ArrayVec<[      Vec2; SOLVER_BUFFER_CAP]>,
@@ -23,16 +25,16 @@ pub struct Solver {
 impl Solver {
 
     pub fn find_min(&self) -> Option<&Contact> {
-        self.contacts.iter().reduce(|p, c| if p.contact_min.abs() < c.contact_min.abs() { p } else { c })
+        self.contacts.iter().reduce(|p, c| if p.contact_min.abs() <= c.contact_min.abs() { p } else { c })
     }
 
-    pub fn add_contacts<const CONSTRAINT: usize, const REQUIRED: bool>(&mut self, a: &impl Shape, b: &impl Shape) -> bool {
-        generate_contacts::<CONSTRAINT, REQUIRED>(a, b, &mut self.buffer_points, &mut self.buffer_axes, &mut self.buffer_projections, &mut self.contacts)
+    pub fn add_contacts<const CONSTRAINT: usize>(&mut self, a: &impl Shape, b: &impl Shape) -> bool {
+        generate_contacts::<CONSTRAINT>(a, b, &mut self.buffer_points, &mut self.buffer_axes, &mut self.buffer_projections, &mut self.contacts)
     }
 
 }
 
-pub fn generate_contacts<const CONSTRAINT: usize, const REQUIRED: bool>(
+pub fn generate_contacts<const CONSTRAINT: usize>(
     a: &impl Shape, 
     b: &impl Shape,
     buffer_points:      &mut impl VecLike<Vec2      >,
@@ -41,15 +43,22 @@ pub fn generate_contacts<const CONSTRAINT: usize, const REQUIRED: bool>(
     out_contacts:       &mut impl VecLike<Contact   >,
 ) -> bool {
     let orig_len = out_contacts.len();
+    let mut is_overlapping = true;
     let mut try_add_contact = |contact: Contact| -> bool {
-        if CONSTRAINT != CONTACT_ALL && !contact.is_overlaped() { 
-            if REQUIRED { 
+        if match (CONSTRAINT, contact.is_penetration()) {
+            (CONTACTS_ALL,              _) => true,
+            (CONTACTS_PENETRATE,     true) => true,
+            (CONTACTS_PENETRATE_REQ, true) => true,
+            (CONTACTS_SEPERATE,     false) => {
+                is_overlapping = false;
+                true
+            },
+            (CONTACTS_PENETRATE_REQ, false) => {
                 out_contacts.shrink_to(orig_len);
-                return false; 
-            }
-        } else {
-            out_contacts.push(contact);
-        }
+                return false; // Exit
+            },
+            _ => false
+        } { out_contacts.push(contact); }
         true
     };
 
@@ -59,7 +68,7 @@ pub fn generate_contacts<const CONSTRAINT: usize, const REQUIRED: bool>(
     a.get_axes(buffer_axes, buffer_projections);
     for (i, &axis) in buffer_axes.iter().enumerate() {
         let contact = Contact::from_overlap(axis, buffer_projections[i], b.project_on_axis(axis));
-        if !try_add_contact(contact) { return CONSTRAINT == CONTACT_PENETRATE; }
+        if !try_add_contact(contact) { return false; }
     }
 
     // STATIC B
@@ -68,7 +77,7 @@ pub fn generate_contacts<const CONSTRAINT: usize, const REQUIRED: bool>(
     b.get_axes(buffer_axes, buffer_projections);
     for (i, axis) in buffer_axes.iter().map(|&v| -v).enumerate() {
         let contact = Contact::from_overlap(axis, a.project_on_axis(axis), buffer_projections[i].reversed());
-        if !try_add_contact(contact) { return CONSTRAINT == CONTACT_PENETRATE; }
+        if !try_add_contact(contact) { return false; }
     }
 
     // DERIVED A 
@@ -79,7 +88,7 @@ pub fn generate_contacts<const CONSTRAINT: usize, const REQUIRED: bool>(
     a.get_axes_derived(buffer_points.as_slice(), buffer_axes);
     for &axis in buffer_axes.iter() {
         let contact = Contact::from_overlap(axis, a.project_on_axis(axis), b.project_on_axis(axis));
-        if !try_add_contact(contact) { return CONSTRAINT == CONTACT_PENETRATE; }
+        if !try_add_contact(contact) { return false; }
     }
 
     // DERIVED B
@@ -90,9 +99,9 @@ pub fn generate_contacts<const CONSTRAINT: usize, const REQUIRED: bool>(
     b.get_axes_derived(buffer_points.as_slice(), buffer_axes);
     for axis in buffer_axes.iter().map(|&v| -v) {
         let contact = Contact::from_overlap(axis, a.project_on_axis(axis), b.project_on_axis(axis));
-        if !try_add_contact(contact) { return CONSTRAINT == CONTACT_PENETRATE; }
+        if !try_add_contact(contact) { return false; }
     }
 
-    CONSTRAINT != CONTACT_PENETRATE
+    is_overlapping
 }
 

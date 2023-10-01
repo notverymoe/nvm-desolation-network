@@ -6,7 +6,7 @@ use crate::Projection;
 
 #[derive(Clone, Copy, Default)]
 pub struct Contact {
-    pub axis:      Vec2,
+    pub axis:        Vec2,
     pub contact_min: f32,
     pub contact_max: f32,
 }
@@ -29,7 +29,7 @@ impl Contact {
         Self{axis, contact_min, contact_max}
     }
 
-    pub fn is_overlaped(&self) -> bool {
+    pub fn is_penetration(&self) -> bool {
         self.contact_min.signum() != self.contact_max.signum()
     }
 
