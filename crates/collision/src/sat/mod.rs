@@ -63,8 +63,8 @@ mod tests {
 
     #[test]
     fn test_rect_early_out() {
-        let a = Rect{min: 1.0*Vec2::ONE, max: 2.0*Vec2::ONE};
-        let b = Rect{min: 3.0*Vec2::ONE, max: 4.0*Vec2::ONE};
+        let a = Rect{min: Vec2::new(0.0, 0.0), max: Vec2::new(10.0, 1.0)};
+        let b = Rect{min: Vec2::new(2.0, 2.0), max: Vec2::new( 8.0, 2.0)};
         let mut solver = Solver::default();
         assert!(!solver.add_contacts::<CONTACTS_PENETRATE_REQ>(&a, &b), "Rects falsely penetrate");
         assert_eq!(solver.contacts.len(), 0, "Solver falsely generated contacts");

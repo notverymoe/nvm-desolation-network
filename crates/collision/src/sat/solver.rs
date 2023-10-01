@@ -45,20 +45,21 @@ pub fn generate_contacts<const CONSTRAINT: usize>(
     let orig_len = out_contacts.len();
     let mut is_overlapping = true;
     let mut try_add_contact = |contact: Contact| -> bool {
-        if match (CONSTRAINT, contact.is_penetration()) {
-            (CONTACTS_ALL,              _) => true,
-            (CONTACTS_PENETRATE,     true) => true,
-            (CONTACTS_PENETRATE_REQ, true) => true,
-            (CONTACTS_SEPERATE,     false) => {
-                is_overlapping = false;
-                true
-            },
+        let is_contact_pen = contact.is_penetration();
+        is_overlapping &= is_contact_pen;
+        let add_contact = match (CONSTRAINT, is_contact_pen) {
+            (CONTACTS_PENETRATE,     false) => false,
+            (CONTACTS_SEPERATE,       true) => false,
             (CONTACTS_PENETRATE_REQ, false) => {
-                out_contacts.shrink_to(orig_len);
-                return false; // Exit
+                out_contacts.truncate(orig_len); // Clear penetrations
+                return false; // early-out exit
             },
-            _ => false
-        } { out_contacts.push(contact); }
+            _ => true,
+        };
+        
+        if add_contact {
+            out_contacts.push(contact);
+        }
         true
     };
 

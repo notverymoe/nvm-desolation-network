@@ -12,7 +12,7 @@ pub trait VecLike<T>: Index<usize, Output = T> {
     fn clear(&mut self);
     fn as_slice(&self) -> &[T];
     fn len(&self) -> usize;
-    fn shrink_to(&mut self, len: usize);
+    fn truncate(&mut self, len: usize);
 }
 
 impl<T: Clone> VecLike<T> for Vec<T> {
@@ -44,8 +44,8 @@ impl<T: Clone> VecLike<T> for Vec<T> {
         self.len()
     }
 
-    fn shrink_to(&mut self, len: usize) {
-        self.shrink_to(len);
+    fn truncate(&mut self, len: usize) {
+        self.truncate(len);
     }
 }
 
@@ -78,7 +78,7 @@ impl<A: Array> VecLike<A::Item> for ArrayVec<A> where A::Item: Clone {
         self.len()
     }
 
-    fn shrink_to(&mut self, len: usize) {
-        self.set_len(len);
+    fn truncate(&mut self, len: usize) {
+        self.truncate(len);
     }
 }
