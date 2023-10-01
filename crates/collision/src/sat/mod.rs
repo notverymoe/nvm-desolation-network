@@ -38,7 +38,7 @@ mod tests {
             assert_eq!(contact.contact_min, 1.0);
             assert_eq!(contact.contact_max, 3.0);
         } else {
-            assert!(false, "No contacts in solver");
+            panic!("No contacts in solver");
         }
 
     }
@@ -54,7 +54,7 @@ mod tests {
             assert_eq!(contact.contact_min, -0.5);
             assert_eq!(contact.contact_max,  1.5);
         } else {
-            assert!(false, "No contacts in solver");
+            panic!("No contacts in solver");
         }
 
     }
