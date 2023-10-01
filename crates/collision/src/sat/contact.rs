@@ -13,6 +13,11 @@ pub struct Contact {
 
 impl Contact {
 
+    pub fn reproject(&self, axis: Vec2) -> Self {
+        let dp = axis.dot(self.axis);
+        Self { axis, contact_min: self.contact_min*dp, contact_max: self.contact_max*dp }
+    }
+
     pub fn from_overlap(axis: Vec2, a: Projection, b: Projection) -> Self {
         let contact_a = b.min() - a.max();
         let contact_b = b.max() - a.min();

@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{Shape, VecLike};
+use crate::{Shape, VecLike, Contact};
 
 pub struct Sweep<T: Shape + Copy> {
     motion: Vec2,
@@ -25,6 +25,10 @@ impl<T: Shape + Copy> Sweep<T> {
 
     pub fn motion(&self) -> &Vec2 {
         &self.motion
+    }
+
+    pub fn get_contact_along_motion(&self, contact: Contact) -> Contact {
+        contact.reproject(self.motion.normalize())
     }
 }
 
