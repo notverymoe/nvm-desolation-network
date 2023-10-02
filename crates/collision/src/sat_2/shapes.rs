@@ -8,6 +8,14 @@ pub struct Line {
     pub(crate) distance:  f32,
 }
 
+impl Line {
+
+    pub fn get_end(&self) -> Vec2 {
+        self.origin + self.direction*self.distance
+    }
+
+}
+
 pub struct Circle {
     pub(crate) origin: Vec2,
     pub(crate) radius: f32,
@@ -54,4 +62,22 @@ pub struct Slope {
     pub(crate) origin:    Vec2,
     pub(crate) direction: Vec2,
     pub(crate) distance:  f32,
+}
+
+impl Slope {
+
+    pub fn run(&self) -> f32 {
+        self.direction.x * self.distance
+    }
+
+    pub fn rise(&self) -> f32 {
+        self.direction.y * self.distance
+    }
+
+    pub fn nearest_point_to(&self, v: Vec2) -> Vec2 {
+        let x = if v.x < self.origin.x { self.origin.x + self.run().max(0.0) } else { self.origin.x - self.run().min(0.0) };
+        let y = if v.y < self.origin.y { self.origin.y + self.rise().max(0.0) } else { self.origin.y - self.rise().min(0.0) };
+        Vec2::new(x, y)
+    }
+
 }

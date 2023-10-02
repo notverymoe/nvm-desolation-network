@@ -27,27 +27,27 @@ pub fn get_seperating_axis_candidates(a: Shape, b: Shape) -> ArrayVec<[Vec2; 4]>
         (Shape::Point(a), Shape::Capsule(b)) => array_vec!(Vec2::X, axis_between(a, b.origin), axis_between(a, b.get_top())),
         (Shape::Point(_),   Shape::Slope(b)) => array_vec!(Vec2::X, Vec2::Y, b.direction.perp()),
 
-        (Shape::Line(a),    Shape::Line(b)) => array_vec!(),
-        (Shape::Line(a),  Shape::Circle(b)) => array_vec!(),
-        (Shape::Line(a),    Shape::Rect(b)) => array_vec!(Vec2::X, Vec2::Y, a.direction.perp()), // HACK Is omitting Line::direction fine?
-        (Shape::Line(a), Shape::Capsule(b)) => array_vec!(),
-        (Shape::Line(a),   Shape::Slope(b)) => array_vec!(),
+        (Shape::Line(a),    Shape::Line(b)) => array_vec!(Vec2::X, Vec2::Y, a.direction.perp(), b.direction.perp()),
+        (Shape::Line(a),  Shape::Circle(b)) => array_vec!({axis_between(a.origin, b.origin)}, axis_between(a.origin + a.direction*a.distance, b.origin)),
+        (Shape::Line(a),    Shape::Rect(_)) => array_vec!(Vec2::X, Vec2::Y, a.direction.perp()), // HACK Is omitting Line::direction fine?
+        (Shape::Line(a), Shape::Capsule(b)) => array_vec!({axis_between(a.origin, b.nearest_point_to(a.origin))}, axis_between(a.get_end(), b.nearest_point_to(a.get_end()))),
+        (Shape::Line(a),   Shape::Slope(b)) => array_vec!(Vec2::X, Vec2::Y, a.direction.perp(), b.direction.perp()),
 
         (Shape::Circle(a),  Shape::Circle(b)) => array_vec!({axis_between(a.origin, b.origin)}),
         (Shape::Circle(a),    Shape::Rect(b)) => array_vec!(Vec2::X, Vec2::Y, axis_between(a.origin, b.nearest_point_to(a.origin))),
         (Shape::Circle(a), Shape::Capsule(b)) => array_vec!(Vec2::X, b.nearest_point_to(a.origin)),
-        (Shape::Circle(a),   Shape::Slope(b)) => array_vec!(),
+        (Shape::Circle(a),   Shape::Slope(b)) => array_vec!(Vec2::X, Vec2::Y, axis_between(a.origin, b.nearest_point_to(a.origin)), b.direction.perp()),
 
         (Shape::Rect(_),    Shape::Rect(_)) => array_vec!(Vec2::X, Vec2::Y),
         (Shape::Rect(a), Shape::Capsule(b)) => array_vec!(Vec2::X, Vec2::Y, axis_between(a.nearest_point_to(b.origin), b.origin), axis_between(a.nearest_point_to(b.get_top()), b.get_top())),
         (Shape::Rect(_),   Shape::Slope(b)) => array_vec!(Vec2::X, Vec2::Y, b.direction.perp()),
 
         (Shape::Capsule(a), Shape::Capsule(b)) => array_vec!(Vec2::X, axis_between(a.nearest_point_to(b.origin), b.origin), axis_between(a.nearest_point_to(b.get_top()), b.get_top())),
-        (Shape::Capsule(a),   Shape::Slope(b)) => array_vec!(),
+        (Shape::Capsule(a),   Shape::Slope(b)) => array_vec!(Vec2::X, Vec2::Y, axis_between(a.origin, b.nearest_point_to(a.origin)), axis_between(a.get_top(), b.nearest_point_to(a.get_top())), b.direction.perp()),
 
         (Shape::Slope(a), Shape::Slope(b)) => array_vec!(Vec2::X, Vec2::Y, a.direction.perp(), b.direction.perp()),
 
-        (a, b) => get_seperating_axis_candidates(b, a), // TODO inline
+        (a, b) => get_seperating_axis_candidates(b, a), // TODO inline?
     }
 }
 
