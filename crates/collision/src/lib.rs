@@ -5,6 +5,8 @@ pub mod shape;
 mod sat;
 pub use sat::*;
 
+pub mod sat_2;
+
 use shape::Rect;
 
 pub trait HasBoundingBox {
