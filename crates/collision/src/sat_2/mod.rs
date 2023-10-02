@@ -30,7 +30,7 @@ pub fn get_seperating_axis_candidates(a: Shape, b: Shape) -> ArrayVec<[Vec2; 3]>
         (Shape::Line(a),    Shape::Line(b)) => array_vec!(a.direction.perp(), b.direction.perp()),
         (Shape::Line(a),  Shape::Circle(b)) => array_vec!({nearest_axis(b.origin, &a)}),
         (Shape::Line(a),    Shape::Rect(_)) => array_vec!(a.direction.perp()),
-        (Shape::Line(a), Shape::Capsule(b)) => array_vec!({nearest_axis(a.origin, &b)}, nearest_axis(a.get_end(), &b)),
+        (Shape::Line(a), Shape::Capsule(b)) => array_vec!({nearest_axis(a.origin, &b)}, nearest_axis(a.end, &b)),
         (Shape::Line(a),   Shape::Slope(b)) => array_vec!(a.direction.perp(), b.direction.perp()),
 
         (Shape::Circle(a),  Shape::Circle(b)) => array_vec!({axis_between(a.origin, b.origin)}),

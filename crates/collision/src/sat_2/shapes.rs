@@ -4,29 +4,25 @@ use bevy::prelude::Vec2;
 
 pub trait ShapesCommon {
     fn nearest_point_to(&self, v: Vec2) -> Vec2;
+    fn get_aabb(&self) -> Rect;
 }
 
-
+#[derive(Debug, Clone, Copy)]
 pub struct Line {
     pub(crate) origin:    Vec2,
+    pub(crate) end:       Vec2,
     pub(crate) direction: Vec2,
-    pub(crate) distance:  f32,
 }
 
 impl Line {
     pub fn run(&self) -> f32 {
-        self.direction.x * self.distance
+        self.end.x - self.origin.x
     }
 
     pub fn rise(&self) -> f32 {
-        self.direction.y * self.distance
-    }
-
-    pub fn get_end(&self) -> Vec2 {
-        self.origin + self.direction*self.distance
+        self.end.y - self.origin.y
     }
 }
-
 
 impl ShapesCommon for Line {
     fn nearest_point_to(&self, v: Vec2) -> Vec2 {
@@ -34,8 +30,16 @@ impl ShapesCommon for Line {
         let y = if v.y < self.origin.y { self.origin.y + self.rise().max(0.0) } else { self.origin.y - self.rise().min(0.0) };
         Vec2::new(x, y)
     }
+
+    fn get_aabb(&self) -> Rect {
+        Rect{
+            origin: self.origin.min(self.end),
+            end:    self.origin.max(self.end),
+        }
+    }
 }
 
+#[derive(Debug, Clone, Copy)]
 pub struct Circle {
     pub(crate) origin: Vec2,
     pub(crate) radius: f32,
@@ -45,8 +49,16 @@ impl ShapesCommon for Circle {
     fn nearest_point_to(&self, _v: Vec2) -> Vec2 {
         self.origin
     }
+
+    fn get_aabb(&self) -> Rect {
+        Rect{
+            origin: self.origin - Vec2::new(self.radius, self.radius),
+            end:    self.origin + Vec2::new(self.radius, self.radius),
+        }
+    }
 }
 
+#[derive(Debug, Clone, Copy)]
 pub struct Rect {
     pub(crate) origin: Vec2,
     pub(crate) end:    Vec2,
@@ -59,8 +71,13 @@ impl ShapesCommon for Rect {
             if v.y <= self.origin.y { self.origin.y } else { self.end.y },
         )
     }
+
+    fn get_aabb(&self) -> Rect {
+        *self
+    }
 }
 
+#[derive(Debug, Clone, Copy)]
 pub struct Capsule {
     pub(crate) origin: Vec2,
     pub(crate) height: f32,
@@ -80,21 +97,29 @@ impl ShapesCommon for Capsule {
             if v.y <= self.origin.y { self.origin.y } else { self.origin.y + self.height },
         )
     }
+
+    fn get_aabb(&self) -> Rect {
+        Rect{
+            origin: self.origin - Vec2::new(self.radius, self.radius),
+            end:    self.origin + Vec2::new(self.radius, self.radius + self.height),
+        }
+    }
 }
 
+#[derive(Debug, Clone, Copy)]
 pub struct Slope {
     pub(crate) origin:    Vec2,
     pub(crate) direction: Vec2,
-    pub(crate) distance:  f32,
+    pub(crate) end:       Vec2,
 }
 
 impl Slope {
     pub fn run(&self) -> f32 {
-        self.direction.x * self.distance
+        self.end.x - self.origin.x
     }
 
     pub fn rise(&self) -> f32 {
-        self.direction.y * self.distance
+        self.end.y - self.origin.y
     }
 }
 
@@ -103,5 +128,12 @@ impl ShapesCommon for Slope {
         let x = if v.x < self.origin.x { self.origin.x +  self.run().max(0.0) } else { self.origin.x -  self.run().min(0.0) };
         let y = if v.y < self.origin.y { self.origin.y + self.rise().max(0.0) } else { self.origin.y - self.rise().min(0.0) };
         Vec2::new(x, y)
+    }
+
+    fn get_aabb(&self) -> Rect {
+        Rect{
+            origin: self.origin.min(self.end),
+            end:    self.origin.max(self.end),
+        }
     }
 }
