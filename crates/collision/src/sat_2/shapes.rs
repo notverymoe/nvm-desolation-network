@@ -49,14 +49,14 @@ impl ShapesCommon for Circle {
 
 pub struct Rect {
     pub(crate) origin: Vec2,
-    pub(crate) size:   Vec2,
+    pub(crate) end:    Vec2,
 }
 
 impl ShapesCommon for Rect {
     fn nearest_point_to(&self, v: Vec2) -> Vec2 {
         Vec2::new(
-            if v.x <= self.origin.x { self.origin.x } else { self.origin.x + self.size.x },
-            if v.y <= self.origin.y { self.origin.y } else { self.origin.y + self.size.y },
+            if v.x <= self.origin.x { self.origin.x } else { self.end.x },
+            if v.y <= self.origin.y { self.origin.y } else { self.end.y },
         )
     }
 }
