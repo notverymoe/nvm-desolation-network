@@ -2,7 +2,7 @@
 
 use bevy::math::Vec2;
 
-#[derive(Clone, Copy, Default)]
+#[derive(Clone, Copy, Default, PartialEq, Debug)]
 pub struct Projection(pub [f32; 2]);
 
 impl Projection {

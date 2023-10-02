@@ -1,7 +1,6 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
 use bevy::prelude::Vec2;
-
 use crate::{Shape, VecLike, Contact};
 
 pub struct Sweep<T: Shape + Copy> {
@@ -50,7 +49,14 @@ impl<T: Shape + Copy> Shape for Sweep<T> {
     }
 
     fn get_axes(&self, out_axes: &mut impl VecLike<Vec2>, out_projections: &mut impl VecLike<crate::Projection>) {
+        let from = out_projections.len();
         self.start.get_axes(out_axes, out_projections);
+        for (i, projection) in out_projections.iter_mut().enumerate().skip(from) {
+            let smear = out_axes[i].dot(self.motion);
+            projection.smear(smear); // I think smear is safe here?
+        }
+        out_axes.push(self.motion.perp().normalize());
+        out_projections.push(self.project_on_axis(self.motion.perp().normalize()));
     }
 
     fn get_axes_derived(&self, other: &[Vec2], out_axes: &mut impl VecLike<Vec2>) {
@@ -68,4 +74,73 @@ impl<T: Shape + Copy> Shape for Sweep<T> {
             end:    self.end.with_offset(offset) 
         }
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use bevy::prelude::Vec2;
+
+    use crate::{Sweep, Shape, shape::{Rect, Circle, Capsule}, Projection};
+
+    #[test]
+    fn test_sweep_point() {
+        let sweep = Sweep::new(Vec2::new(0.0, 0.0), Vec2::new(10.0, 0.0));
+        assert_eq!(sweep.project_on_axis(Vec2::X), Projection([0.0, 10.0]), "Incorrect sweep projection of point on X");
+        assert_eq!(sweep.project_on_axis(Vec2::Y), Projection([0.0,  0.0]), "Incorrect sweep projection of point on Y");
+
+        let mut axes = Vec::new();
+        let mut proj = Vec::new();
+        sweep.get_axes(&mut axes, &mut proj);
+        assert_eq!(axes.as_slice(), [Vec2::X, Vec2::Y, Vec2::Y], "Invalid sweep axes returned");
+        assert_eq!(proj.as_slice(), [Projection([0.0, 10.0]), Projection([0.0, 0.0]), Projection([0.0, 0.0])], "Invalid sweep projection returned");
+    }
+
+    #[test]
+    fn test_sweep_rect() {
+        let sweep = Sweep::new(Rect{min: Vec2::ZERO, max: Vec2::ONE}, Vec2::new(10.0, 0.0));
+        assert_eq!(sweep.project_on_axis(Vec2::X), Projection([0.0, 11.0]), "Incorrect sweep projection of point on X");
+        assert_eq!(sweep.project_on_axis(Vec2::Y), Projection([0.0,  1.0]), "Incorrect sweep projection of point on Y");
+
+        let mut axes = Vec::new();
+        let mut proj = Vec::new();
+        sweep.get_axes(&mut axes, &mut proj);
+        assert_eq!(axes.as_slice(), [Vec2::X, Vec2::Y, Vec2::Y], "Invalid sweep axes returned");
+        assert_eq!(proj.as_slice(), [Projection([0.0, 11.0]), Projection([0.0, 1.0]), Projection([0.0, 1.0])], "Invalid sweep projection returned");
+    }
+
+    #[test]
+    fn test_sweep_circle() {
+        let sweep = Sweep::new(Circle{origin: Vec2::ONE * 0.5, radius: 0.5}, Vec2::new(10.0, 0.0));
+        assert_eq!(sweep.project_on_axis(Vec2::X), Projection([0.0, 11.0]), "Incorrect sweep projection of point on X");
+        assert_eq!(sweep.project_on_axis(Vec2::Y), Projection([0.0,  1.0]), "Incorrect sweep projection of point on Y");
+
+        let mut axes = Vec::new();
+        let test_point = Vec2::new(5.0, 1.0);
+        sweep.get_axes_derived(&[test_point], &mut axes);
+        assert_eq!(axes.as_slice(), [(test_point - sweep.start.origin).normalize(), (test_point - sweep.end.origin).normalize()], "Invalid sweep axes returned");
+    }
+
+    #[test]
+    fn test_sweep_capsule() {
+        let sweep = Sweep::new(Capsule{origin: Vec2::ONE * 0.5,  height: 1.0, radius: 0.5}, Vec2::new(10.0, 0.0));
+        assert_eq!(sweep.project_on_axis(Vec2::X), Projection([0.0, 11.0]), "Incorrect sweep projection of point on X");
+        assert_eq!(sweep.project_on_axis(Vec2::Y), Projection([0.0,  2.0]), "Incorrect sweep projection of point on Y");
+
+        let mut axes = Vec::new();
+        let mut proj = Vec::new();
+        sweep.get_axes(&mut axes, &mut proj);
+        assert_eq!(axes.as_slice(), [Vec2::X, Vec2::Y], "Invalid sweep axes returned");
+        assert_eq!(proj.as_slice(), [Projection([0.0, 11.0]), Projection([0.0, 2.0])], "Invalid sweep projection returned");
+
+        let mut axes = Vec::new();
+        let test_point = Vec2::new(5.0, 10.0);
+        sweep.get_axes_derived(&[test_point], &mut axes);
+        assert_eq!(axes.as_slice(), [
+            (test_point - sweep.start.origin).normalize(), 
+            (test_point - (sweep.start.origin + Vec2::Y*sweep.start.height)).normalize(), 
+            (test_point - sweep.end.origin).normalize(), 
+            (test_point - (sweep.end.origin + Vec2::Y*sweep.start.height)).normalize(), 
+        ], "Invalid sweep axes returned");
+    }
+
 }

@@ -38,7 +38,10 @@ impl Shape for Capsule {
 
     fn get_axes_derived(&self, other: &[Vec2], out_axes: &mut impl VecLike<Vec2>) {
         let end = self.origin + Vec2::new(0.0, self.height);
-        out_axes.extend(other.iter().flat_map(|&p| [p - self.origin, p - end]))
+        out_axes.extend(other.iter().flat_map(|&p| [
+            (p - self.origin).normalize(), 
+            (p - end).normalize()
+        ]))
     }
 
     fn with_offset(mut self, offset: Vec2) -> Self {

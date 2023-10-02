@@ -1,6 +1,6 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-use std::{slice::Iter, ops::Index};
+use std::{slice::{Iter, IterMut}, ops::Index};
 
 use tinyvec::{ArrayVec, Array};
 
@@ -9,6 +9,7 @@ pub trait VecLike<T>: Index<usize, Output = T> {
     fn extend(&mut self, v: impl IntoIterator<Item = T>);
     fn extend_from_slice(&mut self, v: &[T]);
     fn iter(&self) -> Iter<T>;
+    fn iter_mut(&mut self) -> IterMut<'_, T>;
     fn clear(&mut self);
     fn as_slice(&self) -> &[T];
     fn len(&self) -> usize;
@@ -30,6 +31,10 @@ impl<T: Clone> VecLike<T> for Vec<T> {
 
     fn iter(&self) -> Iter<T> {
         self.as_slice().iter()
+    }
+
+    fn iter_mut(&mut self) -> IterMut<'_, T> {
+        self.as_mut_slice().iter_mut()
     }
 
     fn clear(&mut self) {
@@ -64,6 +69,10 @@ impl<A: Array> VecLike<A::Item> for ArrayVec<A> where A::Item: Clone {
 
     fn iter(&self) -> Iter<A::Item> {
         self.as_slice().iter()
+    }
+
+    fn iter_mut(&mut self) -> IterMut<'_, A::Item> {
+        self.as_mut_slice().iter_mut()
     }
 
     fn clear(&mut self) {
