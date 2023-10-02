@@ -28,8 +28,8 @@ pub fn get_seperating_axis_candidates(a: Shape, b: Shape) -> ArrayVec<[Vec2; 4]>
         (Shape::Point(_),   Shape::Slope(b)) => array_vec!(Vec2::X, Vec2::Y, b.direction.perp()),
 
         (Shape::Line(a),    Shape::Line(b)) => array_vec!(Vec2::X, Vec2::Y, a.direction.perp(), b.direction.perp()),
-        (Shape::Line(a),  Shape::Circle(b)) => array_vec!({axis_between(a.origin, b.origin)}, axis_between(a.origin + a.direction*a.distance, b.origin)),
-        (Shape::Line(a),    Shape::Rect(_)) => array_vec!(Vec2::X, Vec2::Y, a.direction.perp()), // HACK Is omitting Line::direction fine?
+        (Shape::Line(a),  Shape::Circle(b)) => array_vec!({axis_between(a.nearest_point_to(b.origin), b.origin)}),
+        (Shape::Line(a),    Shape::Rect(_)) => array_vec!(Vec2::X, Vec2::Y, a.direction.perp()),
         (Shape::Line(a), Shape::Capsule(b)) => array_vec!({axis_between(a.origin, b.nearest_point_to(a.origin))}, axis_between(a.get_end(), b.nearest_point_to(a.get_end()))),
         (Shape::Line(a),   Shape::Slope(b)) => array_vec!(Vec2::X, Vec2::Y, a.direction.perp(), b.direction.perp()),
 
