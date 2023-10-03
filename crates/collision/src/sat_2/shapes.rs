@@ -2,40 +2,37 @@
 
 use bevy::prelude::Vec2;
 
-pub trait ShapesCommon {
+
+pub trait NearestPoint {
     fn nearest_point_to(&self, v: Vec2) -> Vec2;
-    fn get_aabb(&self) -> Rect;
 }
 
 #[derive(Debug, Clone, Copy)]
 pub struct Line {
     pub(crate) start:  Vec2,
-    pub(crate) end:    Vec2,
+    pub(crate) offset: Vec2,
     pub(crate) normal: Vec2,
 }
 
+// impl NearestPoint for Line {
+//     fn nearest_point_to(&self, v: Vec2) -> Vec2 {
+//         let x = if v.x < self.start.x { self.start.x + self.offset.x.max(0.0) } else { self.start.x - self.offset.x.min(0.0) };
+//         let y = if v.y < self.start.y { self.start.y + self.offset.y.max(0.0) } else { self.start.y - self.offset.y.min(0.0) };
+//         Vec2::new(x, y)
+//     }
+// }
+
 impl Line {
-    pub fn run(&self) -> f32 {
-        self.end.x - self.start.x
-    }
-
-    pub fn rise(&self) -> f32 {
-        self.end.y - self.start.y
-    }
-}
-
-impl ShapesCommon for Line {
-    fn nearest_point_to(&self, v: Vec2) -> Vec2 {
-        let x = if v.x < self.start.x { self.start.x +  self.run().max(0.0) } else { self.start.x -  self.run().min(0.0) };
-        let y = if v.y < self.start.y { self.start.y + self.rise().max(0.0) } else { self.start.y - self.rise().min(0.0) };
-        Vec2::new(x, y)
-    }
-
     fn get_aabb(&self) -> Rect {
+        let end = self.start + self.offset;
         Rect{
-            start: self.start.min(self.end),
-            end:    self.start.max(self.end),
+            start: self.start.min(end),
+            end:   self.start.max(end),
         }
+    }
+    
+    pub fn end(&self) -> Vec2 {
+        Vec2::new(self.start.x, self.start.y + self.height)
     }
 }
 
@@ -45,11 +42,13 @@ pub struct Circle {
     pub radius: f32,
 }
 
-impl ShapesCommon for Circle {
+impl NearestPoint for Circle {
     fn nearest_point_to(&self, _v: Vec2) -> Vec2 {
         self.origin
     }
+}
 
+impl Circle {
     fn get_aabb(&self) -> Rect {
         Rect{
             start: self.origin - Vec2::new(self.radius, self.radius),
@@ -64,14 +63,16 @@ pub struct Rect {
     pub(crate) end:   Vec2,
 }
 
-impl ShapesCommon for Rect {
+impl NearestPoint for Rect {
     fn nearest_point_to(&self, v: Vec2) -> Vec2 {
         Vec2::new(
             if v.x <= self.start.x { self.start.x } else { self.end.x },
             if v.y <= self.start.y { self.start.y } else { self.end.y },
         )
     }
+}
 
+impl Rect {
     fn get_aabb(&self) -> Rect {
         *self
     }
@@ -90,14 +91,16 @@ impl Capsule {
     }
 }
     
-impl ShapesCommon for Capsule {
+impl NearestPoint for Capsule {
     fn nearest_point_to(&self, v: Vec2) -> Vec2 {
         Vec2::new(
             self.start.x,
             if v.y <= self.start.y { self.start.y } else { self.start.y + self.height },
         )
     }
+}
 
+impl Capsule {
     fn get_aabb(&self) -> Rect {
         Rect{
             start: self.start - Vec2::new(self.radius, self.radius),
@@ -123,13 +126,15 @@ impl Slope {
     }
 }
 
-impl ShapesCommon for Slope {
-    fn nearest_point_to(&self, v: Vec2) -> Vec2 {
-        let x = if v.x < self.origin.x { self.origin.x +  self.run().max(0.0) } else { self.origin.x -  self.run().min(0.0) };
-        let y = if v.y < self.origin.y { self.origin.y + self.rise().max(0.0) } else { self.origin.y - self.rise().min(0.0) };
-        Vec2::new(x, y)
-    }
+// impl NearestPoint for Slope {
+//     fn nearest_point_to(&self, v: Vec2) -> Vec2 {
+//         let x = if v.x < self.origin.x { self.origin.x +  self.run().max(0.0) } else { self.origin.x -  self.run().min(0.0) };
+//         let y = if v.y < self.origin.y { self.origin.y + self.rise().max(0.0) } else { self.origin.y - self.rise().min(0.0) };
+//         Vec2::new(x, y)
+//     }
+// }
 
+impl Slope {
     fn get_aabb(&self) -> Rect {
         Rect{
             start: self.origin.min(self.end),

@@ -34,9 +34,9 @@ pub fn get_seperating_axis_candidates(a: Shape, b: Shape) -> ([Vec2; 2], usize) 
         (Shape::Point(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Point(a)) => axes_2(axis_between(a, b.start), axis_between(a, b.end())),
         (Shape::Point(_),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Point(_)) => axes_1(b.normal),
 
-        (Shape::Line(a),  Shape::Circle(b)) | ( Shape::Circle(b), Shape::Line(a)) => axes_1(nearest_axis(b.origin, &a)),
+        (Shape::Line(a),  Shape::Circle(b)) | ( Shape::Circle(b), Shape::Line(a)) => axes_2(axis_between(a.start, b.origin), axis_between(a.end(), b.origin)),
         (Shape::Line(a),    Shape::Rect(_)) | (   Shape::Rect(_), Shape::Line(a)) => axes_1(a.normal),
-        (Shape::Line(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Line(a)) => axes_2(nearest_axis(a.start, &b), nearest_axis(a.end, &b)),
+        (Shape::Line(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Line(a)) => axes_2(nearest_axis(b.start, &a), nearest_axis(b.end(), &a)),
         (Shape::Line(a),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Line(a)) => axes_2(a.normal, b.normal),
 
         (Shape::Circle(a),    Shape::Rect(b)) | (   Shape::Rect(b), Shape::Circle(a)) => axes_1(nearest_axis(a.origin, &b)),
@@ -75,6 +75,6 @@ fn axis_between(a: Vec2, b: Vec2) -> Vec2 {
     (b - a).normalize()
 }
 
-fn nearest_axis(from: Vec2, to: &impl ShapesCommon) -> Vec2 {
+fn nearest_axis(from: Vec2, to: &impl NearestPoint) -> Vec2 {
     axis_between(from, to.nearest_point_to(from))
 }
