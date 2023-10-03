@@ -22,40 +22,40 @@ pub fn get_seperating_axis_candidates(a: Shape, b: Shape) -> ([Vec2; 2], usize) 
     
     match (a, b) {
         (  Shape::Point(_),   Shape::Point(_)) => AXES_0,
-        (   Shape::Line(a),    Shape::Line(b)) => axes_2(a.direction.perp(), b.direction.perp()),
+        (   Shape::Line(a),    Shape::Line(b)) => axes_2(a.normal, b.normal),
         ( Shape::Circle(a),  Shape::Circle(b)) => axes_1(axis_between(a.origin, b.origin)),
         (   Shape::Rect(_),    Shape::Rect(_)) => AXES_0,
-        (Shape::Capsule(a), Shape::Capsule(b)) => axes_2(nearest_axis(b.origin, &a), nearest_axis(b.get_top(), &a)),
-        (  Shape::Slope(a),   Shape::Slope(b)) => axes_2(a.direction.perp(), b.direction.perp()),
+        (Shape::Capsule(a), Shape::Capsule(b)) => axes_2(nearest_axis(b.start, &a), nearest_axis(b.end(), &a)),
+        (  Shape::Slope(a),   Shape::Slope(b)) => axes_2(a.normal, b.normal),
 
-        (Shape::Point(_),    Shape::Line(b)) | (   Shape::Line(b), Shape::Point(_)) => axes_2(b.direction, b.direction.perp()),
+        (Shape::Point(_),    Shape::Line(b)) | (   Shape::Line(b), Shape::Point(_)) => axes_1(b.normal),
         (Shape::Point(a),  Shape::Circle(b)) | ( Shape::Circle(b), Shape::Point(a)) => axes_1(axis_between(a, b.origin)),
         (Shape::Point(_),    Shape::Rect(_)) | (   Shape::Rect(_), Shape::Point(_)) => AXES_0,
-        (Shape::Point(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Point(a)) => axes_2(axis_between(a, b.origin), axis_between(a, b.get_top())),
-        (Shape::Point(_),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Point(_)) => axes_1(b.direction.perp()),
+        (Shape::Point(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Point(a)) => axes_2(axis_between(a, b.start), axis_between(a, b.end())),
+        (Shape::Point(_),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Point(_)) => axes_1(b.normal),
 
         (Shape::Line(a),  Shape::Circle(b)) | ( Shape::Circle(b), Shape::Line(a)) => axes_1(nearest_axis(b.origin, &a)),
-        (Shape::Line(a),    Shape::Rect(_)) | (   Shape::Rect(_), Shape::Line(a)) => axes_1(a.direction.perp()),
-        (Shape::Line(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Line(a)) => axes_2(nearest_axis(a.origin, &b), nearest_axis(a.end, &b)),
-        (Shape::Line(a),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Line(a)) => axes_2(a.direction.perp(), b.direction.perp()),
+        (Shape::Line(a),    Shape::Rect(_)) | (   Shape::Rect(_), Shape::Line(a)) => axes_1(a.normal),
+        (Shape::Line(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Line(a)) => axes_2(nearest_axis(a.start, &b), nearest_axis(a.end, &b)),
+        (Shape::Line(a),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Line(a)) => axes_2(a.normal, b.normal),
 
         (Shape::Circle(a),    Shape::Rect(b)) | (   Shape::Rect(b), Shape::Circle(a)) => axes_1(nearest_axis(a.origin, &b)),
-        (Shape::Circle(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Circle(a)) => axes_2(nearest_axis(b.origin, &a), nearest_axis(b.get_top(), &a)),
-        (Shape::Circle(a),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Circle(a)) => axes_2(nearest_axis(a.origin, &b), b.direction.perp()),
+        (Shape::Circle(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Circle(a)) => axes_2(nearest_axis(b.start, &a), nearest_axis(b.end(), &a)),
+        (Shape::Circle(a),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Circle(a)) => axes_2(nearest_axis(a.origin, &b), b.normal),
 
-        (Shape::Rect(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Rect(a)) => axes_2(nearest_axis(b.origin, &a), nearest_axis(b.get_top(), &a)),
-        (Shape::Rect(_),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Rect(_)) => axes_1(b.direction.perp()),
+        (Shape::Rect(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Rect(a)) => axes_2(nearest_axis(b.start, &a), nearest_axis(b.end(), &a)),
+        (Shape::Rect(_),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Rect(_)) => axes_1(b.normal),
 
         (Shape::Capsule(a),   Shape::Slope(b)) | (Shape::Slope(b), Shape::Capsule(a)) => {
             // if nearest is above the base of the cylinder, then we can exclude it
             // since the cylinder hemisphere could only collide with points bellow it
             // we'll include the nearest to the top without checking in that case
             // because we either need it, or it's not going to cause us harm to test
-            let nearest = b.nearest_point_to(a.origin);
-            if nearest.y > a.origin.y {
-                axes_2(b.direction.perp(), axis_between(a.origin, nearest))
+            let nearest = b.nearest_point_to(a.start);
+            if nearest.y > a.start.y {
+                axes_2(b.normal, axis_between(a.start, nearest))
             } else {
-                axes_2(b.direction.perp(), nearest_axis(a.get_top(), &b))
+                axes_2(b.normal, nearest_axis(a.end(), &b))
             }
         }
     }
