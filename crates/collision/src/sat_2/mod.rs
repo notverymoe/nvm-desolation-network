@@ -34,30 +34,19 @@ pub fn get_seperating_axis_candidates(a: Shape, b: Shape) -> ([Vec2; 2], usize) 
         (Shape::Point(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Point(a)) => axes_2(axis_between(a, b.start), axis_between(a, b.end())),
         (Shape::Point(_),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Point(_)) => axes_1(b.normal),
 
-        (Shape::Line(a),  Shape::Circle(b)) | ( Shape::Circle(b), Shape::Line(a)) => axes_2(axis_between(a.start, b.origin), axis_between(a.end(), b.origin)),
+        (Shape::Line(a),  Shape::Circle(b)) | ( Shape::Circle(b), Shape::Line(a)) => axes_2(axis_between(a.start, b.origin), axis_between(a.end, b.origin)),
         (Shape::Line(a),    Shape::Rect(_)) | (   Shape::Rect(_), Shape::Line(a)) => axes_1(a.normal),
-        (Shape::Line(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Line(a)) => axes_2(nearest_axis(b.start, &a), nearest_axis(b.end(), &a)),
+        (Shape::Line(_), Shape::Capsule(_)) | (Shape::Capsule(_), Shape::Line(_)) => todo!(), // TODO need to figure this out
         (Shape::Line(a),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Line(a)) => axes_2(a.normal, b.normal),
 
         (Shape::Circle(a),    Shape::Rect(b)) | (   Shape::Rect(b), Shape::Circle(a)) => axes_1(nearest_axis(a.origin, &b)),
         (Shape::Circle(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Circle(a)) => axes_2(nearest_axis(b.start, &a), nearest_axis(b.end(), &a)),
-        (Shape::Circle(a),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Circle(a)) => axes_2(nearest_axis(a.origin, &b), b.normal),
+        (Shape::Circle(_),   Shape::Slope(_)) | (  Shape::Slope(_), Shape::Circle(_)) => todo!(), // TODO need to figure this out
 
         (Shape::Rect(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Rect(a)) => axes_2(nearest_axis(b.start, &a), nearest_axis(b.end(), &a)),
         (Shape::Rect(_),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Rect(_)) => axes_1(b.normal),
 
-        (Shape::Capsule(a),   Shape::Slope(b)) | (Shape::Slope(b), Shape::Capsule(a)) => {
-            // if nearest is above the base of the cylinder, then we can exclude it
-            // since the cylinder hemisphere could only collide with points bellow it
-            // we'll include the nearest to the top without checking in that case
-            // because we either need it, or it's not going to cause us harm to test
-            let nearest = b.nearest_point_to(a.start);
-            if nearest.y > a.start.y {
-                axes_2(b.normal, axis_between(a.start, nearest))
-            } else {
-                axes_2(b.normal, nearest_axis(a.end(), &b))
-            }
-        }
+        (Shape::Capsule(_),   Shape::Slope(_)) | (Shape::Slope(_), Shape::Capsule(_)) => todo!(), // TODO need to figure this out
     }
 }
 
