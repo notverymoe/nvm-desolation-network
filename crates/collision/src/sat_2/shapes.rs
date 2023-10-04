@@ -70,3 +70,15 @@ pub struct Slope {
     pub(crate) run:    f32,
     pub(crate) normal: Vec2,
 }
+
+impl Slope {
+
+    pub fn point_run(&self) -> Vec2 {
+        Vec2::new(self.origin.x + self.run, self.origin.y)
+    }
+
+    pub fn point_rise(&self) -> Vec2 {
+        Vec2::new(self.origin.x, self.origin.y + self.rise)
+    }
+
+}
