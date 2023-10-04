@@ -1,7 +1,5 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-use bevy::prelude::Vec2;
-
 mod shapes;
 pub use shapes::*;
 
@@ -17,12 +15,4 @@ pub use contact::*;
 mod projection;
 pub use projection::*;
 
-pub enum Shape {
-    Point(Vec2),
-    Line(Line),
-    Circle(Circle),
-    Rect(Rect),
-    Capsule(Capsule),
-    Slope(Slope),
-}
 
