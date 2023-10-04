@@ -3,7 +3,7 @@
 use bevy::prelude::Vec2;
 use tinyvec::ArrayVec;
 
-use super::{Shape, NearestPoint};
+use crate::shape::{Shape, NearestPoint};
 
 pub type CandidateAxes = ArrayVec<[Vec2; 7]>;
 
@@ -56,7 +56,7 @@ pub fn find_candidates_between(a: Shape, b: Shape) -> CandidateAxes {
         (Shape::Rect(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Rect(a)) => axes!(nearest_axis(b.start, &a), nearest_axis(b.end(), &a)),
         (Shape::Rect(_),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Rect(_)) => axes!(b.normal()),
 
-        (Shape::Capsule(a),   Shape::Slope(b)) | (Shape::Slope(b), Shape::Capsule(a)) => axes!(
+        (Shape::Capsule(a), Shape::Slope(b)) | (Shape::Slope(b), Shape::Capsule(a)) => axes!(
             b.normal(),
             axis_between(a.start, b.origin),
             axis_between(a.start, b.point_run()),

@@ -1,65 +1,38 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-use bevy::math::Vec2;
+use bevy::prelude::Vec2;
 
-use crate::{HasBoundingBox, shape::{SlopeOriented, Rect}, Projection, Shape, VecLike};
-
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Slope {
     pub origin: Vec2,
-    pub run:    f32,
-    pub rise:   f32,
-}
-
-impl Shape for Slope {
-
-    const CAN_SMEAR_PROJECTION: bool = true;
-
-    fn project_on_axis(&self, axis: Vec2) -> Projection {
-        Projection::from_points_iter(axis, self.points())
-    }
-
-    fn get_points(&self, out_points: &mut impl VecLike<Vec2>) {
-        out_points.extend_from_slice(&self.points())
-    }
-
-    fn get_axes(&self, out_axes: &mut impl VecLike<Vec2>, out_projections: &mut impl VecLike<Projection>) {
-        // OPT
-        let norms  = [Vec2::X, Vec2::Y, Vec2::new(self.rise, self.run).normalize()];
-        let points = self.points();
-        out_axes.extend_from_slice(&norms);
-        out_projections.extend_from_slice(&[
-            Projection::from_points_iter(norms[0], points),
-            Projection::from_points_iter(norms[1], points),
-            Projection::from_points_iter(norms[2], points),
-        ])
-    }
-
-    fn get_axes_derived(&self, _other: &[Vec2], _out_axes: &mut impl VecLike<Vec2>) {
-        // no derived axes
-    }
-
-    fn with_offset(mut self, offset: Vec2) -> Self {
-        self.origin += offset;
-        self
-    }
-
-}
-
-impl HasBoundingBox for Slope {
-
-    fn get_bounding_box(&self) -> Rect {
-        let (min_x, max_x) = if self.run  <= 0.0 { (self.origin.x + self.run,  self.origin.x) } else { (self.origin.x, self.origin.x + self.run ) };
-        let (min_y, max_y) = if self.rise <= 0.0 { (self.origin.y + self.rise, self.origin.y) } else { (self.origin.x, self.origin.y + self.rise) };
-        Rect{
-            min: Vec2::new(min_x, max_x),
-            max: Vec2::new(min_y, max_y),
-        }
-    }
-
+    rise:   f32,
+    run:    f32,
+    normal: Vec2,
 }
 
 impl Slope {
+
+    pub fn point_run(&self) -> Vec2 {
+        Vec2::new(self.origin.x + self.run, self.origin.y)
+    }
+
+    pub fn point_rise(&self) -> Vec2 {
+        Vec2::new(self.origin.x, self.origin.y + self.rise)
+    }
+
+    pub fn normal(&self) -> Vec2 {
+        self.normal
+    }
+
+    pub fn set_rise_run(&mut self, rise: f32, run: f32) {
+        self.rise = rise;
+        self.run  = run;
+        self.normal = Vec2::new(rise, run).normalize();
+    }
+
+    pub fn get_rise_run(&self) -> [f32; 2] {
+        [self.rise, self.run]
+    }
 
     pub fn points(&self) -> [Vec2; 3] {
         let point_run  = self.origin + Vec2::new(self.run,       0.0);
@@ -72,15 +45,4 @@ impl Slope {
         }
     }
 
-    pub fn with_orientation(self, up: Vec2) -> SlopeOriented {
-        let Slope{origin, run, rise} = self;
-        SlopeOriented{origin, run, rise, up}
-    }
-}
-
-impl From<SlopeOriented> for Slope {
-    fn from(value: SlopeOriented) -> Self {
-        let SlopeOriented{origin, run, rise, up: _} = value;
-        Self{origin, run, rise}
-    }
 }

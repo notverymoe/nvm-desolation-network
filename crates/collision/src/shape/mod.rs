@@ -1,25 +1,32 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-mod circle;
-pub use circle::*;
+use bevy::prelude::Vec2;
+
+pub enum Shape {
+    Point(Vec2),
+    Line(Line),
+    Circle(Circle),
+    Rect(Rect),
+    Capsule(Capsule),
+    Slope(Slope),
+}
+
+pub trait NearestPoint {
+    fn nearest_point_to(&self, v: Vec2) -> Vec2;
+}
+
 
 mod line;
 pub use line::*;
 
+mod circle;
+pub use circle::*;
+
 mod rect;
 pub use rect::*;
-
-mod rect_oriented;
-pub use rect_oriented::*;
-
-mod slope;
-pub use slope::*;
-
-mod slope_oriented;
-pub use slope_oriented::*;
 
 mod capsule;
 pub use capsule::*;
 
-mod capsule_oriented;
-pub use capsule_oriented::*;
+mod slope;
+pub use slope::*;
