@@ -11,6 +11,12 @@ pub use sweep::*;
 mod candidate_axes;
 pub use candidate_axes::*;
 
+mod contact;
+pub use contact::*;
+
+mod projection;
+pub use projection::*;
+
 pub enum Shape {
     Point(Vec2),
     Line(Line),
