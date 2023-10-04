@@ -1,10 +1,35 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
+use std::{slice::Iter, iter::Take};
+
 use bevy::prelude::Vec2;
 
 use super::{Shape, NearestPoint};
 
 pub struct CandidateAxes(([Vec2; 7], usize));
+
+
+impl CandidateAxes {
+
+    pub fn as_slice(&self) -> &[Vec2] {
+        &self.0.0[0..self.0.1]
+    }
+
+    pub fn iter(&self) -> Iter<'_, Vec2> {
+        self.as_slice().iter()
+    }
+
+}
+
+impl IntoIterator for CandidateAxes {
+    type Item = Vec2;
+    type IntoIter = Take<std::array::IntoIter<bevy::prelude::Vec2, 7>>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.0.into_iter().take(self.0.1)
+    }
+}
+
+
 
 impl CandidateAxes {
     pub const NONE: CandidateAxes = CandidateAxes(([Vec2::ZERO, Vec2::ZERO, Vec2::ZERO, Vec2::ZERO, Vec2::ZERO, Vec2::ZERO, Vec2::ZERO], 0));
