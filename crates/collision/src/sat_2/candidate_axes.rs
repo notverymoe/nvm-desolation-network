@@ -56,7 +56,13 @@ impl CandidateAxes {
     
             (Shape::Line(a),  Shape::Circle(b)) | ( Shape::Circle(b), Shape::Line(a)) => CandidateAxes::new_2(axis_between(a.start, b.origin), axis_between(a.end, b.origin)),
             (Shape::Line(a),    Shape::Rect(_)) | (   Shape::Rect(_), Shape::Line(a)) => CandidateAxes::new_1(a.normal),
-            (Shape::Line(_), Shape::Capsule(_)) | (Shape::Capsule(_), Shape::Line(_)) => todo!(), // TODO need to figure this out
+            (Shape::Line(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Line(a)) => CandidateAxes::new_5(
+                a.normal,
+                axis_between(a.start, b.start),
+                axis_between(a.start, b.end()),
+                axis_between(a.end,   b.start),
+                axis_between(a.end,   b.end()),
+            ), // OPT
             (Shape::Line(a),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Line(a)) => CandidateAxes::new_2(a.normal, b.normal),
     
             (Shape::Circle(a),    Shape::Rect(b)) | (   Shape::Rect(b), Shape::Circle(a)) => CandidateAxes::new_1(nearest_axis(a.origin, &b)),
