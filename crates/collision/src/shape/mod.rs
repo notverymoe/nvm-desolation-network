@@ -1,6 +1,7 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
 use bevy::prelude::Vec2;
+use static_assertions::const_assert_eq;
 
 use crate::Projection;
 
@@ -12,6 +13,9 @@ pub enum Shape {
     Capsule(Capsule),
     Slope(Slope),
 }
+
+// We don't want shape to grow larger than this on accident, edit to confirm size change.
+const_assert_eq!(std::mem::size_of::<Shape>(), 32);
 
 pub trait NearestPointTo {
     fn nearest_point_to(&self, v: Vec2) -> Vec2;
