@@ -2,7 +2,9 @@
 
 use bevy::prelude::Vec2;
 
-use super::NearestPointTo;
+use crate::Projection;
+
+use super::{NearestPointTo, Project};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Capsule {
@@ -23,5 +25,25 @@ impl NearestPointTo for Capsule {
             self.start.x,
             if v.y <= self.start.y { self.start.y } else { self.start.y + self.height },
         )
+    }
+}
+
+impl Project for Capsule {
+    fn project_aabb(&self) -> [Projection; 2] {
+        [
+            Projection([self.start.x - self.radius, self.start.x + self.radius]),
+            Projection([self.start.y - self.radius, self.start.y + self.radius + self.height]),
+        ]
+    }
+
+    fn project_on_axis(&self, axis: Vec2) -> Projection {
+        // TODO confirm, I believe that this workds fine,
+        // since this is effectively a swept circle, we
+        // shouldn't need to explicitly test points along
+        // the body for the projection
+        Projection([
+            axis.dot(self.start) - self.radius, 
+            axis.dot(self.end()) + self.radius,
+        ])
     }
 }

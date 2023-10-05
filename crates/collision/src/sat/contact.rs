@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::Projection;
+use crate::{Projection, shape::Project};
 
 #[derive(Clone, Copy, Default)]
 pub struct Contact {
@@ -31,6 +31,10 @@ impl Contact {
 
     pub fn is_penetration(&self) -> bool {
         self.contact_min.signum() != self.contact_max.signum()
+    }
+
+    pub fn from_projections(axis: Vec2, a: &impl Project, b: &impl Project) -> Self {
+        Self::from_overlap(axis, a.project_on_axis(axis), b.project_on_axis(axis))
     }
 
 }

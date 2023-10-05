@@ -1,10 +1,12 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
 use bevy::prelude::Vec2;
+use enum_dispatch::enum_dispatch;
 use static_assertions::const_assert_eq;
 
 use crate::Projection;
 
+#[enum_dispatch(Project)]
 pub enum Shape {
     Point(Vec2),
     Line(Line),
@@ -21,9 +23,20 @@ pub trait NearestPointTo {
     fn nearest_point_to(&self, v: Vec2) -> Vec2;
 }
 
+#[enum_dispatch]
 pub trait Project {
     fn project_aabb(&self) -> [Projection; 2];
-    fn project_on_axis(&self) -> Projection;
+    fn project_on_axis(&self, axis: Vec2) -> Projection;
+}
+
+impl Project for Vec2 {
+    fn project_aabb(&self) -> [Projection; 2] {
+        [Projection::new(self.x), Projection::new(self.y)]
+    }
+
+    fn project_on_axis(&self, axis:Vec2) -> Projection {
+        Projection::new(axis.dot(*self))
+    }
 }
 
 mod line;

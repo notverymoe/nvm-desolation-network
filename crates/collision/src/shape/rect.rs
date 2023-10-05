@@ -2,7 +2,9 @@
 
 use bevy::prelude::Vec2;
 
-use super::NearestPointTo;
+use crate::Projection;
+
+use super::{NearestPointTo, Project};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Rect {
@@ -16,6 +18,19 @@ impl NearestPointTo for Rect {
             if v.x <= self.min.x { self.min.x } else { self.max.x },
             if v.y <= self.min.y { self.min.y } else { self.max.y },
         )
+    }
+}
+
+impl Project for Rect {
+    fn project_aabb(&self) -> [Projection; 2] {
+        [
+            Projection([self.min.x, self.max.x]),
+            Projection([self.min.y, self.max.y]),
+        ]
+    }
+
+    fn project_on_axis(&self, axis: Vec2) -> Projection {
+        Projection::from_points_iter(axis, self.points())
     }
 }
 

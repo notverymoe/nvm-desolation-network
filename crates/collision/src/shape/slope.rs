@@ -2,6 +2,10 @@
 
 use bevy::prelude::Vec2;
 
+use crate::Projection;
+
+use super::Project;
+
 #[derive(Debug, Clone, Copy)]
 pub struct Slope {
     origin:     Vec2,
@@ -82,4 +86,17 @@ impl Slope {
         self.normal_scl = Vec2::new(self.rise, self.run).length_recip();
     }
     
+}
+
+impl Project for Slope {
+    fn project_aabb(&self) -> [Projection; 2] {
+        [
+            Projection::new_unsorted(self.origin.x, self.origin.x + self.run ),
+            Projection::new_unsorted(self.origin.y, self.origin.y + self.rise),
+        ]
+    }
+
+    fn project_on_axis(&self, axis: Vec2) -> Projection {
+        Projection::from_points_iter(axis, self.points_unordered())
+    }
 }
