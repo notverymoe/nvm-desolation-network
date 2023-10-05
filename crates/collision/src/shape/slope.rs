@@ -8,13 +8,12 @@ pub struct Slope {
     rise:       f32,
     run:        f32,
     normal_scl: f32,
-    normal_dp:  [f32; 2],
 }
 
 impl Slope {
 
     pub fn new(origin: Vec2, rise: f32, run: f32) -> Self {
-        let mut result = Self{origin, rise, run, normal_scl: 0.0, normal_dp: [0.0, 0.0]};
+        let mut result = Self{origin, rise, run, normal_scl: 0.0};
         result.recalculate_cache();
         result
     }
@@ -81,11 +80,6 @@ impl Slope {
 
     fn recalculate_cache(&mut self) {
         self.normal_scl = Vec2::new(self.rise, self.run).length_recip();
-        let axis = self.normal();
-        self.normal_dp  = [
-            axis.dot(self.origin),
-            axis.dot(self.point_run())
-        ];
     }
     
 }

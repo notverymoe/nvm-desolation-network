@@ -15,7 +15,7 @@ pub enum Shape {
 }
 
 // We don't want shape to grow larger than this on accident, edit to confirm size change.
-const_assert_eq!(std::mem::size_of::<Shape>(), 32);
+const_assert_eq!(std::mem::size_of::<Shape>(), 28);
 
 pub trait NearestPointTo {
     fn nearest_point_to(&self, v: Vec2) -> Vec2;
