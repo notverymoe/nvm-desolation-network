@@ -12,6 +12,14 @@ pub struct Capsule {
     pub height: f32,
     pub radius: f32,
 }
+
+impl Capsule {
+
+    pub fn new(start: Vec2, radius: f32, height: f32) -> Self {
+        Self{start, radius, height}
+    }
+
+}
     
 impl Capsule {
     pub fn end(&self) -> Vec2 {
@@ -45,5 +53,9 @@ impl Project for Capsule {
             axis.dot(self.start) - self.radius, 
             axis.dot(self.end()) + self.radius,
         ])
+    }
+
+    fn with_offset(&self, o: Vec2) -> Self {
+        Self{start: self.start + o, height: self.height, radius: self.radius}
     }
 }

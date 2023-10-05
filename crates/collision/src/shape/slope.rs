@@ -8,10 +8,10 @@ use super::Project;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Slope {
-    pub(super) origin:     Vec2,
-    pub(super) rise:       f32,
-    pub(super) run:        f32,
-    pub(super) normal_scl: f32,
+    origin:     Vec2,
+    rise:       f32,
+    run:        f32,
+    normal_scl: f32,
 }
 
 impl Slope {
@@ -98,5 +98,10 @@ impl Project for Slope {
 
     fn project_on_axis(&self, axis: Vec2) -> Projection {
         Projection::from_points_iter(axis, self.points_unordered())
+    }
+
+
+    fn with_offset(&self, o: Vec2) -> Self {
+        Self { origin: self.origin + o, rise: self.rise, run: self.run, normal_scl: self.normal_scl }
     }
 }

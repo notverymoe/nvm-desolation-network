@@ -20,7 +20,7 @@ impl Sweep {
             test_cache: shape.project_on_axis(test_dir),
             test_axis: test_dir,
             motion,
-            end:   shape.offset_by(motion),
+            end:   shape.with_offset(motion),
             start: shape,
         }
     }
@@ -58,5 +58,15 @@ impl Project for Sweep {
 
     fn project_on_axis(&self, axis: Vec2) -> Projection {
         self.start.project_on_axis(axis).smeared_by(axis.dot(self.motion))
+    }
+
+    fn with_offset(&self, o: Vec2) -> Self {
+        Self{
+            start: self.start.with_offset(o),
+            end:   self.end.with_offset(o),
+            motion: self.motion,
+            test_axis: self.test_axis,
+            test_cache: self.test_cache.offset_by(self.test_axis.dot(o)),
+        }
     }
 }

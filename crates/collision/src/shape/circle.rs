@@ -10,6 +10,14 @@ pub struct Circle {
     pub radius: f32,
 }
 
+impl Circle {
+
+    pub fn new(origin: Vec2, radius: f32) -> Self {
+        Self{origin, radius}
+    }
+
+}
+
 impl Project for Circle {
     fn project_aabb(&self) -> [Projection; 2] {
         [
@@ -21,5 +29,10 @@ impl Project for Circle {
     fn project_on_axis(&self, axis: Vec2) -> Projection {
         let origin = axis.dot(self.origin);
         Projection([origin - self.radius, origin + self.radius])
+    }
+
+
+    fn with_offset(&self, o: Vec2) -> Self {
+        Self{origin: self.origin + o, radius: self.radius}
     }
 }
