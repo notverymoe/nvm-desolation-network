@@ -70,6 +70,54 @@ pub fn find_candidates_between(a: &Shape, b: &Shape, dest: &mut CandidateAxes) {
     }
 }
 
+pub fn find_dynamic_candidates(a: &Shape, b: &Shape, dest: &mut CandidateAxes) {
+    *dest = match (a, b) {
+        (Shape::Point(_), Shape::Point(_)) |
+        ( Shape::Line(_),  Shape::Line(_)) |
+        ( Shape::Rect(_),  Shape::Rect(_)) |
+        (Shape::Slope(_), Shape::Slope(_)) |
+        (Shape::Point(_),  Shape::Line(_)) | ( Shape::Line(_), Shape::Point(_)) |
+        (Shape::Point(_),  Shape::Rect(_)) | ( Shape::Rect(_), Shape::Point(_)) |
+        (Shape::Point(_), Shape::Slope(_)) | (Shape::Slope(_), Shape::Point(_)) |
+        ( Shape::Line(_),  Shape::Rect(_)) | ( Shape::Rect(_),  Shape::Line(_)) |
+        ( Shape::Line(_), Shape::Slope(_)) | (Shape::Slope(_),  Shape::Line(_)) |
+        ( Shape::Rect(_), Shape::Slope(_)) | (Shape::Slope(_),  Shape::Rect(_)) => Default::default(),
+
+        ( Shape::Circle(a),  Shape::Circle(b)) => axes!(axis_between(a.origin, b.origin)),
+        (Shape::Capsule(a), Shape::Capsule(b)) => axes!(nearest_axis(b.start, a), nearest_axis(b.end(), a)),
+
+        (Shape::Point(a),  Shape::Circle(b)) | ( Shape::Circle(b), Shape::Point(a)) => axes!(axis_between(*a, b.origin)),
+        (Shape::Point(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Point(a)) => axes!(axis_between(*a, b.start), axis_between(*a, b.end())),
+
+        (Shape::Line(a),  Shape::Circle(b)) | ( Shape::Circle(b), Shape::Line(a)) => axes!(axis_between(a.start, b.origin), axis_between(a.end, b.origin)),
+        (Shape::Line(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Line(a)) => axes!(
+            axis_between(a.start, b.start),
+            axis_between(a.start, b.end()),
+            axis_between(a.end,   b.start),
+            axis_between(a.end,   b.end())
+        ).into(), // OPT
+
+        (Shape::Circle(a),    Shape::Rect(b)) | (   Shape::Rect(b), Shape::Circle(a)) => axes!(nearest_axis(a.origin, b)),
+        (Shape::Circle(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Circle(a)) => axes!(axis_between(b.start, a.origin), axis_between(b.start, a.origin)),
+        (Shape::Circle(a),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Circle(a)) => axes!(
+            axis_between(a.origin, b.origin()),
+            axis_between(a.origin, b.point_run()),
+            axis_between(a.origin, b.point_rise())
+        ), // OPT
+
+        (Shape::Rect(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Rect(a)) => axes!(nearest_axis(b.start, a), nearest_axis(b.end(), a)),
+
+        (Shape::Capsule(a), Shape::Slope(b)) | (Shape::Slope(b), Shape::Capsule(a)) => axes!(
+            axis_between(a.start, b.origin()),
+            axis_between(a.start, b.point_run()),
+            axis_between(a.start, b.point_rise()),
+            axis_between(a.end(), b.origin()),
+            axis_between(a.end(), b.point_run()),
+            axis_between(a.end(), b.point_rise())
+        ), // OPT
+    }
+}
+
 fn axis_between(a: Vec2, b: Vec2) -> Vec2 {
     (b - a).normalize()
 }

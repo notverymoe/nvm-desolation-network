@@ -8,10 +8,10 @@ use super::Project;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Slope {
-    origin:     Vec2,
-    rise:       f32,
-    run:        f32,
-    normal_scl: f32,
+    pub(super) origin:     Vec2,
+    pub(super) rise:       f32,
+    pub(super) run:        f32,
+    pub(super) normal_scl: f32,
 }
 
 impl Slope {
