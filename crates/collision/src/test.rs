@@ -8,7 +8,7 @@ use bevy::prelude::Vec2;
 use crate::{shape::{Shape, Project}, Contact, VecLike, find_candidates_between, CandidateAxes, CANDIDATE_AXES_SIZE, Sweep, find_dynamic_candidates};
 
 pub fn test_sweep_vs_sweep<const TEST_ALL: bool>(sweep_a: &Sweep, sweep_b: &Sweep, dest: &mut impl VecLike<Contact>) -> bool {
-    dest.reserve(CANDIDATE_AXES_SIZE + 2);
+    dest.reserve(4*CANDIDATE_AXES_SIZE + 4);
 
     let [aabb_x_a, aabb_y_a] = sweep_a.project_aabb();
     let [aabb_x_b, aabb_y_b] = sweep_b.project_aabb();
@@ -18,6 +18,14 @@ pub fn test_sweep_vs_sweep<const TEST_ALL: bool>(sweep_a: &Sweep, sweep_b: &Swee
     dest.push(contact);
 
     let contact = Contact::from_overlap(Vec2::Y, aabb_y_a, aabb_y_b);
+    if TEST_ALL && !contact.is_penetration() { return false; }
+    dest.push(contact);
+
+    let contact = Contact::from_overlap(sweep_a.test_dir, sweep_a.test_dp, sweep_b.project_on_axis(sweep_a.test_dir));
+    if TEST_ALL && !contact.is_penetration() { return false; }
+    dest.push(contact);
+
+    let contact = Contact::from_overlap(sweep_b.test_dir, sweep_a.project_on_axis(sweep_a.test_dir), sweep_b.test_dp);
     if TEST_ALL && !contact.is_penetration() { return false; }
     dest.push(contact);
 
@@ -46,13 +54,11 @@ pub fn test_sweep_vs_sweep<const TEST_ALL: bool>(sweep_a: &Sweep, sweep_b: &Swee
         dest.push(contact);
     }
 
-    // TODO test ortho motion axis?
-
     true
 }
 
 pub fn test_sweep_vs_static<const TEST_ALL: bool>(sweep_a: &Sweep, shape_b: &Shape, dest: &mut impl VecLike<Contact>) -> bool {
-    dest.reserve(CANDIDATE_AXES_SIZE + 2);
+    dest.reserve(2*CANDIDATE_AXES_SIZE + 3);
 
     let [aabb_x_a, aabb_y_a] = sweep_a.project_aabb();
     let [aabb_x_b, aabb_y_b] = shape_b.project_aabb();
@@ -62,6 +68,10 @@ pub fn test_sweep_vs_static<const TEST_ALL: bool>(sweep_a: &Sweep, shape_b: &Sha
     dest.push(contact);
 
     let contact = Contact::from_overlap(Vec2::Y, aabb_y_a, aabb_y_b);
+    if TEST_ALL && !contact.is_penetration() { return false; }
+    dest.push(contact);
+
+    let contact = Contact::from_overlap(sweep_a.test_dir, sweep_a.test_dp, shape_b.project_on_axis(sweep_a.test_dir));
     if TEST_ALL && !contact.is_penetration() { return false; }
     dest.push(contact);
 
@@ -77,8 +87,6 @@ pub fn test_sweep_vs_static<const TEST_ALL: bool>(sweep_a: &Sweep, shape_b: &Sha
         if TEST_ALL && !contact.is_penetration() { return false; }
         dest.push(contact);
     }
-
-    // TODO test ortho motion axis?
 
     true
 }
