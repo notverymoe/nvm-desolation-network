@@ -2,6 +2,8 @@
 
 use bevy::prelude::Vec2;
 
+use crate::Projection;
+
 pub enum Shape {
     Point(Vec2),
     Line(Line),
@@ -11,10 +13,14 @@ pub enum Shape {
     Slope(Slope),
 }
 
-pub trait NearestPoint {
+pub trait NearestPointTo {
     fn nearest_point_to(&self, v: Vec2) -> Vec2;
 }
 
+pub trait Project {
+    fn project_aabb(&self) -> [Projection; 2];
+    fn project_on_axis(&self) -> Projection;
+}
 
 mod line;
 pub use line::*;

@@ -3,7 +3,7 @@
 use bevy::prelude::Vec2;
 use tinyvec::ArrayVec;
 
-use crate::shape::{Shape, NearestPoint};
+use crate::shape::{Shape, NearestPointTo};
 
 pub type CandidateAxes = ArrayVec<[Vec2; 7]>;
 
@@ -48,7 +48,7 @@ pub fn find_candidates_between(a: Shape, b: Shape) -> CandidateAxes {
         (Shape::Circle(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Circle(a)) => axes!(axis_between(b.start, a.origin), axis_between(b.start, a.origin)),
         (Shape::Circle(a),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Circle(a)) => axes!(
             b.normal(),
-            axis_between(a.origin, b.origin),
+            axis_between(a.origin, b.origin()),
             axis_between(a.origin, b.point_run()),
             axis_between(a.origin, b.point_rise())
         ), // OPT
@@ -58,10 +58,10 @@ pub fn find_candidates_between(a: Shape, b: Shape) -> CandidateAxes {
 
         (Shape::Capsule(a), Shape::Slope(b)) | (Shape::Slope(b), Shape::Capsule(a)) => axes!(
             b.normal(),
-            axis_between(a.start, b.origin),
+            axis_between(a.start, b.origin()),
             axis_between(a.start, b.point_run()),
             axis_between(a.start, b.point_rise()),
-            axis_between(a.end(), b.origin),
+            axis_between(a.end(), b.origin()),
             axis_between(a.end(), b.point_run()),
             axis_between(a.end(), b.point_rise())
         ), // OPT
@@ -72,7 +72,7 @@ fn axis_between(a: Vec2, b: Vec2) -> Vec2 {
     (b - a).normalize()
 }
 
-fn nearest_axis(from: Vec2, to: &impl NearestPoint) -> Vec2 {
+fn nearest_axis(from: Vec2, to: &impl NearestPointTo) -> Vec2 {
     axis_between(from, to.nearest_point_to(from))
 }
 

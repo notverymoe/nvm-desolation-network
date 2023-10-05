@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use super::NearestPoint;
+use super::NearestPointTo;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Rect {
@@ -10,7 +10,7 @@ pub struct Rect {
     pub max: Vec2,
 }
 
-impl NearestPoint for Rect {
+impl NearestPointTo for Rect {
     fn nearest_point_to(&self, v: Vec2) -> Vec2 {
         Vec2::new(
             if v.x <= self.min.x { self.min.x } else { self.max.x },

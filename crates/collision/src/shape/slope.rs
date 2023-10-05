@@ -4,10 +4,38 @@ use bevy::prelude::Vec2;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Slope {
-    pub origin: Vec2,
-    rise:   f32,
-    run:    f32,
-    normal: Vec2,
+    origin:     Vec2,
+    rise:       f32,
+    run:        f32,
+    normal_scl: f32,
+    normal_dp:  [f32; 2],
+}
+
+impl Slope {
+
+    pub fn new(origin: Vec2, rise: f32, run: f32) -> Self {
+        let mut result = Self{origin, rise, run, normal_scl: 0.0, normal_dp: [0.0, 0.0]};
+        result.recalculate_cache();
+        result
+    }
+
+    pub fn normal(&self) -> Vec2 {
+        Vec2::new(self.rise, self.run).perp() * self.normal_scl
+    }
+
+}
+
+impl Slope {
+
+    pub fn origin(&self) -> Vec2 {
+        self.origin
+    }
+
+    pub fn set_origin(&mut self, origin: Vec2) {
+        self.origin = origin;
+        self.recalculate_cache();
+    }
+
 }
 
 impl Slope {
@@ -20,29 +48,44 @@ impl Slope {
         Vec2::new(self.origin.x, self.origin.y + self.rise)
     }
 
-    pub fn normal(&self) -> Vec2 {
-        self.normal
-    }
-
     pub fn set_rise_run(&mut self, rise: f32, run: f32) {
         self.rise = rise;
         self.run  = run;
-        self.normal = Vec2::new(rise, run).normalize();
+        self.recalculate_cache();
     }
 
     pub fn get_rise_run(&self) -> [f32; 2] {
         [self.rise, self.run]
     }
 
-    pub fn points(&self) -> [Vec2; 3] {
-        let point_run  = self.origin + Vec2::new(self.run,       0.0);
-        let point_rise = self.origin + Vec2::new(     0.0, self.rise);
+}
 
+impl Slope {
+
+    pub fn points(&self) -> [Vec2; 3] {
+        // Ordering for CCW polygon 
         if (self.run >= 0.0) == (self.rise >= 0.0) {
-            [self.origin, point_run, point_rise]
+            [self.origin,  self.point_run(), self.point_rise()]
         } else {
-            [self.origin, point_rise, point_run]
+            [self.origin, self.point_rise(),  self.point_run()]
         }
     }
 
+    pub fn points_unordered(&self) -> [Vec2; 3] {
+        [self.origin, self.point_run(), self.point_rise()]
+    }
+
+}
+
+impl Slope {
+
+    fn recalculate_cache(&mut self) {
+        self.normal_scl = Vec2::new(self.rise, self.run).length_recip();
+        let axis = self.normal();
+        self.normal_dp  = [
+            axis.dot(self.origin),
+            axis.dot(self.point_run())
+        ];
+    }
+    
 }
