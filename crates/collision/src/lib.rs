@@ -1,6 +1,7 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
 pub mod shape;
+pub use shape::Shape;
 
 mod sweep;
 pub use sweep::*;
