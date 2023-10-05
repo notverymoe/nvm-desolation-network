@@ -5,11 +5,46 @@ use bevy::prelude::Vec2;
 use crate::{shape::{Shape, Project}, Projection};
 
 pub struct Sweep {
-    pub start:    Shape,
-    pub end:      Shape,
-    pub motion:   Vec2,
-    pub test_dir: Vec2,
-    pub test_dp:  Projection,
+    start:    Shape,
+    end:      Shape,
+    motion:   Vec2,
+    test_axis: Vec2,
+    test_cache:  Projection,
+}
+
+impl Sweep {
+    
+    pub fn new(shape: Shape, motion: Vec2) -> Self {
+        let test_dir = motion.normalize().perp();
+        Self {
+            test_cache: shape.project_on_axis(test_dir),
+            test_axis: test_dir,
+            motion,
+            end:   shape.offset_by(motion),
+            start: shape,
+        }
+    }
+
+    pub fn start(&self) -> &Shape {
+        &self.start
+    }
+
+    pub fn end(&self) -> &Shape {
+        &self.end
+    }
+
+    pub fn motion(&self) -> Vec2 {
+        self.motion
+    }
+
+    pub fn test_axis(&self) -> Vec2 {
+        self.test_axis
+    }
+
+    pub fn test_cache(&self) -> Projection {
+        self.test_cache
+    }
+
 }
 
 impl Project for Sweep {
