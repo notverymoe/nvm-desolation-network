@@ -5,7 +5,9 @@ use tinyvec::ArrayVec;
 
 use crate::shape::{Shape, NearestPointTo};
 
-pub type CandidateAxes = ArrayVec<[Vec2; 7]>;
+pub const CANDIDATE_AXES_SIZE: usize = 7;
+
+pub type CandidateAxes = ArrayVec<[Vec2; CANDIDATE_AXES_SIZE]>;
 
 macro_rules! axes {
     () => { ArrayVec::from_array_empty([Vec2::ZERO, Vec2::ZERO, Vec2::ZERO, Vec2::ZERO, Vec2::ZERO, Vec2::ZERO, Vec2::ZERO]) };
@@ -18,8 +20,8 @@ macro_rules! axes {
     ($a:expr,$b:expr,$c:expr,$d:expr,$e:expr,$f:expr,$g:expr) => { ArrayVec::from([$a, $b, $c, $d, $e, $f, $g])};
 }
 
-pub fn find_candidates_between(a: &Shape, b: &Shape) -> CandidateAxes {    
-    match (a, b) {
+pub fn find_candidates_between(a: &Shape, b: &Shape, dest: &mut CandidateAxes) {    
+    *dest = match (a, b) {
         (  Shape::Point(_),   Shape::Point(_)) => axes!(),
         (   Shape::Line(a),    Shape::Line(b)) => axes!(a.normal, b.normal),
         ( Shape::Circle(a),  Shape::Circle(b)) => axes!(axis_between(a.origin, b.origin)),
