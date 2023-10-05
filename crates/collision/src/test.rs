@@ -46,6 +46,8 @@ pub fn test_sweep_vs_sweep<const TEST_ALL: bool>(sweep_a: &Sweep, sweep_b: &Swee
         dest.push(contact);
     }
 
+    // TODO test ortho motion axis?
+
     true
 }
 
@@ -75,6 +77,8 @@ pub fn test_sweep_vs_static<const TEST_ALL: bool>(sweep_a: &Sweep, shape_b: &Sha
         if TEST_ALL && !contact.is_penetration() { return false; }
         dest.push(contact);
     }
+
+    // TODO test ortho motion axis?
 
     true
 }
