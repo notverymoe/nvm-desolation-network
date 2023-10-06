@@ -12,11 +12,31 @@ pub struct SolverSweep {
 
 impl SolverSweep {
 
-    pub fn test_sweep<const TEST_ALL: bool>(&mut self, b: &Sweep) -> bool {
+    pub fn test_sweep_pen(&mut self, b: &Sweep) -> bool {
+        self.test_sweep::<false>(b)
+    }
+
+    pub fn test_sweep_all(&mut self, b: &Sweep) {
+        self.test_sweep::<true>(b);
+    }
+
+    pub fn test_static_pen(&mut self, b: &Shape) -> bool {
+        self.test_static::<false>(b)
+    }
+
+    pub fn test_static_all(&mut self, b: &Shape) {
+        self.test_static::<true>(b);
+    }
+
+}
+
+impl SolverSweep {
+
+    fn test_sweep<const TEST_ALL: bool>(&mut self, b: &Sweep) -> bool {
         test_sweep_vs_sweep::<TEST_ALL>(&self.target, b, &mut self.contacts)
     }
 
-    pub fn test_static<const TEST_ALL: bool>(&mut self, b: &Shape) -> bool {
+    fn test_static<const TEST_ALL: bool>(&mut self, b: &Shape) -> bool {
         test_sweep_vs_static::<TEST_ALL>(&self.target, b, &mut self.contacts)
     }
 
@@ -29,7 +49,27 @@ pub struct SolverStatic {
 
 impl SolverStatic {
 
-    pub fn test_sweep<const TEST_ALL: bool>(&mut self, b: &Sweep) -> bool {
+    pub fn test_sweep_pen(&mut self, b: &Sweep) -> bool {
+        self.test_sweep::<false>(b)
+    }
+
+    pub fn test_sweep_all(&mut self, b: &Sweep) {
+        self.test_sweep::<true>(b);
+    }
+
+    pub fn test_static_pen(&mut self, b: &Shape) -> bool {
+        self.test_static::<false>(b)
+    }
+
+    pub fn test_static_all(&mut self, b: &Shape) {
+        self.test_static::<true>(b);
+    }
+
+}
+
+impl SolverStatic {
+
+    fn test_sweep<const TEST_ALL: bool>(&mut self, b: &Sweep) -> bool {
         let contact_len = self.contacts.len();
         let result = test_sweep_vs_static::<TEST_ALL>(b, &self.target, &mut self.contacts);
         for contact in self.contacts.iter_mut().skip(contact_len) {
@@ -38,7 +78,7 @@ impl SolverStatic {
         result
     }
 
-    pub fn test_static<const TEST_ALL: bool>(&mut self, b: &Shape) -> bool {
+    fn test_static<const TEST_ALL: bool>(&mut self, b: &Shape) -> bool {
         test_static_vs_static::<TEST_ALL>(&self.target, b, &mut self.contacts)
     }
 
