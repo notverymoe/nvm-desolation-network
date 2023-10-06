@@ -94,3 +94,12 @@ impl Projection {
     }
 
 }
+
+#[cfg(test)]
+impl Projection {
+
+    pub fn is_almost(self, other: Self) -> bool {
+        (self.0[0] - other.0[0]).abs() < 1e-6 && (self.0[1] - other.0[1]).abs() < 1e-6
+    }
+
+}

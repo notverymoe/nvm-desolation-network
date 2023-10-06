@@ -13,7 +13,7 @@ impl Contacts {
         self.iter().reduce(|p, c| if c.contact_min.abs() < p.contact_min.abs() { c } else { p })
     }
 
-    pub fn find_min_contact_along_normal(&self, axis: Vec2) -> Option<(Contact, f32)> {
+    pub fn find_min_contact_along_axis(&self, axis: Vec2) -> Option<(Contact, f32)> {
         if self.is_empty() { return None; }
         Some(self.iter().fold((Contact::default(), 0.0), |p: (Contact, f32), c| {
             let contact_on_axis = axis.dot(c.axis * c.contact_min);

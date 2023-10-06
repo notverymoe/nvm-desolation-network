@@ -36,3 +36,20 @@ impl Project for Circle {
         Self{origin: self.origin + o, radius: self.radius}
     }
 }
+
+
+#[cfg(test)]
+mod test {
+    use bevy::prelude::Vec2;
+
+    use crate::{shape::Project, Projection};
+
+    use super::Circle;
+
+    #[test]
+    fn test_circle_projection() {
+        assert!(Circle::new(            Vec2::ZERO, 1.0).project_on_axis(Vec2::ONE.normalize()).is_almost(Projection([-1.0, 1.0])));
+        assert!(Circle::new( Vec2::ONE.normalize(), 1.0).project_on_axis(Vec2::ONE.normalize()).is_almost(Projection([ 0.0, 2.0])));
+    }
+
+}
