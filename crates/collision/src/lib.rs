@@ -12,6 +12,9 @@ pub use candidate_axes::*;
 mod contact;
 pub use contact::*;
 
+mod contacts;
+pub use contacts::*;
+
 mod projection;
 pub use projection::*;
 
