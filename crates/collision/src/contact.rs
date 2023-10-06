@@ -37,4 +37,9 @@ impl Contact {
         Self::from_overlap(axis, a.project_on_axis(axis), b.project_on_axis(axis))
     }
 
+    pub fn reverse(&mut self) {
+        self.contact_min = -self.contact_min;
+        self.contact_max = -self.contact_max;
+    }
+
 }

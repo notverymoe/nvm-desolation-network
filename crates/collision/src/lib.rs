@@ -15,8 +15,8 @@ pub use contact::*;
 mod projection;
 pub use projection::*;
 
-mod test;
-pub use test::*;
+mod solver;
+pub use solver::*;
 
 mod util;
 pub use util::*;

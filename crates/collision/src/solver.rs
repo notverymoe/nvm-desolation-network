@@ -4,6 +4,46 @@ use bevy::prelude::Vec2;
 
 use crate::{shape::{Shape, Project}, Contact, VecLike, find_candidates_between, CandidateAxes, CANDIDATE_AXES_SIZE, Sweep, find_dynamic_candidates};
 
+
+pub struct SolverSweep {
+    pub target: Sweep,
+    pub contacts: Vec<Contact>,
+}
+
+impl SolverSweep {
+
+    pub fn test_sweep<const TEST_ALL: bool>(&mut self, b: &Sweep) -> bool {
+        test_sweep_vs_sweep::<TEST_ALL>(&self.target, b, &mut self.contacts)
+    }
+
+    pub fn test_static<const TEST_ALL: bool>(&mut self, b: &Shape) -> bool {
+        test_sweep_vs_static::<TEST_ALL>(&self.target, b, &mut self.contacts)
+    }
+
+}
+
+pub struct SolverStatic {
+    pub target: Shape,
+    pub contacts: Vec<Contact>,
+}
+
+impl SolverStatic {
+
+    pub fn test_sweep<const TEST_ALL: bool>(&mut self, b: &Sweep) -> bool {
+        let contact_len = self.contacts.len();
+        let result = test_sweep_vs_static::<TEST_ALL>(b, &self.target, &mut self.contacts);
+        for contact in self.contacts.iter_mut().skip(contact_len) {
+            contact.reverse();
+        }
+        result
+    }
+
+    pub fn test_static<const TEST_ALL: bool>(&mut self, b: &Shape) -> bool {
+        test_static_vs_static::<TEST_ALL>(&self.target, b, &mut self.contacts)
+    }
+
+}
+
 pub fn test_sweep_vs_sweep<const TEST_ALL: bool>(sweep_a: &Sweep, sweep_b: &Sweep, dest: &mut impl VecLike<Contact>) -> bool {
     dest.reserve(4*CANDIDATE_AXES_SIZE + 4);
 
