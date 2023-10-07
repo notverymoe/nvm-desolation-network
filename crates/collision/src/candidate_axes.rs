@@ -20,7 +20,7 @@ macro_rules! axes {
     ($a:expr,$b:expr,$c:expr,$d:expr,$e:expr,$f:expr,$g:expr) => { ArrayVec::from([$a, $b, $c, $d, $e, $f, $g])};
 }
 
-pub fn find_candidates_between(a: &Shape, b: &Shape, dest: &mut CandidateAxes) {    
+pub fn find_seperating_candidates_between(a: &Shape, b: &Shape, dest: &mut CandidateAxes) {    
     *dest = match (a, b) {
         (  Shape::Point(_),   Shape::Point(_)) => axes!(),
         (   Shape::Line(a),    Shape::Line(b)) => axes!(a.test_axis(), b.test_axis()),
@@ -70,7 +70,7 @@ pub fn find_candidates_between(a: &Shape, b: &Shape, dest: &mut CandidateAxes) {
     }
 }
 
-pub fn find_dynamic_candidates(a: &Shape, b: &Shape, dest: &mut CandidateAxes) {
+pub fn find_dynamic_seperating_candidates_between(a: &Shape, b: &Shape, dest: &mut CandidateAxes) {
     *dest = match (a, b) {
         (Shape::Point(_), Shape::Point(_)) |
         ( Shape::Line(_),  Shape::Line(_)) |
