@@ -27,7 +27,7 @@ impl Slope {
     }
 
     pub fn normal(&self) -> Vec2 {
-        Vec2::new(self.rise, self.run).perp() * self.normal_scl
+        Vec2::new(self.run, self.rise) * self.normal_scl
     }
 
 }
@@ -40,7 +40,6 @@ impl Slope {
 
     pub fn set_origin(&mut self, origin: Vec2) {
         self.origin = origin;
-        self.recalculate_cache();
     }
 
 }
@@ -87,7 +86,7 @@ impl Slope {
 impl Slope {
 
     fn recalculate_cache(&mut self) {
-        self.normal_scl = Vec2::new(self.rise, self.run).length_recip();
+        self.normal_scl = Vec2::new(self.run, self.rise).length_recip();
     }
     
 }

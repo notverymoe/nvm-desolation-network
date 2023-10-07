@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{shape::{Shape, Project}, Contact, VecLike, find_seperating_candidates_between, CandidateAxes, CANDIDATE_AXES_SIZE, Sweep, find_dynamic_seperating_candidates_between, Contacts};
+use crate::{shape::{Shape, Project}, Contact, VecLike, find_static_seperating_candidates_between, CANDIDATE_AXES_SIZE, Sweep, find_dynamic_seperating_candidates_between, Contacts};
 
 
 pub struct SolverSweep {          
@@ -103,43 +103,43 @@ pub fn test_sweep_vs_sweep<const TEST_ALL: bool>(sweep_a: &Sweep, sweep_b: &Swee
     let [aabb_x_b, aabb_y_b] = sweep_b.project_aabb();
 
     let contact = Contact::from_overlap(Vec2::X, aabb_x_a, aabb_x_b);
-    if TEST_ALL && !contact.is_penetration() { return false; }
+    if !TEST_ALL && !contact.is_penetration() { return false; }
     dest.push(contact);
 
     let contact = Contact::from_overlap(Vec2::Y, aabb_y_a, aabb_y_b);
-    if TEST_ALL && !contact.is_penetration() { return false; }
+    if !TEST_ALL && !contact.is_penetration() { return false; }
     dest.push(contact);
 
     let contact = Contact::from_overlap(sweep_a.test_axis(), sweep_a.test_cache(), sweep_b.project_on_axis(sweep_a.test_axis()));
-    if TEST_ALL && !contact.is_penetration() { return false; }
+    if !TEST_ALL && !contact.is_penetration() { return false; }
     dest.push(contact);
 
     let contact = Contact::from_overlap(sweep_b.test_axis(), sweep_a.project_on_axis(sweep_a.test_axis()), sweep_b.test_cache());
-    if TEST_ALL && !contact.is_penetration() { return false; }
+    if !TEST_ALL && !contact.is_penetration() { return false; }
     dest.push(contact);
 
-    let mut axes: CandidateAxes = Default::default();
-    find_seperating_candidates_between(sweep_a.start(), sweep_b.start(), &mut axes);
-    for contact in axes.into_iter().map(|a| Contact::from_projections(a, sweep_a, sweep_b)) {
-        if TEST_ALL && !contact.is_penetration() { return false; }
+    for contact in find_static_seperating_candidates_between(sweep_a.start(), sweep_b.start()).into_iter().map(|a| Contact::from_projections(a, sweep_a, sweep_b)) {
+        if !TEST_ALL && !contact.is_penetration() { return false; }
         dest.push(contact);
     }
 
-    find_dynamic_seperating_candidates_between(sweep_a.end(), sweep_b.start(), &mut axes);
-    for contact in axes.into_iter().map(|a| Contact::from_projections(a, sweep_a, sweep_b)) {
-        if TEST_ALL && !contact.is_penetration() { return false; }
+    for contact in find_dynamic_seperating_candidates_between(sweep_a.start(), sweep_b.start()).into_iter().map(|a| Contact::from_projections(a, sweep_a, sweep_b)) {
+        if !TEST_ALL && !contact.is_penetration() { return false; }
         dest.push(contact);
     }
 
-    find_dynamic_seperating_candidates_between(sweep_a.start(), sweep_b.end(), &mut axes);
-    for contact in axes.into_iter().map(|a| Contact::from_projections(a, sweep_a, sweep_b)) {
-        if TEST_ALL && !contact.is_penetration() { return false; }
+    for contact in find_dynamic_seperating_candidates_between(sweep_a.end(), sweep_b.start()).into_iter().map(|a| Contact::from_projections(a, sweep_a, sweep_b)) {
+        if !TEST_ALL && !contact.is_penetration() { return false; }
         dest.push(contact);
     }
 
-    find_dynamic_seperating_candidates_between(sweep_a.end(), sweep_b.end(), &mut axes);
-    for contact in axes.into_iter().map(|a| Contact::from_projections(a, sweep_a, sweep_b)) {
-        if TEST_ALL && !contact.is_penetration() { return false; }
+    for contact in find_dynamic_seperating_candidates_between(sweep_a.start(), sweep_b.end()).into_iter().map(|a| Contact::from_projections(a, sweep_a, sweep_b)) {
+        if !TEST_ALL && !contact.is_penetration() { return false; }
+        dest.push(contact);
+    }
+
+    for contact in find_dynamic_seperating_candidates_between(sweep_a.end(), sweep_b.end()).into_iter().map(|a| Contact::from_projections(a, sweep_a, sweep_b)) {
+        if !TEST_ALL && !contact.is_penetration() { return false; }
         dest.push(contact);
     }
 
@@ -153,27 +153,29 @@ pub fn test_sweep_vs_static<const TEST_ALL: bool>(sweep_a: &Sweep, shape_b: &Sha
     let [aabb_x_b, aabb_y_b] = shape_b.project_aabb();
 
     let contact = Contact::from_overlap(Vec2::X, aabb_x_a, aabb_x_b);
-    if TEST_ALL && !contact.is_penetration() { return false; }
+    if !TEST_ALL && !contact.is_penetration() { return false; }
     dest.push(contact);
 
     let contact = Contact::from_overlap(Vec2::Y, aabb_y_a, aabb_y_b);
-    if TEST_ALL && !contact.is_penetration() { return false; }
+    if !TEST_ALL && !contact.is_penetration() { return false; }
     dest.push(contact);
 
     let contact = Contact::from_overlap(sweep_a.test_axis(), sweep_a.test_cache(), shape_b.project_on_axis(sweep_a.test_axis()));
-    if TEST_ALL && !contact.is_penetration() { return false; }
+    if !TEST_ALL && !contact.is_penetration() { return false; }
     dest.push(contact);
 
-    let mut axes: CandidateAxes = Default::default();
-    find_seperating_candidates_between(sweep_a.start(), shape_b, &mut axes);
-    for contact in axes.into_iter().map(|a| Contact::from_projections(a, sweep_a, shape_b)) {
-        if TEST_ALL && !contact.is_penetration() { return false; }
+    for contact in find_static_seperating_candidates_between(sweep_a.start(), shape_b).into_iter().map(|a| Contact::from_projections(a, sweep_a, shape_b)) {
+        if !TEST_ALL && !contact.is_penetration() { return false; }
         dest.push(contact);
     }
 
-    find_dynamic_seperating_candidates_between(sweep_a.end(), shape_b, &mut axes);
-    for contact in axes.into_iter().map(|a| Contact::from_projections(a, sweep_a, shape_b)) {
-        if TEST_ALL && !contact.is_penetration() { return false; }
+    for contact in find_dynamic_seperating_candidates_between(sweep_a.start(), shape_b).into_iter().map(|a| Contact::from_projections(a, sweep_a, shape_b)) {
+        if !TEST_ALL && !contact.is_penetration() { return false; }
+        dest.push(contact);
+    }
+
+    for contact in find_dynamic_seperating_candidates_between(sweep_a.end(), shape_b).into_iter().map(|a| Contact::from_projections(a, sweep_a, shape_b)) {
+        if !TEST_ALL && !contact.is_penetration() { return false; }
         dest.push(contact);
     }
 
@@ -194,11 +196,14 @@ pub fn test_static_vs_static<const TEST_ALL: bool>(shape_a: &Shape, shape_b: &Sh
     if !TEST_ALL && !contact.is_penetration() { return false; }
     dest.push(contact);
 
-    let mut axes: CandidateAxes = Default::default();
-    find_seperating_candidates_between(shape_a, shape_b, &mut axes);
-    for contact in axes.into_iter().map(|a| Contact::from_projections(a, shape_a, shape_b)) {
-        if !TEST_ALL && !contact.is_penetration() { return false; }
-        dest.push(contact);
+    for contact in find_static_seperating_candidates_between(shape_a, shape_b).into_iter().map(|a| Contact::from_projections(a, shape_a, shape_b)) {
+       if !TEST_ALL && !contact.is_penetration() { return false; }
+       dest.push(contact);
+    }
+    
+    for contact in find_dynamic_seperating_candidates_between(shape_a, shape_b).into_iter().map(|a| Contact::from_projections(a, shape_a, shape_b)) {
+       if !TEST_ALL && !contact.is_penetration() { return false; }
+       dest.push(contact);
     }
 
     true

@@ -49,10 +49,10 @@ impl Project for Capsule {
         // since this is effectively a swept circle, we
         // shouldn't need to explicitly test points along
         // the body for the projection
-        Projection([
-            axis.dot(self.start) - self.radius, 
-            axis.dot(self.end()) + self.radius,
-        ])
+
+        let start = Projection::new(axis.dot(self.start));
+        let end   = Projection::new(axis.dot(self.end()));
+        start.merged_with(end).inflated_by(self.radius)
     }
 
     fn with_offset(&self, o: Vec2) -> Self {

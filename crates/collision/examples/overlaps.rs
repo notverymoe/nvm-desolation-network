@@ -21,8 +21,8 @@ impl StaticCollider {
 
     const RECT:    collision::shape::Rect    = collision::shape::Rect::new(Vec2::ZERO, Vec2::new(100.0, 100.0));
     const CIRCLE:  collision::shape::Circle  = collision::shape::Circle::new(Vec2::ZERO, 50.0);
-    const CAPSULE: collision::shape::Capsule = collision::shape::Capsule::new(Vec2::ZERO, 25.0, 50.0);
-    const LINE:    collision::shape::Line    = collision::shape::Line::from_raw(Vec2::ZERO, Vec2::new(100.0, 100.0), Vec2::new(-1.41421356237, 1.41421356237));
+    const CAPSULE: collision::shape::Capsule = collision::shape::Capsule::new(Vec2::ZERO, 25.0, 100.0);
+    const LINE:    collision::shape::Line    = collision::shape::Line::from_raw(Vec2::ZERO, Vec2::new(100.0, 100.0), Vec2::new(-0.70710678118, 0.70710678118 ));
     const SLOPE:   collision::shape::Slope   = collision::shape::Slope::from_raw(Vec2::ZERO, 100.0, 100.0, 0.00707106781);
 
     pub fn new(origin: Vec2) -> Self {
