@@ -43,7 +43,7 @@ pub fn find_candidates_between(a: &Shape, b: &Shape, dest: &mut CandidateAxes) {
             axis_between(a.start(), b.end()),
             axis_between(a.end(),   b.start),
             axis_between(a.end(),   b.end())
-        ).into(), // OPT
+        ), // OPT
         (Shape::Line(a),   Shape::Slope(b)) | (  Shape::Slope(b), Shape::Line(a)) => axes!(a.test_axis(), b.normal()),
 
         (Shape::Circle(a),    Shape::Rect(b)) | (   Shape::Rect(b), Shape::Circle(a)) => axes!(nearest_axis(a.origin, b)),
@@ -95,7 +95,7 @@ pub fn find_dynamic_candidates(a: &Shape, b: &Shape, dest: &mut CandidateAxes) {
             axis_between(a.start(), b.end()),
             axis_between(a.end(),   b.start),
             axis_between(a.end(),   b.end())
-        ).into(), // OPT
+        ), // OPT
 
         (Shape::Circle(a),    Shape::Rect(b)) | (   Shape::Rect(b), Shape::Circle(a)) => axes!(nearest_axis(a.origin, b)),
         (Shape::Circle(a), Shape::Capsule(b)) | (Shape::Capsule(b), Shape::Circle(a)) => axes!(axis_between(b.start, a.origin), axis_between(b.start, a.origin)),

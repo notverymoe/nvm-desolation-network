@@ -11,7 +11,7 @@ impl Projection {
     }
 
     pub fn new_unsorted(a: f32, b: f32) -> Self {
-        Self(if a <= b { [a, b] } else { [a, b] })
+        Self(if a <= b { [a, b] } else { [b, a] })
     }
 
     pub fn from_points_iter(axis: Vec2, points: impl IntoIterator<Item = Vec2>) -> Self {

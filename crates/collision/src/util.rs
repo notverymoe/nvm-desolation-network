@@ -15,6 +15,7 @@ pub trait VecLike<T>: Index<usize, Output = T> {
     fn len(&self) -> usize;
     fn truncate(&mut self, len: usize);
     fn reserve(&mut self, len: usize);
+    fn is_empty(&self) -> bool;
 }
 
 impl<T: Clone> VecLike<T> for Vec<T> {
@@ -57,6 +58,10 @@ impl<T: Clone> VecLike<T> for Vec<T> {
     fn reserve(&mut self, len: usize) {
         self.reserve(len);
     }
+
+    fn is_empty(&self) -> bool {
+        self.is_empty()
+    }
 }
 
 impl<A: Array> VecLike<A::Item> for ArrayVec<A> where A::Item: Clone {
@@ -98,5 +103,9 @@ impl<A: Array> VecLike<A::Item> for ArrayVec<A> where A::Item: Clone {
 
     fn reserve(&mut self, _len: usize) {
         // do nothing
+    }
+
+    fn is_empty(&self) -> bool {
+        self.is_empty()
     }
 }
