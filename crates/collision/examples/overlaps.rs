@@ -8,7 +8,7 @@ pub fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_systems(Startup,    setup )
-        .add_systems(Update,     (update, check_colliders))
+        .add_systems(Update,     (update_inactive, update_active, check_colliders))
         .add_systems(PostUpdate, render)
         .add_systems(Last, cleanup)
         .run();
@@ -55,18 +55,58 @@ fn setup(mut commands: Commands) {
 
     commands.spawn(Camera2dBundle::default());
 
-    commands.spawn((StaticCollider::new(Vec2::ONE * 20.0), ActiveCollider));
-    commands.spawn(StaticCollider::new(Vec2::ONE * 100.0));
+    commands.spawn((StaticCollider::new(Vec2::X * -200.0), ActiveCollider));
+    commands.spawn( StaticCollider::new(Vec2::X *  200.0));
 }
 
-fn update(mut q: Query<&mut StaticCollider, With<ActiveCollider>>, keys: Res<Input<KeyCode>>, time: Res<Time>) {
-
+fn update_inactive(
+    mut q_inactive: Query<&mut StaticCollider, Without<ActiveCollider>>, 
+    keys: Res<Input<KeyCode>>,
+    time: Res<Time>
+ ) {
     let mut offset = Vec2::ZERO;
-    let mut collider = q.get_single_mut().unwrap();
+
+    if keys.pressed(KeyCode::I) {
+        offset += Vec2::Y;
+    }
+
+    if keys.pressed(KeyCode::J) {
+        offset -= Vec2::X;
+    }
+
+    if keys.pressed(KeyCode::K) {
+        offset -= Vec2::Y;
+    }
+
+    if keys.pressed(KeyCode::L) {
+        offset += Vec2::X;
+    }
+
+    for mut collider in q_inactive.iter_mut() {
+        if keys.just_pressed(KeyCode::Backslash) {
+            collider.next();
+        }
+
+        if offset != Vec2::ZERO {
+            offset *= 200.0 * time.delta_seconds();
+            collider.0 = collider.0.with_offset(offset);
+        }
+    }
+}
+
+fn update_active(
+    mut q_active:   Query<&mut StaticCollider,    With<ActiveCollider>>, 
+    keys: Res<Input<KeyCode>>, 
+    time: Res<Time>
+) {
+
+    let mut collider = q_active.get_single_mut().unwrap();
 
     if keys.just_pressed(KeyCode::Tab) {
         collider.next();
     }
+
+    let mut offset = Vec2::ZERO;
 
     if keys.pressed(KeyCode::W) {
         offset += Vec2::Y;
@@ -85,7 +125,7 @@ fn update(mut q: Query<&mut StaticCollider, With<ActiveCollider>>, keys: Res<Inp
     }
 
     if offset != Vec2::ZERO {
-        offset *= 100.0 * time.delta_seconds();
+        offset *= 200.0 * time.delta_seconds();
         collider.0 = collider.0.with_offset(offset);
     }
 
