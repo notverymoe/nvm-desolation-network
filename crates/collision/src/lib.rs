@@ -21,5 +21,5 @@ pub use projection::*;
 mod solver;
 pub use solver::*;
 
-mod util;
-pub use util::*;
+mod vec_like;
+pub use vec_like::*;
