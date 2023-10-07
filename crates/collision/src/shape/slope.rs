@@ -9,15 +9,15 @@ use super::Project;
 #[derive(Debug, Clone, Copy)]
 pub struct Slope {
     origin:     Vec2,
-    rise:       f32,
     run:        f32,
+    rise:       f32,
     normal_scl: f32,
 }
 
 impl Slope {
 
-    pub fn new(origin: Vec2, rise: f32, run: f32) -> Self {
-        let mut result = Self{origin, rise, run, normal_scl: 0.0};
+    pub fn new(origin: Vec2, run: f32, rise: f32) -> Self {
+        let mut result = Self{origin, run, rise, normal_scl: 0.0};
         result.recalculate_cache();
         result
     }
@@ -104,4 +104,43 @@ impl Project for Slope {
     fn with_offset(&self, o: Vec2) -> Self {
         Self { origin: self.origin + o, rise: self.rise, run: self.run, normal_scl: self.normal_scl }
     }
+}
+
+#[cfg(test)]
+mod test {
+    use bevy::prelude::Vec2;
+
+    use crate::{shape::Project, Projection};
+
+    use super::Slope;
+
+    #[test]
+    fn test_slope_projection() {
+        let dp = (2.0_f32).sqrt();
+
+        // Q1
+        assert_eq!(Slope::new(Vec2::ZERO,  1.0,  1.0).project_on_axis(Vec2::X), Projection([0.0, 1.0]));
+        assert_eq!(Slope::new(Vec2::ZERO,  1.0,  1.0).project_on_axis(Vec2::Y), Projection([0.0, 1.0]));
+        assert_eq!(Slope::new(Vec2::ZERO,  1.0,  1.0).project_on_axis(Vec2::ONE.normalize()), Projection([0.0, dp*0.5]));
+        assert_eq!(Slope::new( Vec2::ONE,  1.0,  1.0).project_on_axis(Vec2::ONE.normalize()), Projection([ dp, dp*1.5]));
+
+        // Q2
+        assert_eq!(Slope::new(Vec2::ZERO, -1.0,  1.0).project_on_axis(Vec2::X), Projection([-1.0, 0.0]));
+        assert_eq!(Slope::new(Vec2::ZERO, -1.0,  1.0).project_on_axis(Vec2::Y), Projection([ 0.0, 1.0]));
+        assert_eq!(Slope::new(Vec2::ZERO, -1.0,  1.0).project_on_axis(Vec2::ONE.normalize()), Projection([-dp*0.5, dp*0.5]));
+        assert_eq!(Slope::new( Vec2::ONE, -1.0,  1.0).project_on_axis(Vec2::ONE.normalize()), Projection([ dp*0.5, dp*1.5]));
+
+        // Q4
+        assert_eq!(Slope::new(Vec2::ZERO, -1.0, -1.0).project_on_axis(Vec2::X), Projection([-1.0, 0.0]));
+        assert_eq!(Slope::new(Vec2::ZERO, -1.0, -1.0).project_on_axis(Vec2::Y), Projection([-1.0, 0.0]));
+        assert_eq!(Slope::new(Vec2::ZERO, -1.0, -1.0).project_on_axis(Vec2::ONE.normalize()), Projection([-dp*0.5, 0.0]));
+        assert_eq!(Slope::new( Vec2::ONE, -1.0, -1.0).project_on_axis(Vec2::ONE.normalize()), Projection([ dp*0.5,  dp]));
+
+        // Q4
+        assert_eq!(Slope::new(Vec2::ZERO,  1.0, -1.0).project_on_axis(Vec2::X), Projection([ 0.0, 1.0]));
+        assert_eq!(Slope::new(Vec2::ZERO,  1.0, -1.0).project_on_axis(Vec2::Y), Projection([-1.0, 0.0]));
+        assert_eq!(Slope::new(Vec2::ZERO,  1.0, -1.0).project_on_axis(Vec2::ONE.normalize()), Projection([-dp*0.5, dp*0.5]));
+        assert_eq!(Slope::new( Vec2::ONE,  1.0, -1.0).project_on_axis(Vec2::ONE.normalize()), Projection([ dp*0.5, dp*1.5]));
+    }
+
 }

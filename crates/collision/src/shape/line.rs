@@ -55,3 +55,23 @@ impl Project for Line {
     }
 
 }
+
+#[cfg(test)]
+mod test {
+    use bevy::prelude::Vec2;
+
+    use crate::{shape::Project, Projection};
+
+    use super::Line;
+
+    #[test]
+    fn test_line_projection() {
+        let dp = (2.0_f32).sqrt();
+
+        assert_eq!(Line::new_offset(Vec2::ZERO, Vec2::ONE).project_on_axis(Vec2::X), Projection([0.0, 1.0]));
+        assert_eq!(Line::new_offset(Vec2::ZERO, Vec2::ONE).project_on_axis(Vec2::Y), Projection([0.0, 1.0]));
+        assert_eq!(Line::new_offset(Vec2::ZERO, Vec2::ONE).project_on_axis(Vec2::ONE.normalize()), Projection([0.0, dp    ]));
+        assert_eq!(Line::new_offset( Vec2::ONE, Vec2::ONE).project_on_axis(Vec2::ONE.normalize()), Projection([ dp, dp*2.0]));
+    }
+
+}

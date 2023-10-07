@@ -2,7 +2,7 @@
 
 use bevy::math::Vec2;
 
-#[derive(Clone, Copy, Default, PartialEq, Debug)]
+#[derive(Clone, Copy, Default, Debug)]
 pub struct Projection(pub [f32; 2]);
 
 impl Projection {
@@ -95,10 +95,9 @@ impl Projection {
 
 }
 
-#[cfg(test)]
-impl Projection {
+impl PartialEq for Projection {
 
-    pub fn is_almost(self, other: Self) -> bool {
+    fn eq(&self, other: &Self) -> bool {
         (self.0[0] - other.0[0]).abs() < 1e-6 && (self.0[1] - other.0[1]).abs() < 1e-6
     }
 

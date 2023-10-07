@@ -59,3 +59,23 @@ impl Project for Capsule {
         Self{start: self.start + o, height: self.height, radius: self.radius}
     }
 }
+
+#[cfg(test)]
+mod test {
+    use bevy::prelude::Vec2;
+
+    use crate::{shape::Project, Projection};
+
+    use super::Capsule;
+
+    #[test]
+    fn test_capsule_projection() {
+        let dp = (2.0_f32).sqrt();
+
+        assert_eq!(Capsule::new(Vec2::ZERO, 1.0, 1.0).project_on_axis(Vec2::X), Projection([-1.0, 1.0]));
+        assert_eq!(Capsule::new(Vec2::ZERO, 1.0, 1.0).project_on_axis(Vec2::Y), Projection([-1.0, 2.0]));
+        assert_eq!(Capsule::new(Vec2::ZERO, 1.0, 1.0).project_on_axis(Vec2::ONE.normalize()), Projection([-1.0,      1.0 + dp*0.5]));
+        assert_eq!(Capsule::new( Vec2::ONE, 1.0, 1.0).project_on_axis(Vec2::ONE.normalize()), Projection([-1.0 + dp, 1.0 + dp*1.5]));
+    }
+
+}

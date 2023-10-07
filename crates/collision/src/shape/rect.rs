@@ -70,3 +70,20 @@ impl Rect {
     }
 
 }
+
+#[cfg(test)]
+mod test {
+    use bevy::prelude::Vec2;
+
+    use crate::{shape::Project, Projection};
+
+    use super::Rect;
+
+    #[test]
+    fn test_rect_projection() {
+        let dp = (2.0_f32).sqrt();
+        assert_eq!(Rect::new(Vec2::ZERO, Vec2::ONE    ).project_on_axis(Vec2::ONE.normalize()), Projection([0.0, dp    ]));
+        assert_eq!(Rect::new( Vec2::ONE, Vec2::ONE*2.0).project_on_axis(Vec2::ONE.normalize()), Projection([ dp, dp*2.0]));
+    }
+
+}

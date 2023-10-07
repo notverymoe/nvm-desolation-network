@@ -48,8 +48,8 @@ mod test {
 
     #[test]
     fn test_circle_projection() {
-        assert!(Circle::new(            Vec2::ZERO, 1.0).project_on_axis(Vec2::ONE.normalize()).is_almost(Projection([-1.0, 1.0])));
-        assert!(Circle::new( Vec2::ONE.normalize(), 1.0).project_on_axis(Vec2::ONE.normalize()).is_almost(Projection([ 0.0, 2.0])));
+        assert_eq!(Circle::new(            Vec2::ZERO, 1.0).project_on_axis(Vec2::ONE.normalize()), Projection([-1.0, 1.0]));
+        assert_eq!(Circle::new( Vec2::ONE.normalize(), 1.0).project_on_axis(Vec2::ONE.normalize()), Projection([ 0.0, 2.0]));
     }
 
 }
