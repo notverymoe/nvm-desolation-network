@@ -16,6 +16,10 @@ pub struct Slope {
 
 impl Slope {
 
+    pub const fn from_raw(origin: Vec2, run: f32, rise: f32, normal_scl: f32) -> Self {
+        Self { origin, run, rise, normal_scl }
+    }
+
     pub fn new(origin: Vec2, run: f32, rise: f32) -> Self {
         let mut result = Self{origin, run, rise, normal_scl: 0.0};
         result.recalculate_cache();

@@ -15,7 +15,7 @@ pub struct Capsule {
 
 impl Capsule {
 
-    pub fn new(start: Vec2, radius: f32, height: f32) -> Self {
+    pub  const fn new(start: Vec2, radius: f32, height: f32) -> Self {
         Self{start, radius, height}
     }
 

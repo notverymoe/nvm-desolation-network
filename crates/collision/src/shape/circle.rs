@@ -12,7 +12,7 @@ pub struct Circle {
 
 impl Circle {
 
-    pub fn new(origin: Vec2, radius: f32) -> Self {
+    pub const fn new(origin: Vec2, radius: f32) -> Self {
         Self{origin, radius}
     }
 

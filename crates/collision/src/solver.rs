@@ -187,17 +187,17 @@ pub fn test_static_vs_static<const TEST_ALL: bool>(shape_a: &Shape, shape_b: &Sh
     let [aabb_x_b, aabb_y_b] = shape_b.project_aabb();
 
     let contact = Contact::from_overlap(Vec2::X, aabb_x_a, aabb_x_b);
-    if TEST_ALL && !contact.is_penetration() { return false; }
+    if !TEST_ALL && !contact.is_penetration() { return false; }
     dest.push(contact);
 
     let contact = Contact::from_overlap(Vec2::Y, aabb_y_a, aabb_y_b);
-    if TEST_ALL && !contact.is_penetration() { return false; }
+    if !TEST_ALL && !contact.is_penetration() { return false; }
     dest.push(contact);
 
     let mut axes: CandidateAxes = Default::default();
     find_seperating_candidates_between(shape_a, shape_b, &mut axes);
     for contact in axes.into_iter().map(|a| Contact::from_projections(a, shape_a, shape_b)) {
-        if TEST_ALL && !contact.is_penetration() { return false; }
+        if !TEST_ALL && !contact.is_penetration() { return false; }
         dest.push(contact);
     }
 

@@ -15,6 +15,10 @@ pub struct Line {
 
 impl Line {
 
+    pub const fn from_raw(start: Vec2, end: Vec2, test_axis: Vec2) -> Self {
+        Self{start, end, test_axis}
+    }
+
     pub fn new(start: Vec2, end: Vec2) -> Self {
         let test_axis = (end - start).normalize().perp();
         Self{start, end, test_axis}

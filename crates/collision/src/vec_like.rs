@@ -1,8 +1,10 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-use std::{slice::{Iter, IterMut}, ops::Index};
+use std::{slice::{Iter, IterMut}, ops::Index, marker::PhantomData};
 
 use tinyvec::{ArrayVec, Array};
+
+
 
 pub trait VecLike<T>: Index<usize, Output = T> {
     fn push(&mut self, v: T);
@@ -107,5 +109,62 @@ impl<A: Array> VecLike<A::Item> for ArrayVec<A> where A::Item: Clone {
 
     fn is_empty(&self) -> bool {
         self.is_empty()
+    }
+}
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct DummyVec<T>(PhantomData<T>);
+
+impl<T> Index<usize> for DummyVec<T> {
+    type Output = T;
+    fn index(&self, _index: usize) -> &Self::Output {
+        panic!("Attempt to index out of bounds")
+    }
+}
+
+impl<T> VecLike<T> for DummyVec<T> {
+
+    fn push(&mut self, _v: T) {
+        // Do Nothing
+    }
+
+    fn extend(&mut self, _v: impl IntoIterator<Item = T>) {
+        // Do Nothing
+    }
+
+    fn extend_from_slice(&mut self, _v: &[T]) {
+        // Do Nothing
+    }
+
+    fn iter(&self) -> Iter<T> {
+        [].iter()
+    }
+
+    fn iter_mut(&mut self) -> IterMut<'_, T> {
+        [].iter_mut()
+    }
+
+    fn clear(&mut self) {
+        // Do Nothing
+    }
+
+    fn as_slice(&self) -> &[T] {
+        &[]
+    }
+
+    fn len(&self) -> usize {
+        0
+    }
+
+    fn truncate(&mut self, _len: usize) {
+        // Do Nothing
+    }
+
+    fn reserve(&mut self, _len: usize) {
+        // Do Nothing
+    }
+
+    fn is_empty(&self) -> bool {
+        true
     }
 }
