@@ -28,6 +28,14 @@ impl SolverSweep {
         self.test_static::<true>(b);
     }
 
+    pub fn find_time_of_impact(&self) -> Option<(Contact, f32)> {
+        self.contacts.find_min_contact_along_axis(self.target.motion())
+    }
+
+    pub fn find_min_contact(&self) -> Option<&Contact> {
+        self.contacts.find_min_contact()
+    }
+
 }
 
 impl SolverSweep {
@@ -63,6 +71,10 @@ impl SolverStatic {
 
     pub fn test_static_all(&mut self, b: &Shape) {
         self.test_static::<true>(b);
+    }
+
+    pub fn find_min_contact(&self) -> Option<&Contact> {
+        self.contacts.find_min_contact()
     }
 
 }
