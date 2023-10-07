@@ -45,11 +45,6 @@ impl Project for Capsule {
     }
 
     fn project_on_axis(&self, axis: Vec2) -> Projection {
-        // TODO confirm, I believe that this workds fine,
-        // since this is effectively a swept circle, we
-        // shouldn't need to explicitly test points along
-        // the body for the projection
-
         let start = Projection::new(axis.dot(self.start));
         let end   = Projection::new(axis.dot(self.end()));
         start.merged_with(end).inflated_by(self.radius)
