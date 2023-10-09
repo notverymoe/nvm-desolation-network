@@ -8,7 +8,7 @@ pub fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_systems(Startup,    setup )
-        .add_systems(Update,     (update_inactive, update_active, check_colliders))
+        .add_systems(Update,     (update_inactive, update_active, check_colliders).chain())
         .add_systems(PostUpdate, render)
         .add_systems(Last, cleanup)
         .run();
@@ -159,7 +159,6 @@ fn render(mut gizmos: Gizmos, q: Query<(Entity, &StaticCollider)>, q_overlaps: Q
             },
             Shape::Rect(s) => {
                 let size = s.max - s.min;
-
                 gizmos.rect_2d(s.min + size*0.5, 0.0, size, color);
             },
             Shape::Capsule(s) => {

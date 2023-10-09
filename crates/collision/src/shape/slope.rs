@@ -92,6 +92,10 @@ impl Slope {
 }
 
 impl Project for Slope {
+    fn offset(&self) -> Vec2 {
+        self.origin
+    }
+    
     fn project_aabb(&self) -> [Projection; 2] {
         [
             Projection::new_unsorted(self.origin.x, self.origin.x + self.run ),

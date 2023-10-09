@@ -37,6 +37,10 @@ impl NearestPointTo for Capsule {
 }
 
 impl Project for Capsule {
+    fn offset(&self) -> Vec2 {
+        self.start
+    }
+
     fn project_aabb(&self) -> [Projection; 2] {
         [
             Projection([self.start.x - self.radius, self.start.x + self.radius]),

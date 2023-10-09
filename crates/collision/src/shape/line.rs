@@ -43,6 +43,10 @@ impl Line {
 }
 
 impl Project for Line {
+    fn offset(&self) -> Vec2 {
+        self.start
+    }
+
     fn project_aabb(&self) -> [Projection; 2] {
         [
             Projection::new_unsorted(self.start.x, self.end.x),

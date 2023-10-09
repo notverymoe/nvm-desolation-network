@@ -48,6 +48,10 @@ impl Sweep {
 }
 
 impl Project for Sweep {
+    fn offset(&self) -> Vec2 {
+        self.start.offset()
+    }
+
     fn project_aabb(&self) -> [Projection; 2] {
         let [x, y] = self.start.project_aabb();
         [

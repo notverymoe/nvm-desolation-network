@@ -7,6 +7,7 @@ use static_assertions::const_assert_eq;
 use crate::Projection;
 
 #[enum_dispatch(Project)]
+#[derive(Clone, Copy)]
 pub enum Shape {
     Point(Vec2),
     Line(Line),
@@ -25,12 +26,17 @@ pub trait NearestPointTo {
 
 #[enum_dispatch]
 pub trait Project {
+    fn offset(&self) -> Vec2;
     fn project_aabb(&self) -> [Projection; 2];
     fn project_on_axis(&self, axis: Vec2) -> Projection;
     fn with_offset(&self, o: Vec2) -> Self;
 }
 
 impl Project for Vec2 {
+    fn offset(&self) -> Vec2 {
+        *self
+    }
+
     fn project_aabb(&self) -> [Projection; 2] {
         [Projection::new(self.x), Projection::new(self.y)]
     }

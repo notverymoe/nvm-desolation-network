@@ -19,6 +19,10 @@ impl Circle {
 }
 
 impl Project for Circle {
+    fn offset(&self) -> Vec2 {
+        self.origin
+    }
+    
     fn project_aabb(&self) -> [Projection; 2] {
         [
             Projection([self.origin.x - self.radius, self.origin.x + self.radius]),

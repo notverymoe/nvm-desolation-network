@@ -42,6 +42,10 @@ impl NearestPointTo for Rect {
 }
 
 impl Project for Rect {
+    fn offset(&self) -> Vec2 {
+        self.min
+    }
+
     fn project_aabb(&self) -> [Projection; 2] {
         [
             Projection([self.min.x, self.max.x]),

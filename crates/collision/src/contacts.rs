@@ -4,7 +4,7 @@ use bevy::prelude::{DerefMut, Deref, Vec2};
 
 use crate::Contact;
 
-#[derive(DerefMut, Deref)]
+#[derive(DerefMut, Deref, Default)]
 pub struct Contacts(Vec<Contact>);
 
 impl Contacts {
@@ -15,8 +15,10 @@ impl Contacts {
 
     pub fn find_min_contact_along_axis(&self, axis: Vec2) -> Option<(Contact, f32)> {
         if self.is_empty() { return None; }
-        Some(self.iter().fold((Contact::default(), 0.0), |p: (Contact, f32), c| {
-            let contact_on_axis = c.contact_min / axis.dot(c.axis);
+        Some(self.iter().fold((Contact::default(), f32::INFINITY), |p: (Contact, f32), c| {
+            let factor = axis.dot(c.axis);
+            if factor.abs() < 1e-8 { return p; }
+            let contact_on_axis = c.contact_min / factor;
             if contact_on_axis.abs() < p.1.abs() {
                 (*c, contact_on_axis)
             } else {
