@@ -7,6 +7,9 @@ use crate::projection::{ProjectOnAxis, Projection};
 mod rect;
 pub use rect::*;
 
+mod rect_rounded;
+pub use rect_rounded::*;
+
 mod circle;
 pub use circle::*;
 
@@ -14,15 +17,44 @@ pub use circle::*;
 pub enum ShapeData {
     Rect(RectData),
     Circle(CircleData),
+    RectRounded(RectRoundedData),
 }
 
 impl ProjectOnAxis for ShapeData {
     fn project_on_axis(&self, axis: Vec2) -> crate::projection::Projection {
         match self {
-            ShapeData::Rect(data)   => data.project_on_axis(axis),
-            ShapeData::Circle(data) => data.project_on_axis(axis),
+            ShapeData::Rect(data)        => data.project_on_axis(axis),
+            ShapeData::Circle(data)      => data.project_on_axis(axis),
+            ShapeData::RectRounded(data) => data.project_on_axis(axis),
         }
     }
+}
+
+impl ShapeData {
+
+    pub fn rect(size: Vec2) -> Self {
+        Self::Rect(RectData{ size })
+    }
+
+    pub fn circle(radius: f32) -> Self {
+        Self::Circle(CircleData{ radius })
+    }
+
+    pub fn rect_rounded(size: Vec2, radius: f32) -> Self {
+        Self::RectRounded(RectRoundedData{ size, radius })
+    }
+
+    pub fn combine(self, other: Self) -> Self {
+        match (self, other) {
+            (ShapeData::Rect(r0),        ShapeData::Rect(r1)) => Self::rect(r0.size + r1.size),
+            (ShapeData::Circle(c0),      ShapeData::Circle(c1)) => Self::circle(c0.radius + c1.radius),
+            (ShapeData::RectRounded(r0), ShapeData::RectRounded(r1)) => Self::rect_rounded(r0.size + r1.size, r0.radius + r1.radius),
+            (ShapeData::Rect(r),         ShapeData::Circle(c)) | (ShapeData::Circle(c), ShapeData::Rect(r))         => Self::rect_rounded(r.size, c.radius),
+            (ShapeData::RectRounded(r0), ShapeData::Rect(r1))  | (ShapeData::Rect(r1),  ShapeData::RectRounded(r0)) => Self::rect_rounded(r0.size + r1.size, r0.radius),
+            (ShapeData::RectRounded(r),  ShapeData::Circle(c)) | (ShapeData::Circle(c), ShapeData::RectRounded(r))  => Self::rect_rounded(r.size, c.radius + r.radius),
+        }
+    }
+
 }
 
 pub struct Shape {

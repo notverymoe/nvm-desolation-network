@@ -16,3 +16,14 @@ impl ProjectOnAxis for CircleData {
     }
 
 }
+
+impl CircleData {
+
+    pub fn raycast(&self, origin: Vec2, axis: Vec2) -> Option<[f32; 2]> {
+        let adj = axis.perp_dot(origin);
+        if self.radius < adj { return None; }
+        let offset = self.radius*(1.0-(adj/self.radius).powi(2)).sqrt();
+        Some([-offset, offset])
+    }
+
+}
