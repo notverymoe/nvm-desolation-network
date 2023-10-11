@@ -1202,6 +1202,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "collision_2"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "enum_dispatch",
+]
+
+[[package]]
 name = "color_quant"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
