@@ -11,7 +11,7 @@ pub trait ProjectOnAxis {
 pub struct Projection(pub [f32; 2]);
 
 impl Projection {
-    pub fn new(v: f32) -> Self {
+    pub const fn new(v: f32) -> Self {
         Self([v,v])
     }
 

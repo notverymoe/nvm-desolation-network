@@ -11,7 +11,7 @@ pub struct RectData {
 
 impl RectData {
 
-    pub fn new(size: Vec2) -> Self {
+    pub const fn new(size: Vec2) -> Self {
         Self{size}
     }
 

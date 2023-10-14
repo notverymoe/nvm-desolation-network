@@ -11,7 +11,7 @@ pub struct CircleData {
 
 impl CircleData {
 
-    pub fn new(radius: f32) -> Self {
+    pub const fn new(radius: f32) -> Self {
         Self{radius}
     }
 

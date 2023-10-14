@@ -12,7 +12,7 @@ pub struct RectRoundedData {
 
 impl RectRoundedData {
 
-    pub fn new(size: Vec2, radius: f32) -> Self {
+    pub const fn new(size: Vec2, radius: f32) -> Self {
         Self{size, radius}
     }
 

@@ -20,6 +20,24 @@ pub enum ShapeData {
     RectRounded(RectRoundedData),
 }
 
+impl From<RectData> for ShapeData {
+    fn from(value: RectData) -> Self {
+        Self::Rect(value)
+    }
+}
+
+impl From<CircleData> for ShapeData {
+    fn from(value: CircleData) -> Self {
+        Self::Circle(value)
+    }
+}
+
+impl From<RectRoundedData> for ShapeData {
+    fn from(value: RectRoundedData) -> Self {
+        Self::RectRounded(value)
+    }
+}
+
 impl ProjectOnAxis for ShapeData {
     fn project_aabb(&self) -> [Projection; 2] {
         match self {
@@ -78,6 +96,14 @@ impl ShapeData {
 pub struct Shape {
     pub origin: Vec2,
     pub data:   ShapeData,
+}
+
+impl Shape {
+
+    pub fn new(origin: Vec2, data: impl Into<ShapeData>) -> Self {
+        Self{origin, data: data.into()}
+    }
+
 }
 
 impl ProjectOnAxis for Shape {
