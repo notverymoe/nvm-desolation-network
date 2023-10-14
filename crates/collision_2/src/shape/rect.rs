@@ -20,6 +20,7 @@ impl NormalAtPoint for RectData {
         let dist_x = (point.x.abs() - self.size.x).abs(); 
         let dist_y = (point.y.abs() - self.size.y).abs();
 
+        // OPT can we make this branchless?
         if dist_x == dist_y {
             Vec2::new(
                 point.x.signum() * std::f32::consts::SQRT_2,

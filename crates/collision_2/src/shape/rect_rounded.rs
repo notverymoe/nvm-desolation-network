@@ -22,16 +22,21 @@ impl NormalAtPoint for RectRoundedData {
         let dist_x = pnt_abs.x - (self.size.x + self.radius); 
         let dist_y = pnt_abs.y - (self.size.y + self.radius);
 
+        // OPT maybe if we reverse the subtraction order
+        // we can skip the f32::abs within the rect branch
         if dist_x < -self.radius || dist_y < -self.radius {
+            // Within the the inner rect
             let dist_x = dist_x.abs(); 
             let dist_y = dist_y.abs();
 
+            // OPT can we make this branchless?
             if dist_x < dist_y {
                 Vec2::new(point.x.signum(), 0.0)
             } else {
                 Vec2::new(0.0, point.y.signum())
             }
         } else {
+            // In a circle's corner of influence
             point.signum() * (pnt_abs - self.size).normalize()
         }
     }
