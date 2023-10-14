@@ -17,12 +17,18 @@ impl RectData {
 
 impl NormalAtPoint for RectData {
     fn normal_at(&self, point: Vec2) -> Vec2 {
-        let dist_x = point.x.abs() - self.size.x; 
-        let dist_y = point.y.abs() - self.size.y;
+        let pnt_abs = point.abs();
+        let dist_x = pnt_abs.x - self.size.x; 
+        let dist_y = pnt_abs.y - self.size.y;
 
         // OPT can we make this branchless?
-        // TODO do we want to put some fuzzyness here?
-        if dist_x.signum() == dist_y.signum() {
+
+        if dist_x >= 0.0 && dist_y >= 0.0 {
+            Vec2::new(
+                point.x.signum() * std::f32::consts::FRAC_1_SQRT_2,
+                point.y.signum() * std::f32::consts::FRAC_1_SQRT_2,
+            )
+        } else if dist_x.signum() == dist_y.signum() {
             if dist_x == dist_y {
                 Vec2::new(
                     point.x.signum() * std::f32::consts::FRAC_1_SQRT_2,
