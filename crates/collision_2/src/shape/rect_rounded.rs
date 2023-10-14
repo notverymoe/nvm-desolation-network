@@ -68,32 +68,50 @@ mod test {
         let result = target.raycast(&ray);
         assert_eq!(result, None);
 
-        // x-axis
+        // hit x-axis
         let ray  = RayCaster::new(-3.0 * Vec2::X, Vec2::X);
         let result = target.raycast(&ray);
         assert_eq!(result, Some(Projection([1.0, 5.0])));
+
+        // hit x-axis reverse
+        let ray  = RayCaster::new(3.0 * Vec2::X, Vec2::X);
+        let result = target.raycast(&ray);
+        assert_eq!(result, Some(Projection([-5.0, -1.0])));
 
         // miss y-axis
         let ray  = RayCaster::new(3.01*Vec2::X + -3.0 * Vec2::Y, Vec2::Y);
         let result = target.raycast(&ray);
         assert_eq!(result, None);
 
-        // y-axis
+        // hit y-axis
         let ray  = RayCaster::new(-3.0 * Vec2::Y, Vec2::Y);
         let result = target.raycast(&ray);
         assert_eq!(result, Some(Projection([1.0, 5.0])));
+
+        // hit y-axis reverse
+        let ray  = RayCaster::new(3.0 * Vec2::Y, Vec2::Y);
+        let result = target.raycast(&ray);
+        assert_eq!(result, Some(Projection([-5.0, -1.0])));
 
         // miss 45 deg
         let ray  = RayCaster::new(3.5*Vec2::X + -3.0*Vec2::ONE, Vec2::ONE.normalize());
         let result = target.raycast(&ray);
         assert_eq!(result, None);
 
-        // 45 deg
+        // hit 45 deg
         let ray  = RayCaster::new(-3.0*Vec2::ONE, Vec2::ONE.normalize());
         let result = target.raycast(&ray);
         assert_eq!(result, Some(Projection([
             2.0*std::f32::consts::SQRT_2 - 1.0,
             4.0*std::f32::consts::SQRT_2 + 1.0,
+        ])));
+
+        // hit 45 deg reverse
+        let ray  = RayCaster::new(3.0*Vec2::ONE, Vec2::ONE.normalize());
+        let result = target.raycast(&ray);
+        assert_eq!(result, Some(Projection([
+            -(4.0*std::f32::consts::SQRT_2 + 1.0),
+            -(2.0*std::f32::consts::SQRT_2 - 1.0),
         ])));
     }
 
