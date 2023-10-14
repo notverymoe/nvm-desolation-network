@@ -2,7 +2,7 @@
 
 use bevy::prelude::*;
 
-use collision_2::{shape::{RectRoundedData, RectData, CircleData, ShapeData, Shape}, ray::{RayCaster, RaycastTarget}, projection::Projection};
+use collision_2::{RectRoundedData, RectData, CircleData, ShapeData, Shape, RayCaster, RaycastTarget, Projection};
 
 pub fn main() {
     App::new()

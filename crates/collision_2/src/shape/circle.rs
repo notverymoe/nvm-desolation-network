@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{projection::{Projection, ProjectOnAxis}, ray::{RayCaster, RaycastTarget}};
+use crate::{Projection, ProjectOnAxis, RayCaster, RaycastTarget};
 
 #[derive(Debug, Clone, Copy)]
 pub struct CircleData {

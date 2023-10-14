@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{projection::{ProjectOnAxis, Projection}, ray::{RaycastTarget, RayCaster}};
+use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster};
 
 mod rect;
 pub use rect::*;

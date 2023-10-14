@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::projection::Projection;
+use crate::Projection;
 
 pub trait RaycastTarget {
     fn raycast(&self, ray: &RayCaster) -> Option<Projection>;

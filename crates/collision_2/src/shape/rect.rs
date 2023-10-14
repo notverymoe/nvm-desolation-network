@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{projection::{Projection, ProjectOnAxis}, ray::{RaycastTarget, RayCaster}};
+use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster};
 
 #[derive(Debug, Clone, Copy)]
 pub struct RectData {
