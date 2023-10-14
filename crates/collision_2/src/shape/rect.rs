@@ -55,15 +55,30 @@ mod test {
     fn raycast_rect() {
         let target = RectData::new(Vec2::ONE);
 
+        // miss x-axis
+        let ray  = Ray::new(2.01 * Vec2::Y + -2.0 * Vec2::X, Vec2::X);
+        let result = target.raycast(&ray);
+        assert_eq!(result, None);
+
         // x-axis
         let ray  = Ray::new(-2.0 * Vec2::X, Vec2::X);
         let result = target.raycast(&ray);
         assert_eq!(result, Some(Projection([1.0, 3.0])));
 
+        // miss y-axis
+        let ray  = Ray::new(2.01 * Vec2::X + -2.0 * Vec2::Y, Vec2::Y);
+        let result = target.raycast(&ray);
+        assert_eq!(result, None);
+
         // y-axis
         let ray  = Ray::new(-2.0 * Vec2::Y, Vec2::Y);
         let result = target.raycast(&ray);
         assert_eq!(result, Some(Projection([1.0, 3.0])));
+
+        // miss 45 deg
+        let ray  = Ray::new(2.01 * Vec2::X + -2.0*Vec2::ONE, Vec2::ONE.normalize());
+        let result = target.raycast(&ray);
+        assert_eq!(result, None);
 
         // 45 deg
         let ray  = Ray::new(-2.0*Vec2::ONE, Vec2::ONE.normalize());
