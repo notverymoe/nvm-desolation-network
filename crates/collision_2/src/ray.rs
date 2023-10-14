@@ -59,8 +59,8 @@ impl RayCaster {
     }
 
     pub fn find_rect_intersection(&self, min: Vec2, max: Vec2) -> Option<Projection> {
-        let mut tmin = 0.0;
-        let mut tmax = f32::INFINITY;
+        let mut tmin = -f32::INFINITY;
+        let mut tmax =  f32::INFINITY;
 
         for d in 0..2 {
             let t1 = (min[d] - self.origin[d]) * self.direction_inv[d];
