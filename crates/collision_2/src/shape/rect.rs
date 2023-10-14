@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::projection::{Projection, ProjectOnAxis};
+use crate::{projection::{Projection, ProjectOnAxis}, ray::{RaycastTarget, Ray}};
 
 #[derive(Debug, Clone, Copy)]
 pub struct RectData {
@@ -17,6 +17,14 @@ impl ProjectOnAxis for RectData {
         // the relative position.
         let axis_dp = axis.abs().dot(self.size);
         Projection([-axis_dp, axis_dp])
+    }
+
+}
+
+impl RaycastTarget for RectData {
+
+    fn raycast(&self, ray: &Ray) -> Option<Projection> {
+        ray.find_rect_intersection(-self.size, self.size)
     }
 
 }

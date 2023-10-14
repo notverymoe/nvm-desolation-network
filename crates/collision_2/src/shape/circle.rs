@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::projection::{Projection, ProjectOnAxis};
+use crate::{projection::{Projection, ProjectOnAxis}, ray::{Ray, RaycastTarget}};
 
 #[derive(Debug, Clone, Copy)]
 pub struct CircleData {
@@ -17,13 +17,10 @@ impl ProjectOnAxis for CircleData {
 
 }
 
-impl CircleData {
+impl RaycastTarget for CircleData {
 
-    pub fn raycast(&self, origin: Vec2, axis: Vec2) -> Option<[f32; 2]> {
-        let adj = axis.perp_dot(origin);
-        if self.radius < adj { return None; }
-        let offset = self.radius*(1.0-(adj/self.radius).powi(2)).sqrt();
-        Some([-offset, offset])
+    fn raycast(&self, ray: &Ray) -> Option<Projection> {
+        ray.find_circle_intersection_at_origin(self.radius)
     }
 
 }

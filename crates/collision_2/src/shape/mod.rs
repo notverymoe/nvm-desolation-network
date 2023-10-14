@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::projection::{ProjectOnAxis, Projection};
+use crate::{projection::{ProjectOnAxis, Projection}, ray::{RaycastTarget, Ray}};
 
 mod rect;
 pub use rect::*;
@@ -30,6 +30,16 @@ impl ProjectOnAxis for ShapeData {
     }
 }
 
+impl RaycastTarget for ShapeData {
+    fn raycast(&self, ray: &Ray) -> Option<Projection> {
+        match self {
+            ShapeData::Rect(data)        => data.raycast(ray),
+            ShapeData::Circle(data)      => data.raycast(ray),
+            ShapeData::RectRounded(data) => data.raycast(ray),
+        }
+    }
+}
+
 impl ShapeData {
 
     pub fn rect(size: Vec2) -> Self {
@@ -46,12 +56,12 @@ impl ShapeData {
 
     pub fn combine(self, other: Self) -> Self {
         match (self, other) {
-            (ShapeData::Rect(r0),        ShapeData::Rect(r1)) => Self::rect(r0.size + r1.size),
-            (ShapeData::Circle(c0),      ShapeData::Circle(c1)) => Self::circle(c0.radius + c1.radius),
+            (ShapeData::Rect(r0),        ShapeData::Rect(r1)       ) => Self::rect(r0.size + r1.size),
+            (ShapeData::Circle(c0),      ShapeData::Circle(c1)     ) => Self::circle(c0.radius + c1.radius),
             (ShapeData::RectRounded(r0), ShapeData::RectRounded(r1)) => Self::rect_rounded(r0.size + r1.size, r0.radius + r1.radius),
-            (ShapeData::Rect(r),         ShapeData::Circle(c)) | (ShapeData::Circle(c), ShapeData::Rect(r))         => Self::rect_rounded(r.size, c.radius),
-            (ShapeData::RectRounded(r0), ShapeData::Rect(r1))  | (ShapeData::Rect(r1),  ShapeData::RectRounded(r0)) => Self::rect_rounded(r0.size + r1.size, r0.radius),
-            (ShapeData::RectRounded(r),  ShapeData::Circle(c)) | (ShapeData::Circle(c), ShapeData::RectRounded(r))  => Self::rect_rounded(r.size, c.radius + r.radius),
+            (ShapeData::Rect(r),         ShapeData::Circle(c)) | (ShapeData::Circle(c), ShapeData::Rect(r)        ) => Self::rect_rounded(r.size, c.radius),
+            (ShapeData::RectRounded(r0), ShapeData::Rect(r1) ) | (ShapeData::Rect(r1),  ShapeData::RectRounded(r0)) => Self::rect_rounded(r0.size + r1.size, r0.radius),
+            (ShapeData::RectRounded(r),  ShapeData::Circle(c)) | (ShapeData::Circle(c), ShapeData::RectRounded(r) ) => Self::rect_rounded(r.size, c.radius + r.radius),
         }
     }
 
@@ -65,5 +75,11 @@ pub struct Shape {
 impl ProjectOnAxis for Shape {
     fn project_on_axis(&self, axis: Vec2) -> Projection {
         self.data.project_on_axis(axis).offset_by(axis.dot(self.origin))
+    }
+}
+
+impl RaycastTarget for Shape {
+    fn raycast(&self, ray: &Ray) -> Option<Projection> {
+        self.data.raycast(&ray.with_offset(-self.origin))
     }
 }
