@@ -55,7 +55,7 @@ impl RaycastTarget for RectRoundedData {
 mod test {
     use bevy::prelude::Vec2;
 
-    use crate::{ray::{RayCaster, RaycastTarget}, projection::Projection};
+    use crate::{ray_caster::{RayCaster, RaycastTarget}, projection::Projection};
 
     use super::RectRoundedData;
 

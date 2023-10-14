@@ -50,7 +50,10 @@ impl RayCaster {
 impl RayCaster {
 
     pub fn find_circle_intersection(&self, origin: Vec2, radius: f32) -> Option<Projection> {
-        let shifted_dp = [self.origin_dp[0] - self.direction.dot(origin), self.origin_dp[1] - self.direction.perp_dot(origin)];
+        let shifted_dp = [
+            self.origin_dp[0] - self.direction.dot(origin),
+            self.origin_dp[1] - self.direction.perp_dot(origin)
+        ];
         find_circle_intersection_at_origin(shifted_dp, radius)
     }
 
