@@ -9,6 +9,14 @@ pub struct RectData {
     pub size: Vec2,
 }
 
+impl RectData {
+
+    pub fn new(size: Vec2) -> Self {
+        Self{size}
+    }
+
+}
+
 impl ProjectOnAxis for RectData {
     fn project_aabb(&self) -> [Projection; 2] {
         [
@@ -31,6 +39,39 @@ impl RaycastTarget for RectData {
 
     fn raycast(&self, ray: &Ray) -> Option<Projection> {
         ray.find_rect_intersection(-self.size, self.size)
+    }
+
+}
+
+#[cfg(test)]
+mod test {
+    use bevy::prelude::Vec2;
+
+    use crate::{ray::{Ray, RaycastTarget}, projection::Projection};
+
+    use super::RectData;
+
+    #[test]
+    fn raycast_rect() {
+        let target = RectData::new(Vec2::ONE);
+
+        // x-axis
+        let ray  = Ray::new(-2.0 * Vec2::X, Vec2::X);
+        let result = target.raycast(&ray);
+        assert_eq!(result, Some(Projection([1.0, 3.0])));
+
+        // y-axis
+        let ray  = Ray::new(-2.0 * Vec2::Y, Vec2::Y);
+        let result = target.raycast(&ray);
+        assert_eq!(result, Some(Projection([1.0, 3.0])));
+
+        // 45 deg
+        let ray  = Ray::new(-2.0*Vec2::ONE, Vec2::ONE.normalize());
+        let result = target.raycast(&ray);
+        assert_eq!(result, Some(Projection([
+            1.0*std::f32::consts::SQRT_2,
+            3.0*std::f32::consts::SQRT_2,
+        ])));
     }
 
 }

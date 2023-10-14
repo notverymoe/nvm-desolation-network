@@ -10,6 +10,14 @@ pub struct RectRoundedData {
     pub radius: f32,
 }
 
+impl RectRoundedData {
+
+    pub fn new(size: Vec2, radius: f32) -> Self {
+        Self{size, radius}
+    }
+
+}
+
 impl ProjectOnAxis for RectRoundedData {
     fn project_aabb(&self) -> [Projection; 2] {
         [
@@ -29,22 +37,56 @@ impl ProjectOnAxis for RectRoundedData {
 impl RaycastTarget for RectRoundedData {
 
     fn raycast(&self, ray: &Ray) -> Option<Projection> {
+
+        let min_x = self.size.x;
+        let max_x = self.size.x + self.radius;
+
+        let min_y = self.size.y;
+        let max_y = self.size.y + self.radius;
+
         // OPT we could use a modified rect intersecton to only operate on one axis
         [
             ray.find_circle_intersection(Vec2::new( self.size.x,  self.size.y), self.radius),
             ray.find_circle_intersection(Vec2::new(-self.size.x,  self.size.y), self.radius),
             ray.find_circle_intersection(Vec2::new(-self.size.x, -self.size.y), self.radius),
             ray.find_circle_intersection(Vec2::new( self.size.x, -self.size.y), self.radius),
-            ray.find_rect_intersection(
-                Vec2::new(-(self.size.x - self.radius), -self.size.y), 
-                Vec2::new(  self.size.x - self.radius,  -self.size.y)
-            ),
-            ray.find_rect_intersection(
-                Vec2::new(-self.size.x, -(self.size.y - self.radius)), 
-                Vec2::new( self.size.x,   self.size.y - self.radius )
-            ),
+            ray.find_rect_intersection(Vec2::new(-min_x, -max_y), Vec2::new(min_x,  max_y)), // vert test
+            ray.find_rect_intersection(Vec2::new(-max_x, -min_y), Vec2::new(max_x,  min_y)), // horz test
         ].iter().filter_map(|v| *v).reduce(|p, c| p.merged_with(c))
         
+    }
+
+}
+
+#[cfg(test)]
+mod test {
+    use bevy::prelude::Vec2;
+
+    use crate::{ray::{Ray, RaycastTarget}, projection::Projection};
+
+    use super::RectRoundedData;
+
+    #[test]
+    fn raycast_rect_rounded() {
+        let target = RectRoundedData::new(Vec2::ONE, 1.0);
+
+        // x-axis
+        let ray  = Ray::new(-3.0 * Vec2::X, Vec2::X);
+        let result = target.raycast(&ray);
+        assert_eq!(result, Some(Projection([1.0, 5.0])));
+
+        // y-axis
+        let ray  = Ray::new(-3.0 * Vec2::Y, Vec2::Y);
+        let result = target.raycast(&ray);
+        assert_eq!(result, Some(Projection([1.0, 5.0])));
+
+        // 45 deg
+        let ray  = Ray::new(-3.0*Vec2::ONE, Vec2::ONE.normalize());
+        let result = target.raycast(&ray);
+        assert_eq!(result, Some(Projection([
+            2.0*std::f32::consts::SQRT_2 - 1.0,
+            4.0*std::f32::consts::SQRT_2 + 1.0,
+        ])));
     }
 
 }

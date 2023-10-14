@@ -10,9 +10,10 @@ pub trait RaycastTarget {
 
 #[derive(Debug, Clone, Copy)]
 pub struct Ray {
-    origin:        Vec2,
-    direction:     Vec2,
-    direction_inv: Vec2,
+    origin:         Vec2,
+    origin_dp:      [f32; 2],
+    direction:      Vec2,
+    direction_inv:  Vec2,
 }
 
 impl Ray {
@@ -20,6 +21,7 @@ impl Ray {
     pub fn new(origin: Vec2, direction: Vec2) -> Self {
         Self{
             origin, 
+            origin_dp: [direction.dot(origin), direction.perp_dot(origin)],
             direction,
             direction_inv: Vec2::new(1.0/direction.x, 1.0/direction.y),
         }
@@ -34,10 +36,12 @@ impl Ray {
     }
 
     pub fn with_offset(self, offset: Vec2) -> Self {
+        let origin = self.origin + offset;
         Self{
-            origin: self.origin + offset, 
-            direction: self.direction, 
-            direction_inv: self.direction_inv
+            origin, 
+            origin_dp:      [self.direction.dot(origin), self.direction.perp_dot(origin)],
+            direction:      self.direction, 
+            direction_inv:  self.direction_inv
         }
     }
 
@@ -46,11 +50,12 @@ impl Ray {
 impl Ray {
 
     pub fn find_circle_intersection(&self, origin: Vec2, radius: f32) -> Option<Projection> {
-        find_circle_intersection_at_origin(self.origin - origin, self.direction, radius)
+        let shifted_dp = [self.origin_dp[0] - self.direction.dot(origin), self.origin_dp[1] - self.direction.perp_dot(origin)];
+        find_circle_intersection_at_origin(shifted_dp, radius)
     }
 
     pub fn find_circle_intersection_at_origin(&self, radius: f32) -> Option<Projection> {
-        find_circle_intersection_at_origin(self.origin, self.direction, radius)
+        find_circle_intersection_at_origin(self.origin_dp, radius)
     }
 
     pub fn find_rect_intersection(&self, min: Vec2, max: Vec2) -> Option<Projection> {
@@ -73,9 +78,14 @@ impl Ray {
 
 }
 
-fn find_circle_intersection_at_origin(ray_origin: Vec2, ray_dir: Vec2, radius: f32) -> Option<Projection> {
-    let adj = ray_dir.perp_dot(ray_origin);
-    if radius < adj { return None; }
-    let offset = radius*(1.0-(adj/radius).powi(2)).sqrt();
-    Some(Projection([-offset, offset]))
+fn find_circle_intersection_at_origin(
+    ray_dp: [f32; 2],
+    radius: f32
+) -> Option<Projection> {
+    if radius < ray_dp[1] { return None; }
+    let offset = radius*(1.0-(ray_dp[1]/radius).powi(2)).sqrt();
+    Some(Projection([
+        -offset - ray_dp[0], 
+         offset - ray_dp[0]
+    ]))
 }
