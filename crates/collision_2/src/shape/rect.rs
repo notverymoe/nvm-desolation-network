@@ -21,30 +21,43 @@ impl NormalAtPoint for RectData {
         let dist_x = pnt_abs.x - self.size.x; 
         let dist_y = pnt_abs.y - self.size.y;
 
-        // OPT can we make this branchless?
+        // TODO OPT make this better
 
+        // +/- XY Quad
         if dist_x >= 0.0 && dist_y >= 0.0 {
-            Vec2::new(
+            return Vec2::new(
                 point.x.signum() * std::f32::consts::FRAC_1_SQRT_2,
                 point.y.signum() * std::f32::consts::FRAC_1_SQRT_2,
-            )
-        } else if dist_x.signum() == dist_y.signum() {
-            if dist_x == dist_y {
-                Vec2::new(
-                    point.x.signum() * std::f32::consts::FRAC_1_SQRT_2,
-                    point.y.signum() * std::f32::consts::FRAC_1_SQRT_2,
-                )
-            } else if dist_x < dist_y {
-                Vec2::new(point.x.signum(), 0.0)
-            } else {
-                Vec2::new(0.0, point.y.signum())
-            }
-        } else if dist_x.signum() < dist_y.signum() {
-            Vec2::new(0.0, point.y.signum())
-        } else {
-            Vec2::new(point.x.signum(), 0.0)
+            );
         }
 
+        // +Y Quad
+        if dist_x <= 0.0 && dist_y >= 0.0 {
+            return Vec2::new(0.0, point.y.signum());
+        }
+
+        // +X Quad
+        if dist_x >= 0.0 && dist_y <= 0.0 {
+            return Vec2::new(point.x.signum(), 0.0);
+        }
+
+        let pnt_scl  = pnt_abs/self.size;
+
+        // -Y Quad
+        if pnt_scl.y > pnt_scl.x {
+            return Vec2::new(0.0, point.y.signum());
+        }
+
+        // -X Quad
+        if pnt_scl.x > pnt_scl.y {
+            return Vec2::new(point.x.signum(), 0.0);
+        }
+
+        // Inside && x == y
+        Vec2::new(
+            point.x.signum() * std::f32::consts::FRAC_1_SQRT_2,
+            point.y.signum() * std::f32::consts::FRAC_1_SQRT_2,
+        )
     }
 }
 
