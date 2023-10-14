@@ -45,8 +45,12 @@ impl Ray {
 
 impl Ray {
 
-    pub fn find_circle_intersection(self, origin: Vec2, radius: f32) -> Option<Projection> {
-        self.with_offset(-origin).find_circle_intersection_at_origin(radius)
+    pub fn find_circle_intersection(&self, origin: Vec2, radius: f32) -> Option<Projection> {
+        find_circle_intersection_at_origin(self.origin - origin, self.direction, radius)
+    }
+
+    pub fn find_circle_intersection_at_origin(&self, radius: f32) -> Option<Projection> {
+        find_circle_intersection_at_origin(self.origin, self.direction, radius)
     }
 
     pub fn find_rect_intersection(&self, min: Vec2, max: Vec2) -> Option<Projection> {
@@ -69,13 +73,9 @@ impl Ray {
 
 }
 
-impl Ray {
-
-    pub fn find_circle_intersection_at_origin(&self, radius: f32) -> Option<Projection> {
-        let adj = self.direction.perp_dot(self.origin);
-        if radius < adj { return None; }
-        let offset = radius*(1.0-(adj/radius).powi(2)).sqrt();
-        Some(Projection([-offset, offset]))
-    }
-
+fn find_circle_intersection_at_origin(ray_origin: Vec2, ray_dir: Vec2, radius: f32) -> Option<Projection> {
+    let adj = ray_dir.perp_dot(ray_origin);
+    if radius < adj { return None; }
+    let offset = radius*(1.0-(adj/radius).powi(2)).sqrt();
+    Some(Projection([-offset, offset]))
 }

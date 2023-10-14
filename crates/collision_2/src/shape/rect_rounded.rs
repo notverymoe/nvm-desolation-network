@@ -11,6 +11,12 @@ pub struct RectRoundedData {
 }
 
 impl ProjectOnAxis for RectRoundedData {
+    fn project_aabb(&self) -> [Projection; 2] {
+        [
+            Projection([-self.size.x - self.radius, self.size.x + self.radius]),
+            Projection([-self.size.y - self.radius, self.size.y + self.radius]),
+        ]
+    }
 
     fn project_on_axis(&self, axis: Vec2) -> Projection {
         // Don't ask, this works, it's magic. See RectData for some info.

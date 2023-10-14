@@ -3,6 +3,7 @@
 use bevy::math::Vec2;
 
 pub trait ProjectOnAxis {
+    fn project_aabb(&self) -> [Projection; 2];
     fn project_on_axis(&self, axis: Vec2) -> Projection;
 }
 
@@ -21,6 +22,10 @@ impl Projection {
     pub fn from_points_iter(axis: Vec2, points: impl IntoIterator<Item = Vec2>) -> Self {
         // OPT we might be able to get this neater
         points.into_iter().fold(Self([f32::INFINITY, f32::NEG_INFINITY]), |p, c| p.expanded_by(axis.dot(c)))
+    }
+
+    pub fn get_points(&self, axis: Vec2) -> [Vec2; 2] {
+        [axis*self.0[0], axis*self.0[1]]
     }
 
     pub fn swept_by(mut self, a: Self) -> Self {

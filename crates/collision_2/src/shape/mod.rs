@@ -21,6 +21,14 @@ pub enum ShapeData {
 }
 
 impl ProjectOnAxis for ShapeData {
+    fn project_aabb(&self) -> [Projection; 2] {
+        match self {
+            ShapeData::Rect(data)        => data.project_aabb(),
+            ShapeData::Circle(data)      => data.project_aabb(),
+            ShapeData::RectRounded(data) => data.project_aabb(),
+        }
+    }
+
     fn project_on_axis(&self, axis: Vec2) -> crate::projection::Projection {
         match self {
             ShapeData::Rect(data)        => data.project_on_axis(axis),
@@ -73,6 +81,11 @@ pub struct Shape {
 }
 
 impl ProjectOnAxis for Shape {
+    fn project_aabb(&self) -> [Projection; 2] {
+        let [x, y] = self.data.project_aabb();
+        [x.offset_by(self.origin.x), y.offset_by(self.origin.y)]
+    }
+
     fn project_on_axis(&self, axis: Vec2) -> Projection {
         self.data.project_on_axis(axis).offset_by(axis.dot(self.origin))
     }

@@ -10,6 +10,13 @@ pub struct CircleData {
 }
 
 impl ProjectOnAxis for CircleData {
+    
+    fn project_aabb(&self) -> [Projection; 2] {
+        [
+            Projection([-self.radius, self.radius]),
+            Projection([-self.radius, self.radius]),
+        ]
+    }
 
     fn project_on_axis(&self, _axis: Vec2) -> Projection {
         Projection([-self.radius, self.radius])

@@ -10,6 +10,12 @@ pub struct RectData {
 }
 
 impl ProjectOnAxis for RectData {
+    fn project_aabb(&self) -> [Projection; 2] {
+        [
+            Projection([-self.size.x, self.size.x]),
+            Projection([-self.size.y, self.size.y]),
+        ]
+    }
 
     fn project_on_axis(&self, axis: Vec2) -> Projection {
         // Axis points towards a particular corner, Vec2::abs() will 
