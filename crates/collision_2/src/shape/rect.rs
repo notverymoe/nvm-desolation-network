@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster};
+use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster, NormalAtPoint};
 
 #[derive(Debug, Clone, Copy)]
 pub struct RectData {
@@ -12,6 +12,24 @@ pub struct RectData {
 impl RectData {
     pub const fn new(size: Vec2) -> Self {
         Self{size}
+    }
+}
+
+impl NormalAtPoint for RectData {
+    fn normal_at(&self, point: Vec2) -> Vec2 {
+        let dist_x = (point.x.abs() - self.size.x).abs(); 
+        let dist_y = (point.y.abs() - self.size.y).abs();
+
+        if dist_x == dist_y {
+            Vec2::new(
+                point.x.signum() * std::f32::consts::SQRT_2,
+                point.y.signum() * std::f32::consts::SQRT_2,
+            )
+        } else if dist_x < dist_y {
+            Vec2::new(point.x.signum(), 0.0)
+        } else {
+            Vec2::new(0.0, point.y.signum())
+        }
     }
 }
 

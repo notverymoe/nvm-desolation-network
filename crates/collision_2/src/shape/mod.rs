@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster};
+use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster, NormalAtPoint};
 
 mod rect;
 pub use rect::*;
@@ -35,6 +35,16 @@ impl From<CircleData> for ShapeData {
 impl From<RectRoundedData> for ShapeData {
     fn from(value: RectRoundedData) -> Self {
         Self::RectRounded(value)
+    }
+}
+
+impl NormalAtPoint for ShapeData {
+    fn normal_at(&self, point: Vec2) -> Vec2 {
+        match self {
+            ShapeData::Rect(data)        => data.normal_at(point),
+            ShapeData::Circle(data)      => data.normal_at(point),
+            ShapeData::RectRounded(data) => data.normal_at(point),
+        }
     }
 }
 
@@ -104,6 +114,12 @@ impl Shape {
         Self{origin, data: data.into()}
     }
 
+}
+
+impl NormalAtPoint for Shape {
+    fn normal_at(&self, point: Vec2) -> Vec2 {
+        self.data.normal_at(point - self.origin)
+    }
 }
 
 impl ProjectOnAxis for Shape {

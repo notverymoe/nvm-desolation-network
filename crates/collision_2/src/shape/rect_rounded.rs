@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster};
+use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster, NormalAtPoint};
 
 #[derive(Debug, Clone, Copy)]
 pub struct RectRoundedData {
@@ -13,6 +13,27 @@ pub struct RectRoundedData {
 impl RectRoundedData {
     pub const fn new(size: Vec2, radius: f32) -> Self {
         Self{size, radius}
+    }
+}
+
+impl NormalAtPoint for RectRoundedData {
+    fn normal_at(&self, point: Vec2) -> Vec2 {
+        let pnt_abs = point.abs();
+        let dist_x = pnt_abs.x - (self.size.x + self.radius); 
+        let dist_y = pnt_abs.y - (self.size.y + self.radius);
+
+        if dist_x < -self.radius || dist_y < -self.radius {
+            let dist_x = dist_x.abs(); 
+            let dist_y = dist_y.abs();
+
+            if dist_x < dist_y {
+                Vec2::new(point.x.signum(), 0.0)
+            } else {
+                Vec2::new(0.0, point.y.signum())
+            }
+        } else {
+            point.signum() * (pnt_abs - self.size).normalize()
+        }
     }
 }
 

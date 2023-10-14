@@ -1,12 +1,14 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-use bevy::prelude::*;
+use bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
 
-use collision_2::{RectRoundedData, RectData, CircleData, ShapeData, Shape, RayCaster, RaycastTarget, Projection};
+use collision_2::{RectRoundedData, RectData, CircleData, ShapeData, Shape, RayCaster, RaycastTarget, Projection, NormalAtPoint};
 
 pub fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugins(LogDiagnosticsPlugin::default())
+        .add_plugins(FrameTimeDiagnosticsPlugin)
         .add_systems(Startup,    setup )
         .add_systems(Update,     (update_raycaster, update_static, check_colliders).chain())
         .add_systems(PostUpdate, render)
@@ -18,9 +20,9 @@ pub struct StaticCollider(Shape);
 
 impl StaticCollider {
 
-    const RECT:         RectData        = RectData::new(Vec2::new(100.0, 100.0));
-    const CIRCLE:       CircleData      = CircleData::new(50.0);
-    const RECT_ROUNDED: RectRoundedData = RectRoundedData::new(Vec2::new(100.0, 100.0), 50.0);
+    const RECT:         RectData        = RectData::new(Vec2::new(50.0, 50.0));
+    const CIRCLE:       CircleData      = CircleData::new(75.0);
+    const RECT_ROUNDED: RectRoundedData = RectRoundedData::new(Vec2::new(50.0, 50.0), 25.0);
 
     pub fn new(origin: Vec2) -> Self {
         Self(Shape::new(origin, Self::CIRCLE))
@@ -48,7 +50,16 @@ pub struct RayCasterCollider {
 fn setup(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
 
-    commands.spawn(StaticCollider::new(Vec2::X * 200.0));
+    commands.spawn(StaticCollider::new(Vec2::new( 300.0,  300.0)));
+    commands.spawn(StaticCollider::new(Vec2::new(-300.0,  300.0)));
+    commands.spawn(StaticCollider::new(Vec2::new(-300.0, -300.0)));
+    commands.spawn(StaticCollider::new(Vec2::new( 300.0, -300.0)));
+
+    commands.spawn(StaticCollider::new(Vec2::new( 200.0,    0.0)));
+    commands.spawn(StaticCollider::new(Vec2::new(   0.0,  200.0)));
+    commands.spawn(StaticCollider::new(Vec2::new(-200.0,   0.0)));
+    commands.spawn(StaticCollider::new(Vec2::new(   0.0, -200.0)));
+
     commands.spawn(RayCasterCollider{origin: -Vec2::X * 200.0, target: Vec2::ZERO, hits: Vec::default()});
 }
 
@@ -151,9 +162,16 @@ fn render(
         gizmos.circle_2d(caster.target, 10.0, Color::GREEN);
         gizmos.line_2d(caster.origin - dir*6000.0, caster.target + dir*6000.0, if caster.hits.is_empty() { Color::LIME_GREEN } else { Color::PINK });
 
-        for (_, hit) in caster.hits.iter() {
+        for (hit_id, hit) in caster.hits.iter() {
             let [start, end] = hit.get_points(dir).map(|v| caster.origin + v);
             gizmos.line_2d(start, end, Color::PURPLE);
+
+            let hit_shape = &q_static.get(*hit_id).unwrap().1.0;
+            let start_norm = hit_shape.normal_at(start);
+            gizmos.line_2d(start, start + start_norm*50.0, Color::BLUE);
+
+            let end_norm = hit_shape.normal_at(end);
+            gizmos.line_2d(end, end + end_norm*50.0, Color::BLUE);
         }
         
     }

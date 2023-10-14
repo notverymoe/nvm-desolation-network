@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{Projection, ProjectOnAxis, RayCaster, RaycastTarget};
+use crate::{Projection, ProjectOnAxis, RayCaster, RaycastTarget, NormalAtPoint};
 
 #[derive(Debug, Clone, Copy)]
 pub struct CircleData {
@@ -12,6 +12,12 @@ pub struct CircleData {
 impl CircleData {
     pub const fn new(radius: f32) -> Self {
         Self{radius}
+    }
+}
+
+impl NormalAtPoint for CircleData {
+    fn normal_at(&self, point: Vec2) -> Vec2 {
+        point.normalize()
     }
 }
 
