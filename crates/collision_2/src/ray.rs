@@ -5,18 +5,18 @@ use bevy::prelude::Vec2;
 use crate::projection::Projection;
 
 pub trait RaycastTarget {
-    fn raycast(&self, ray: &Ray) -> Option<Projection>;
+    fn raycast(&self, ray: &RayCaster) -> Option<Projection>;
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct Ray {
+pub struct RayCaster {
     origin:         Vec2,
     origin_dp:      [f32; 2],
     direction:      Vec2,
     direction_inv:  Vec2,
 }
 
-impl Ray {
+impl RayCaster {
 
     pub fn new(origin: Vec2, direction: Vec2) -> Self {
         Self{
@@ -47,7 +47,7 @@ impl Ray {
 
 } 
 
-impl Ray {
+impl RayCaster {
 
     pub fn find_circle_intersection(&self, origin: Vec2, radius: f32) -> Option<Projection> {
         let shifted_dp = [self.origin_dp[0] - self.direction.dot(origin), self.origin_dp[1] - self.direction.perp_dot(origin)];

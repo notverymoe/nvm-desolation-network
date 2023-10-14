@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{projection::{Projection, ProjectOnAxis}, ray::{Ray, RaycastTarget}};
+use crate::{projection::{Projection, ProjectOnAxis}, ray::{RayCaster, RaycastTarget}};
 
 #[derive(Debug, Clone, Copy)]
 pub struct CircleData {
@@ -29,7 +29,7 @@ impl ProjectOnAxis for CircleData {
 }
 
 impl RaycastTarget for CircleData {
-    fn raycast(&self, ray: &Ray) -> Option<Projection> {
+    fn raycast(&self, ray: &RayCaster) -> Option<Projection> {
         ray.find_circle_intersection_at_origin(self.radius)
     }
 }
@@ -38,7 +38,7 @@ impl RaycastTarget for CircleData {
 mod test {
     use bevy::prelude::Vec2;
 
-    use crate::{ray::{Ray, RaycastTarget}, projection::Projection};
+    use crate::{ray::{RayCaster, RaycastTarget}, projection::Projection};
 
     use super::CircleData;
 
@@ -47,32 +47,32 @@ mod test {
         let target = CircleData::new(1.0);
 
         // miss x-axis
-        let ray  = Ray::new(2.01* Vec2::Y + -2.0 * Vec2::X, Vec2::X);
+        let ray  = RayCaster::new(2.01* Vec2::Y + -2.0 * Vec2::X, Vec2::X);
         let result = target.raycast(&ray);
         assert_eq!(result, None);
 
         // x-axis
-        let ray  = Ray::new(-2.0 * Vec2::X, Vec2::X);
+        let ray  = RayCaster::new(-2.0 * Vec2::X, Vec2::X);
         let result = target.raycast(&ray);
         assert_eq!(result, Some(Projection([1.0, 3.0])));
 
         // miss y-axis
-        let ray  = Ray::new(2.01* Vec2::X + -2.0 * Vec2::Y, Vec2::Y);
+        let ray  = RayCaster::new(2.01* Vec2::X + -2.0 * Vec2::Y, Vec2::Y);
         let result = target.raycast(&ray);
         assert_eq!(result, None);
 
         // y-axis
-        let ray  = Ray::new(-2.0 * Vec2::Y, Vec2::Y);
+        let ray  = RayCaster::new(-2.0 * Vec2::Y, Vec2::Y);
         let result = target.raycast(&ray);
         assert_eq!(result, Some(Projection([1.0, 3.0])));
 
         // miss 45 deg
-        let ray  = Ray::new(2.01* Vec2::X + -Vec2::ONE, Vec2::Y);
+        let ray  = RayCaster::new(2.01* Vec2::X + -Vec2::ONE, Vec2::Y);
         let result = target.raycast(&ray);
         assert_eq!(result, None);
 
         // 45 deg
-        let ray  = Ray::new(-Vec2::ONE, Vec2::ONE.normalize());
+        let ray  = RayCaster::new(-Vec2::ONE, Vec2::ONE.normalize());
         let result = target.raycast(&ray);
         assert_eq!(result, Some(Projection([
             std::f32::consts::SQRT_2 - 1.0,

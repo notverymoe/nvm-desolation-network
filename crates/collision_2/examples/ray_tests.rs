@@ -2,7 +2,7 @@
 
 use bevy::prelude::*;
 
-use collision_2::{shape::{RectRoundedData, RectData, CircleData, ShapeData, Shape}, ray::{Ray, RaycastTarget}, projection::Projection};
+use collision_2::{shape::{RectRoundedData, RectData, CircleData, ShapeData, Shape}, ray::{RayCaster, RaycastTarget}, projection::Projection};
 
 pub fn main() {
     App::new()
@@ -37,7 +37,7 @@ impl StaticCollider {
 }
 
 #[derive(Component)]
-pub struct RayCaster {
+pub struct RayCasterCollider {
     origin: Vec2,
     target: Vec2,
 
@@ -49,7 +49,7 @@ fn setup(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
 
     commands.spawn(StaticCollider::new(Vec2::X * 200.0));
-    commands.spawn(RayCaster{origin: -Vec2::X * 200.0, target: Vec2::ZERO, hits: Vec::default()});
+    commands.spawn(RayCasterCollider{origin: -Vec2::X * 200.0, target: Vec2::ZERO, hits: Vec::default()});
 }
 
 fn update_static(
@@ -64,7 +64,7 @@ fn update_static(
 }
 
 fn update_raycaster(
-    mut q: Query<&mut RayCaster>, 
+    mut q: Query<&mut RayCasterCollider>, 
     keys: Res<Input<KeyCode>>,
     time: Res<Time>
  ) {
@@ -116,12 +116,12 @@ fn update_raycaster(
 }
 
 fn check_colliders(
-    mut q_caster:  Query<&mut RayCaster>,
+    mut q_caster:  Query<&mut RayCasterCollider>,
     q_static: Query<(Entity, &StaticCollider)>,
 ) {
     for mut caster in q_caster.iter_mut() {
         caster.hits.clear();
-        let ray = Ray::new(caster.origin, (caster.target - caster.origin).normalize());
+        let ray = RayCaster::new(caster.origin, (caster.target - caster.origin).normalize());
         for (shape_id, StaticCollider(shape)) in q_static.iter() {
             if let Some(projection) = shape.raycast(&ray) {
                 caster.hits.push((shape_id, projection));
@@ -133,7 +133,7 @@ fn check_colliders(
 
 fn render(
     mut gizmos: Gizmos, 
-    q_caster:  Query<&RayCaster>,
+    q_caster:  Query<&RayCasterCollider>,
     q_static: Query<(Entity, &StaticCollider)>,
 ) {
     for (shape_id, StaticCollider(shape)) in q_static.iter() {

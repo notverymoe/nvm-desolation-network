@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{projection::{ProjectOnAxis, Projection}, ray::{RaycastTarget, Ray}};
+use crate::{projection::{ProjectOnAxis, Projection}, ray::{RaycastTarget, RayCaster}};
 
 mod rect;
 pub use rect::*;
@@ -57,7 +57,7 @@ impl ProjectOnAxis for ShapeData {
 }
 
 impl RaycastTarget for ShapeData {
-    fn raycast(&self, ray: &Ray) -> Option<Projection> {
+    fn raycast(&self, ray: &RayCaster) -> Option<Projection> {
         match self {
             ShapeData::Rect(data)        => data.raycast(ray),
             ShapeData::Circle(data)      => data.raycast(ray),
@@ -118,7 +118,7 @@ impl ProjectOnAxis for Shape {
 }
 
 impl RaycastTarget for Shape {
-    fn raycast(&self, ray: &Ray) -> Option<Projection> {
+    fn raycast(&self, ray: &RayCaster) -> Option<Projection> {
         self.data.raycast(&ray.with_offset(-self.origin))
     }
 }
