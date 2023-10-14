@@ -12,3 +12,6 @@ pub use projection::*;
 mod normal_at_point;
 pub use normal_at_point::*;
 
+mod util;
+pub use util::*;
+

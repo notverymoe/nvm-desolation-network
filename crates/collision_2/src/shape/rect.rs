@@ -17,20 +17,28 @@ impl RectData {
 
 impl NormalAtPoint for RectData {
     fn normal_at(&self, point: Vec2) -> Vec2 {
-        let dist_x = (point.x.abs() - self.size.x).abs(); 
-        let dist_y = (point.y.abs() - self.size.y).abs();
+        let dist_x = point.x.abs() - self.size.x; 
+        let dist_y = point.y.abs() - self.size.y;
 
         // OPT can we make this branchless?
-        if dist_x == dist_y {
-            Vec2::new(
-                point.x.signum() * std::f32::consts::SQRT_2,
-                point.y.signum() * std::f32::consts::SQRT_2,
-            )
-        } else if dist_x < dist_y {
-            Vec2::new(point.x.signum(), 0.0)
-        } else {
+        // TODO do we want to put some fuzzyness here?
+        if dist_x.signum() == dist_y.signum() {
+            if dist_x == dist_y {
+                Vec2::new(
+                    point.x.signum() * std::f32::consts::FRAC_1_SQRT_2,
+                    point.y.signum() * std::f32::consts::FRAC_1_SQRT_2,
+                )
+            } else if dist_x < dist_y {
+                Vec2::new(point.x.signum(), 0.0)
+            } else {
+                Vec2::new(0.0, point.y.signum())
+            }
+        } else if dist_x.signum() < dist_y.signum() {
             Vec2::new(0.0, point.y.signum())
+        } else {
+            Vec2::new(point.x.signum(), 0.0)
         }
+
     }
 }
 
@@ -61,9 +69,7 @@ impl RaycastTarget for RectData {
 mod test {
     use bevy::prelude::Vec2;
 
-    use crate::{ray_caster::{RayCaster, RaycastTarget}, projection::Projection};
-
-    use super::RectData;
+    use crate::{RayCaster, RaycastTarget, Projection, RectData, NormalAtPoint, assert_vec_eq};
 
     #[test]
     fn raycast_rect() {
@@ -119,6 +125,18 @@ mod test {
             -3.0*std::f32::consts::SQRT_2,
             -1.0*std::f32::consts::SQRT_2,
         ])));
+    }
+
+    #[test]
+    fn normals_rect() {
+        let target = RectData::new(Vec2::ONE);
+
+        assert_vec_eq!(target.normal_at(100.0 *   Vec2::X),  Vec2::X);
+        assert_vec_eq!(target.normal_at(100.0 *  -Vec2::X), -Vec2::X);
+        assert_vec_eq!(target.normal_at(100.0 *   Vec2::Y),  Vec2::Y);
+        assert_vec_eq!(target.normal_at(100.0 *  -Vec2::Y), -Vec2::Y);
+        assert_vec_eq!(target.normal_at(100.0 * Vec2::ONE), Vec2::ONE.normalize());
+
     }
 
 }

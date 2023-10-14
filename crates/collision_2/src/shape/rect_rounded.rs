@@ -19,25 +19,29 @@ impl RectRoundedData {
 impl NormalAtPoint for RectRoundedData {
     fn normal_at(&self, point: Vec2) -> Vec2 {
         let pnt_abs = point.abs();
-        let dist_x = pnt_abs.x - (self.size.x + self.radius); 
-        let dist_y = pnt_abs.y - (self.size.y + self.radius);
+        let dist_x = pnt_abs.x - self.size.x; 
+        let dist_y = pnt_abs.y - self.size.y;
 
-        // OPT maybe if we reverse the subtraction order
-        // we can skip the f32::abs within the rect branch
-        if dist_x < -self.radius || dist_y < -self.radius {
-            // Within the the inner rect
-            let dist_x = dist_x.abs(); 
-            let dist_y = dist_y.abs();
+        // OPT can we make this branchless?
 
-            // OPT can we make this branchless?
-            if dist_x < dist_y {
+        if dist_x >= 0.0 && dist_y >= 0.0 {
+            // In a circle's corner of influence
+            point.signum() * (pnt_abs - self.size).normalize()
+        } else if dist_x.signum() == dist_y.signum() {
+            if dist_x == dist_y {
+                Vec2::new(
+                    point.x.signum() * std::f32::consts::FRAC_1_SQRT_2,
+                    point.y.signum() * std::f32::consts::FRAC_1_SQRT_2,
+                )
+            } else if dist_x < dist_y {
                 Vec2::new(point.x.signum(), 0.0)
             } else {
                 Vec2::new(0.0, point.y.signum())
             }
+        } else if dist_x.signum() < dist_y.signum() {
+            Vec2::new(0.0, point.y.signum())
         } else {
-            // In a circle's corner of influence
-            point.signum() * (pnt_abs - self.size).normalize()
+            Vec2::new(point.x.signum(), 0.0)
         }
     }
 }
@@ -81,9 +85,7 @@ impl RaycastTarget for RectRoundedData {
 mod test {
     use bevy::prelude::Vec2;
 
-    use crate::{ray_caster::{RayCaster, RaycastTarget}, projection::Projection};
-
-    use super::RectRoundedData;
+    use crate::{RayCaster, RaycastTarget, Projection, RectRoundedData, NormalAtPoint, assert_vec_eq};
 
     #[test]
     fn raycast_rect_rounded() {
@@ -139,6 +141,18 @@ mod test {
             -(4.0*std::f32::consts::SQRT_2 + 1.0),
             -(2.0*std::f32::consts::SQRT_2 - 1.0),
         ])));
+    }
+
+    #[test]
+    fn normals_rect_rounded() {
+        let target = RectRoundedData::new(Vec2::ONE, 1.0);
+
+        assert_vec_eq!(target.normal_at(100.0 *   Vec2::X),  Vec2::X);
+        assert_vec_eq!(target.normal_at(100.0 *  -Vec2::X), -Vec2::X);
+        assert_vec_eq!(target.normal_at(100.0 *   Vec2::Y),  Vec2::Y);
+        assert_vec_eq!(target.normal_at(100.0 *  -Vec2::Y), -Vec2::Y);
+        assert_vec_eq!(target.normal_at(100.0 * Vec2::ONE), Vec2::ONE.normalize());
+
     }
 
 }

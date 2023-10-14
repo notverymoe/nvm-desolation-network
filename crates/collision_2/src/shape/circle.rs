@@ -44,9 +44,7 @@ impl RaycastTarget for CircleData {
 mod test {
     use bevy::prelude::Vec2;
 
-    use crate::{ray_caster::{RayCaster, RaycastTarget}, projection::Projection};
-
-    use super::CircleData;
+    use crate::{RayCaster, RaycastTarget, Projection, CircleData, NormalAtPoint, assert_vec_eq};
 
     #[test]
     fn raycast_circle() {
@@ -102,6 +100,18 @@ mod test {
             -(std::f32::consts::SQRT_2 + 1.0),
             -(std::f32::consts::SQRT_2 - 1.0),
         ])));
+    }
+
+    #[test]
+    fn normals_circle() {
+        let target = CircleData::new(1.0);
+
+        assert_vec_eq!(target.normal_at(100.0 *   Vec2::X),  Vec2::X);
+        assert_vec_eq!(target.normal_at(100.0 *  -Vec2::X), -Vec2::X);
+        assert_vec_eq!(target.normal_at(100.0 *   Vec2::Y),  Vec2::Y);
+        assert_vec_eq!(target.normal_at(100.0 *  -Vec2::Y), -Vec2::Y);
+        assert_vec_eq!(target.normal_at(100.0 * Vec2::ONE), Vec2::ONE.normalize());
+
     }
 
 }
