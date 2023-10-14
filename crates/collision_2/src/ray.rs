@@ -82,7 +82,7 @@ fn find_circle_intersection_at_origin(
     ray_dp: [f32; 2],
     radius: f32
 ) -> Option<Projection> {
-    if radius < ray_dp[1] { return None; }
+    if radius < ray_dp[1].abs() { return None; }
     let offset = radius*(1.0-(ray_dp[1]/radius).powi(2)).sqrt();
     Some(Projection([
         -offset - ray_dp[0], 
