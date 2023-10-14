@@ -10,11 +10,9 @@ pub struct RectData {
 }
 
 impl RectData {
-
     pub const fn new(size: Vec2) -> Self {
         Self{size}
     }
-
 }
 
 impl ProjectOnAxis for RectData {
@@ -32,15 +30,12 @@ impl ProjectOnAxis for RectData {
         let axis_dp = axis.abs().dot(self.size);
         Projection([-axis_dp, axis_dp])
     }
-
 }
 
 impl RaycastTarget for RectData {
-
     fn raycast(&self, ray: &Ray) -> Option<Projection> {
         ray.find_rect_intersection(-self.size, self.size)
     }
-
 }
 
 #[cfg(test)]

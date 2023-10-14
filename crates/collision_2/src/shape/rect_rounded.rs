@@ -11,11 +11,9 @@ pub struct RectRoundedData {
 }
 
 impl RectRoundedData {
-
     pub const fn new(size: Vec2, radius: f32) -> Self {
         Self{size, radius}
     }
-
 }
 
 impl ProjectOnAxis for RectRoundedData {
@@ -31,13 +29,10 @@ impl ProjectOnAxis for RectRoundedData {
         let axis_dp = axis.abs().dot(self.size) + self.radius;
         Projection([-axis_dp, axis_dp])
     }
-
 }
 
 impl RaycastTarget for RectRoundedData {
-
     fn raycast(&self, ray: &Ray) -> Option<Projection> {
-
         let min_x = self.size.x;
         let max_x = self.size.x + self.radius;
 
@@ -53,9 +48,7 @@ impl RaycastTarget for RectRoundedData {
             ray.find_rect_intersection(Vec2::new(-min_x, -max_y), Vec2::new(min_x,  max_y)), // vert test
             ray.find_rect_intersection(Vec2::new(-max_x, -min_y), Vec2::new(max_x,  min_y)), // horz test
         ].iter().filter_map(|v| *v).reduce(|p, c| p.merged_with(c))
-        
     }
-
 }
 
 #[cfg(test)]

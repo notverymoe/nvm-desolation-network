@@ -10,15 +10,12 @@ pub struct CircleData {
 }
 
 impl CircleData {
-
     pub const fn new(radius: f32) -> Self {
         Self{radius}
     }
-
 }
 
 impl ProjectOnAxis for CircleData {
-    
     fn project_aabb(&self) -> [Projection; 2] {
         [
             Projection([-self.radius, self.radius]),
@@ -29,15 +26,12 @@ impl ProjectOnAxis for CircleData {
     fn project_on_axis(&self, _axis: Vec2) -> Projection {
         Projection([-self.radius, self.radius])
     }
-
 }
 
 impl RaycastTarget for CircleData {
-
     fn raycast(&self, ray: &Ray) -> Option<Projection> {
         ray.find_circle_intersection_at_origin(self.radius)
     }
-
 }
 
 #[cfg(test)]
