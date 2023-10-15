@@ -6,4 +6,4 @@ members=[
 ]
 
 [workspace.dependencies]
-bevy = {git="https://github.com/bevyengine/bevy.git", ref="b416d181a7e489df9a2b35f98e9e8038699586f5", default-features=false}
+bevy = {git="https://github.com/bevyengine/bevy.git", ref="b416d181a7e489df9a2b35f98e9e8038699586f5", default-features=false, features = ["dynamic_linking"]}
