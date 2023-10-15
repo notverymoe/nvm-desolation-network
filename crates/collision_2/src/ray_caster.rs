@@ -49,6 +49,14 @@ impl RayCaster {
 
 impl RayCaster {
 
+    pub fn test(&self, other: &impl RaycastTarget) -> Option<Projection> {
+        other.raycast(self)
+    }
+
+}
+
+impl RayCaster {
+
     pub fn find_circle_intersection(&self, origin: Vec2, radius: f32) -> Option<Projection> {
         let shifted_dp = [
             self.origin_dp[0] - self.direction.dot(origin),

@@ -2,7 +2,7 @@
 
 use bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
 
-use collision_2::{RectRoundedData, RectData, CircleData, ShapeData, Shape, RayCaster, RaycastTarget, Projection, NormalAtPoint};
+use collision_2::{RectRoundedData, RectData, CircleData, ShapeData, Shape, RayCaster, Projection, NormalAtPoint};
 
 pub fn main() {
     App::new()
@@ -134,7 +134,7 @@ fn check_colliders(
         caster.hits.clear();
         let ray = RayCaster::new(caster.origin, (caster.target - caster.origin).normalize());
         for (shape_id, StaticCollider(shape)) in q_static.iter() {
-            if let Some(projection) = shape.raycast(&ray) {
+            if let Some(projection) = ray.test(shape) {
                 caster.hits.push((shape_id, projection));
             }
         }
