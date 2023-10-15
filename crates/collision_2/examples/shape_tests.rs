@@ -2,7 +2,7 @@
 
 use bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
 
-use collision_2::{RectRoundedData, RectData, CircleData, ShapeData, Shape, RayCaster, Projection, NormalAtPoint};
+use collision_2::{RectRoundedData, RectData, CircleData, ShapeData, Shape, Projection, ShapeCaster, NormalAtPoint};
 
 pub fn main() {
     App::new()
@@ -21,8 +21,8 @@ pub struct StaticCollider(Shape);
 impl StaticCollider {
 
     const RECT:         RectData        = RectData::new(Vec2::new(50.0, 50.0));
-    const CIRCLE:       CircleData      = CircleData::new(75.0);
-    const RECT_ROUNDED: RectRoundedData = RectRoundedData::new(Vec2::new(50.0, 50.0), 25.0);
+    const CIRCLE:       CircleData      = CircleData::new(50.0);
+    const RECT_ROUNDED: RectRoundedData = RectRoundedData::new(Vec2::new(25.0, 25.0), 25.0);
 
     pub fn new(origin: Vec2) -> Self {
         Self(Shape::new(origin, Self::CIRCLE))
@@ -40,10 +40,9 @@ impl StaticCollider {
 
 #[derive(Component)]
 pub struct RayCasterCollider {
-    origin: Vec2,
+    collider: StaticCollider,
     target: Vec2,
-
-    hits: Vec<(Entity, Projection)>,
+    hits: Vec<(Entity, Projection, Shape)>,
 }
 
 
@@ -60,7 +59,11 @@ fn setup(mut commands: Commands) {
     commands.spawn(StaticCollider::new(Vec2::new(-200.0,   0.0)));
     commands.spawn(StaticCollider::new(Vec2::new(   0.0, -200.0)));
 
-    commands.spawn(RayCasterCollider{origin: -Vec2::X * 200.0, target: Vec2::ZERO, hits: Vec::default()});
+    commands.spawn(RayCasterCollider{
+        target: Vec2::X * 400.0, 
+        collider: StaticCollider::new(-Vec2::X * 400.0),
+        hits: Vec::default()
+    });
 }
 
 fn update_static(
@@ -83,6 +86,10 @@ fn update_raycaster(
     let mut offset_origin  = Vec2::ZERO;
     let mut offset_target = Vec2::ZERO;
 
+    if keys.just_pressed(KeyCode::Tab) {
+        caster.collider.next();
+    }
+
     if keys.pressed(KeyCode::W) {
         offset_origin += Vec2::Y;
     }
@@ -101,7 +108,7 @@ fn update_raycaster(
 
     if offset_origin != Vec2::ZERO {
         offset_origin *= 200.0 * time.delta_seconds();
-        caster.origin += offset_origin;
+        caster.collider.0.origin += offset_origin;
     }
 
     if keys.pressed(KeyCode::I) {
@@ -132,10 +139,10 @@ fn check_colliders(
 ) {
     for mut caster in q_caster.iter_mut() {
         caster.hits.clear();
-        let ray = RayCaster::new(caster.origin, (caster.target - caster.origin).normalize());
+        let ray = ShapeCaster::new(&caster.collider.0, (caster.target - caster.collider.0.origin).normalize());
         for (shape_id, StaticCollider(shape)) in q_static.iter() {
-            if let Some(projection) = ray.test_static(shape) {
-                caster.hits.push((shape_id, projection));
+            if let Some((projection, shape)) = ray.test_static(shape) {
+                caster.hits.push((shape_id, projection, shape));
             }
         }
     }
@@ -156,22 +163,26 @@ fn render(
     }
 
     for caster in q_caster.iter() {
-        let dir = (caster.target - caster.origin).normalize();
+        let caster_origin = caster.collider.0.origin;
+        let dir = (caster.target - caster_origin).normalize();
 
-        gizmos.circle_2d(caster.origin, 10.0, Color::GREEN);
-        gizmos.circle_2d(caster.target, 10.0, Color::GREEN);
-        gizmos.line_2d(caster.origin - dir*6000.0, caster.target + dir*6000.0, if caster.hits.is_empty() { Color::LIME_GREEN } else { Color::PINK });
+        render_shape(&mut gizmos, &caster.collider.0, Color::YELLOW);
 
-        for (hit_id, hit) in caster.hits.iter() {
-            let [start, end] = hit.get_points(dir).map(|v| caster.origin + v);
-            gizmos.line_2d(start, end, Color::PURPLE);
+        gizmos.circle_2d(caster.target, 10.0, Color::YELLOW);
 
-            let hit_shape = &q_static.get(*hit_id).unwrap().1.0;
+        gizmos.line_2d(caster_origin - dir*6000.0, caster.target + dir*6000.0, if caster.hits.is_empty() { Color::LIME_GREEN } else { Color::PINK });
+
+        for (_hit_id, hit, hit_shape) in caster.hits.iter() {
+            let [start, _end] = hit.get_points(dir).map(|v| caster_origin + v);
+
+            render_shape(&mut gizmos, hit_shape, Color::SALMON);
+            render_shape(&mut gizmos, &Shape::new(start, caster.collider.0.data), Color::PURPLE);
+
+            // TODO get normal at point
+            //let hit_shape  = &q_static.get(*hit_id).unwrap().1.0;
             let start_norm = hit_shape.normal_at(start);
+            //let [hit_point, _]  = hit_shape.raycast(&RayCaster::new(start, -start_norm)).unwrap().get_points(-start_norm).map(|v| start + v); // TODO better
             gizmos.line_2d(start, start + start_norm*50.0, Color::BLUE);
-
-            let end_norm = hit_shape.normal_at(end);
-            gizmos.line_2d(end, end + end_norm*50.0, Color::BLUE);
         }
         
     }

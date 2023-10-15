@@ -49,7 +49,7 @@ impl RayCaster {
 
 impl RayCaster {
 
-    pub fn test(&self, other: &impl RaycastTarget) -> Option<Projection> {
+    pub fn test_static(&self, other: &impl RaycastTarget) -> Option<Projection> {
         other.raycast(self)
     }
 

@@ -3,6 +3,9 @@
 mod ray_caster;
 pub use ray_caster::*;
 
+mod shape_caster;
+pub use shape_caster::*;
+
 mod shape;
 pub use shape::*;
 
