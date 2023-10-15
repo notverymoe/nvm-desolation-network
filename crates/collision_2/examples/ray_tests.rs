@@ -2,7 +2,7 @@
 
 use bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
 
-use collision_2::{RectRoundedData, RectData, CircleData, ShapeData, Shape, RayCaster, Projection, NormalAtPoint};
+use collision_2::{RectRoundedData, RectData, CircleData, ShapeData, Shape, RayCaster, Projection, NormalAtPoint, SlopeData};
 
 pub fn main() {
     App::new()
@@ -32,7 +32,8 @@ impl StaticCollider {
         self.0.data = match self.0.data {
             ShapeData::Circle(_)      => Self::RECT.into(),
             ShapeData::Rect(_)        => Self::RECT_ROUNDED.into(),
-            ShapeData::RectRounded(_) => Self::CIRCLE.into(),
+            ShapeData::RectRounded(_) => SlopeData::new(Vec2::new(100.0, 100.0)).into(),
+            ShapeData::Slope(_)       => Self::CIRCLE.into(),
         }
     }
 
@@ -166,12 +167,12 @@ fn render(
             let [start, end] = hit.get_points(dir).map(|v| caster.origin + v);
             gizmos.line_2d(start, end, Color::PURPLE);
 
-            let hit_shape = &q_static.get(*hit_id).unwrap().1.0;
-            let start_norm = hit_shape.normal_at(start);
-            gizmos.line_2d(start, start + start_norm*50.0, Color::BLUE);
-
-            let end_norm = hit_shape.normal_at(end);
-            gizmos.line_2d(end, end + end_norm*50.0, Color::BLUE);
+            //let hit_shape = &q_static.get(*hit_id).unwrap().1.0;
+            //let start_norm = hit_shape.normal_at(start);
+            //gizmos.line_2d(start, start + start_norm*50.0, Color::BLUE);
+//
+            //let end_norm = hit_shape.normal_at(end);
+            //gizmos.line_2d(end, end + end_norm*50.0, Color::BLUE);
         }
         
     }
@@ -212,6 +213,18 @@ fn render_shape(gizmos: &mut Gizmos, shape: &Shape, color: Color) {
             gizmos.line_2d(
                 shape.origin + Vec2::new(s.size.x + s.radius, -s.size.y),
                 shape.origin + Vec2::new(s.size.x + s.radius,  s.size.y),
+                color
+            );
+        },
+        ShapeData::Slope(s) => {
+            let size = s.size();
+            gizmos.linestrip_2d(
+                [
+                    shape.origin,
+                    shape.origin + Vec2::new(0.0, size.y),
+                    shape.origin + Vec2::new(size.x, 0.0),
+                    shape.origin,
+                ],
                 color
             );
         },
