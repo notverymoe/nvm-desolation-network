@@ -54,7 +54,7 @@ impl NormalAtPoint for ShapeData {
             ShapeData::Rect(data)        => data.normal_at(point),
             ShapeData::Circle(data)      => data.normal_at(point),
             ShapeData::RectRounded(data) => data.normal_at(point),
-            ShapeData::Slope(data)       => todo!(),
+            ShapeData::Slope(data)       => data.normal_at(point),
         }
     }
 }

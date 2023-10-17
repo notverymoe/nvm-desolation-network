@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, RayCaster, Projection, ProjectOnAxis};
+use crate::{RaycastTarget, RayCaster, Projection, ProjectOnAxis, NormalAtPoint};
 
 #[derive(Debug, Clone, Copy)]
 pub struct SlopeData {
@@ -29,6 +29,16 @@ impl SlopeData {
             Vec2::new(0.0, size.y),
             Vec2::new(size.x, 0.0),
         ]
+    }
+
+    pub fn points_sorted(&self) -> [Vec2; 3] {
+        let size = self.size();
+        // Ordering for CCW polygon 
+        if (size.x >= 0.0) == (size.y >= 0.0) {
+            [Vec2::ZERO,  Vec2::new(size.x, 0.0), Vec2::new(0.0, size.y)]
+        } else {
+            [Vec2::ZERO, Vec2::new(0.0, size.y),  Vec2::new(size.x, 0.0)]
+        }
     }
 
 }
@@ -60,5 +70,21 @@ impl RaycastTarget for SlopeData {
             ray.find_bounded_ray_intersection(Vec2::ZERO, size.y.signum() * Vec2::Y, size.y.abs()),
             ray.find_bounded_ray_intersection(Vec2::new(0.0, size.y), self.direction, self.length),
         ].iter().filter_map(|v| *v).reduce(|c, v| c.merged_with(v))
+    }
+}
+
+impl NormalAtPoint for SlopeData {
+    fn normal_at(&self, point: Vec2) -> Vec2 {
+        let points = self.points_sorted();
+        let [d0, d1, d2] = points.map(|v| point.distance_squared(v));
+
+        if (d0 > d1) && (d0 > d2) {
+            (points[2] - points[1]).normalize().perp()
+        } else if (d1 > d0) && (d1 > d2) {
+            (points[0] - points[2]).normalize().perp()
+        } else {
+            (points[1] - points[0]).normalize().perp()
+        }
+
     }
 }

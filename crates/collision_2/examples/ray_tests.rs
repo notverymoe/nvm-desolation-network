@@ -167,12 +167,12 @@ fn render(
             let [start, end] = hit.get_points(dir).map(|v| caster.origin + v);
             gizmos.line_2d(start, end, Color::PURPLE);
 
-            //let hit_shape = &q_static.get(*hit_id).unwrap().1.0;
-            //let start_norm = hit_shape.normal_at(start);
-            //gizmos.line_2d(start, start + start_norm*50.0, Color::BLUE);
-//
-            //let end_norm = hit_shape.normal_at(end);
-            //gizmos.line_2d(end, end + end_norm*50.0, Color::BLUE);
+            let hit_shape = &q_static.get(*hit_id).unwrap().1.0;
+            let start_norm = hit_shape.normal_at(start);
+            gizmos.line_2d(start, start + start_norm*50.0, Color::BLUE);
+
+            let end_norm = hit_shape.normal_at(end);
+            gizmos.line_2d(end, end + end_norm*50.0, Color::BLUE);
         }
         
     }
