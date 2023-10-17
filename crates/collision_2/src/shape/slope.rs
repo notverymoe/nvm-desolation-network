@@ -41,6 +41,10 @@ impl SlopeData {
         }
     }
 
+    pub fn normal(&self) -> Vec2 {
+        self.direction.perp()
+    }
+
 }
 
 impl ProjectOnAxis for SlopeData {
@@ -75,16 +79,22 @@ impl RaycastTarget for SlopeData {
 
 impl NormalAtPoint for SlopeData {
     fn normal_at(&self, point: Vec2) -> Vec2 {
-        let points = self.points_sorted();
-        let [d0, d1, d2] = points.map(|v| point.distance_squared(v));
+        // TODO improve this. this isn't correct. but works well enough for our use case.
 
-        if (d0 > d1) && (d0 > d2) {
-            (points[2] - points[1]).normalize().perp()
-        } else if (d1 > d0) && (d1 > d2) {
-            (points[0] - points[2]).normalize().perp()
-        } else {
-            (points[1] - points[0]).normalize().perp()
-        }
+        let size = self.size();
 
+        let n = [
+            -size.x.signum() * Vec2::X,
+            -size.y.signum() * Vec2::Y,
+            self.normal(),
+        ];
+
+        let dp = [
+            n[0].dot(point).abs(),
+            n[1].dot(point).abs(),
+            (n[2].dot(point) - self.length*0.5).abs(),
+        ];
+
+        n[dp.iter().enumerate().min_by(|(_, a), (_, b)| a.total_cmp(b)).unwrap().0]
     }
 }
