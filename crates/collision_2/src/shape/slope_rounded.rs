@@ -5,17 +5,19 @@ use bevy::prelude::Vec2;
 use crate::{RaycastTarget, RayCaster, Projection, ProjectOnAxis, NormalAtPoint};
 
 #[derive(Debug, Clone, Copy)]
-pub struct SlopeData {
+pub struct SlopeRoundedData {
+    pub radius:    f32,
     pub direction: Vec2,
     pub length:    f32,
 }
 
-impl SlopeData {
 
-    pub fn new(size: Vec2) -> Self {
+impl SlopeRoundedData {
+
+    pub fn new(size: Vec2, radius: f32) -> Self {
         let length    =  size.length();
         let direction = -size.perp()/length;
-        Self{direction, length}
+        Self{radius, direction, length}
     }
 
     pub fn size(&self) -> Vec2 {
@@ -47,33 +49,37 @@ impl SlopeData {
 
 }
 
-impl ProjectOnAxis for SlopeData {
+impl ProjectOnAxis for SlopeRoundedData {
     fn project_aabb(&self) -> [Projection; 2] {
         let size = self.size();
         [
-            Projection::new_unsorted(0.0, size.x),
-            Projection::new_unsorted(0.0, size.y),
+            Projection::new_unsorted(0.0, size.x).expanded_by(self.radius),
+            Projection::new_unsorted(0.0, size.y).expanded_by(self.radius),
         ]
     }
 
     fn project_on_axis(&self, axis: Vec2) -> Projection {
-        Projection::from_points_iter(axis, self.points())
+        Projection::from_points_iter(axis, self.points()).expanded_by(self.radius)
     }
 }
 
-
-impl RaycastTarget for SlopeData {
+impl RaycastTarget for SlopeRoundedData {
     fn raycast(&self, ray: &RayCaster) -> Option<Projection> {
         let size = self.size();
+        let x_off = size.x.signum() * self.radius;
+        let y_off = size.y.signum() * self.radius;
         [
-            ray.find_bounded_ray_intersection(Vec2::ZERO, size.x.signum() * Vec2::X, size.x.abs()),
-            ray.find_bounded_ray_intersection(Vec2::ZERO, size.y.signum() * Vec2::Y, size.y.abs()),
-            ray.find_bounded_ray_intersection(Vec2::new(0.0, size.y), self.direction, self.length),
+            ray.find_circle_intersection(Vec2::ZERO,             self.radius),
+            ray.find_circle_intersection(Vec2::new(size.x, 0.0), self.radius),
+            ray.find_circle_intersection(Vec2::new(0.0, size.y), self.radius),
+            ray.find_bounded_ray_intersection(Vec2::new(-x_off, 0.0), size.x.signum() * Vec2::X, size.x.abs()),
+            ray.find_bounded_ray_intersection(Vec2::new(0.0, -y_off), size.y.signum() * Vec2::Y, size.y.abs()),
+            ray.find_bounded_ray_intersection(Vec2::new(x_off, y_off + size.y), self.direction, self.length),
         ].iter().filter_map(|v| *v).reduce(|c, v| c.merged_with(v))
     }
 }
 
-impl NormalAtPoint for SlopeData {
+impl NormalAtPoint for SlopeRoundedData {
     fn normal_at(&self, point: Vec2) -> Vec2 {
         let size = self.size();
 

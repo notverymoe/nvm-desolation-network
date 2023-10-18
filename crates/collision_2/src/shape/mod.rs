@@ -16,12 +16,16 @@ pub use circle::*;
 mod slope;
 pub use slope::*;
 
+mod slope_rounded;
+pub use slope_rounded::*;
+
 #[derive(Debug, Clone, Copy)]
 pub enum ShapeData {
     Rect(RectData),
     Circle(CircleData),
     RectRounded(RectRoundedData),
     Slope(SlopeData),
+    SlopeRounded(SlopeRoundedData),
 }
 
 impl From<RectData> for ShapeData {
@@ -48,13 +52,20 @@ impl From<SlopeData> for ShapeData {
     }
 }
 
+impl From<SlopeRoundedData> for ShapeData {
+    fn from(value: SlopeRoundedData) -> Self {
+        Self::SlopeRounded(value)
+    }
+}
+
 impl NormalAtPoint for ShapeData {
     fn normal_at(&self, point: Vec2) -> Vec2 {
         match self {
-            ShapeData::Rect(data)        => data.normal_at(point),
-            ShapeData::Circle(data)      => data.normal_at(point),
-            ShapeData::RectRounded(data) => data.normal_at(point),
-            ShapeData::Slope(data)       => data.normal_at(point),
+            ShapeData::Rect(data)         => data.normal_at(point),
+            ShapeData::Circle(data)       => data.normal_at(point),
+            ShapeData::RectRounded(data)  => data.normal_at(point),
+            ShapeData::Slope(data)        => data.normal_at(point),
+            ShapeData::SlopeRounded(data) => data.normal_at(point),
         }
     }
 }
@@ -62,19 +73,21 @@ impl NormalAtPoint for ShapeData {
 impl ProjectOnAxis for ShapeData {
     fn project_aabb(&self) -> [Projection; 2] {
         match self {
-            ShapeData::Rect(data)        => data.project_aabb(),
-            ShapeData::Circle(data)      => data.project_aabb(),
-            ShapeData::RectRounded(data) => data.project_aabb(),
-            ShapeData::Slope(data)       => data.project_aabb(),
+            ShapeData::Rect(data)         => data.project_aabb(),
+            ShapeData::Circle(data)       => data.project_aabb(),
+            ShapeData::RectRounded(data)  => data.project_aabb(),
+            ShapeData::Slope(data)        => data.project_aabb(),
+            ShapeData::SlopeRounded(data) => data.project_aabb(),
         }
     }
 
     fn project_on_axis(&self, axis: Vec2) -> crate::projection::Projection {
         match self {
-            ShapeData::Rect(data)        => data.project_on_axis(axis),
-            ShapeData::Circle(data)      => data.project_on_axis(axis),
-            ShapeData::RectRounded(data) => data.project_on_axis(axis),
-            ShapeData::Slope(data)       => data.project_on_axis(axis),
+            ShapeData::Rect(data)         => data.project_on_axis(axis),
+            ShapeData::Circle(data)       => data.project_on_axis(axis),
+            ShapeData::RectRounded(data)  => data.project_on_axis(axis),
+            ShapeData::Slope(data)        => data.project_on_axis(axis),
+            ShapeData::SlopeRounded(data) => data.project_on_axis(axis),
         }
     }
 }
@@ -82,10 +95,11 @@ impl ProjectOnAxis for ShapeData {
 impl RaycastTarget for ShapeData {
     fn raycast(&self, ray: &RayCaster) -> Option<Projection> {
         match self {
-            ShapeData::Rect(data)        => data.raycast(ray),
-            ShapeData::Circle(data)      => data.raycast(ray),
-            ShapeData::RectRounded(data) => data.raycast(ray),
-            ShapeData::Slope(data)       => data.raycast(ray),
+            ShapeData::Rect(data)         => data.raycast(ray),
+            ShapeData::Circle(data)       => data.raycast(ray),
+            ShapeData::RectRounded(data)  => data.raycast(ray),
+            ShapeData::Slope(data)        => data.raycast(ray),
+            ShapeData::SlopeRounded(data) => data.raycast(ray),
         }
     }
 }
@@ -120,6 +134,15 @@ impl ShapeData {
             (ShapeData::Slope(_), ShapeData::Circle(_)) => todo!(),
             (ShapeData::Slope(_), ShapeData::RectRounded(_)) => todo!(),
             (ShapeData::Slope(_), ShapeData::Slope(_)) => todo!(),
+            (ShapeData::Rect(_), ShapeData::SlopeRounded(_)) => todo!(),
+            (ShapeData::Circle(_), ShapeData::SlopeRounded(_)) => todo!(),
+            (ShapeData::RectRounded(_), ShapeData::SlopeRounded(_)) => todo!(),
+            (ShapeData::Slope(_), ShapeData::SlopeRounded(_)) => todo!(),
+            (ShapeData::SlopeRounded(_), ShapeData::Rect(_)) => todo!(),
+            (ShapeData::SlopeRounded(_), ShapeData::Circle(_)) => todo!(),
+            (ShapeData::SlopeRounded(_), ShapeData::RectRounded(_)) => todo!(),
+            (ShapeData::SlopeRounded(_), ShapeData::Slope(_)) => todo!(),
+            (ShapeData::SlopeRounded(_), ShapeData::SlopeRounded(_)) => todo!(),
         }
     }
 

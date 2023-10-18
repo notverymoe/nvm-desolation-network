@@ -2,7 +2,7 @@
 
 use bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
 
-use collision_2::{RectRoundedData, RectData, CircleData, ShapeData, Shape, Projection, ShapeCaster, NormalAtPoint, SlopeData};
+use collision_2::{SlopeRoundedData, RectRoundedData, RectData, CircleData, ShapeData, Shape, Projection, ShapeCaster, NormalAtPoint, SlopeData};
 
 pub fn main() {
     App::new()
@@ -30,10 +30,11 @@ impl StaticCollider {
 
     pub fn next(&mut self) {
         self.0.data = match self.0.data {
-            ShapeData::Circle(_)      => Self::RECT.into(),
-            ShapeData::Rect(_)        => Self::RECT_ROUNDED.into(),
-            ShapeData::RectRounded(_) => SlopeData::new(Vec2::new(25.0, 25.0)).into(),
-            ShapeData::Slope(_)       => Self::CIRCLE.into(),
+            ShapeData::Circle(_)       => Self::RECT.into(),
+            ShapeData::Rect(_)         => Self::RECT_ROUNDED.into(),
+            ShapeData::RectRounded(_)  => SlopeData::new(Vec2::new(100.0, 100.0)).into(),
+            ShapeData::Slope(_)        => SlopeRoundedData::new(Vec2::new(75.0, 75.0), 25.0).into(),
+            ShapeData::SlopeRounded(_) => Self::CIRCLE.into(),
         }
     }
 
@@ -229,6 +230,22 @@ fn render_shape(gizmos: &mut Gizmos, shape: &Shape, color: Color) {
         },
         ShapeData::Slope(s) => {
             let size = s.size();
+            gizmos.linestrip_2d(
+                [
+                    shape.origin,
+                    shape.origin + Vec2::new(0.0, size.y),
+                    shape.origin + Vec2::new(size.x, 0.0),
+                    shape.origin,
+                ],
+                color
+            );
+        },
+        ShapeData::SlopeRounded(s) => {
+            let size = s.size();
+            gizmos.circle_2d(shape.origin, s.radius, color);
+            gizmos.circle_2d(shape.origin + Vec2::new( size.x,      0.0), s.radius, color);
+            gizmos.circle_2d(shape.origin + Vec2::new(      0.0, size.y), s.radius, color);
+            
             gizmos.linestrip_2d(
                 [
                     shape.origin,
