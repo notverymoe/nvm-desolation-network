@@ -1,8 +1,8 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-use bevy::prelude::Vec2;
+use bevy::prelude::{Gizmos, Vec2, Color};
 
-use crate::{Projection, ProjectOnAxis, RayCaster, RaycastTarget, NormalAtPoint};
+use crate::{Projection, ProjectOnAxis, RayCaster, RaycastTarget, NormalAtPoint, GizmoRenderable};
 
 #[derive(Debug, Clone, Copy)]
 pub struct CircleData {
@@ -37,6 +37,12 @@ impl ProjectOnAxis for CircleData {
 impl RaycastTarget for CircleData {
     fn raycast(&self, ray: &RayCaster) -> Option<Projection> {
         ray.find_circle_intersection_at_origin(self.radius)
+    }
+}
+
+impl GizmoRenderable for CircleData {
+    fn render(&self, gizmos: &mut Gizmos, offset: Vec2, color: Color) {
+        gizmos.circle_2d(offset, self.radius, color);
     }
 }
 

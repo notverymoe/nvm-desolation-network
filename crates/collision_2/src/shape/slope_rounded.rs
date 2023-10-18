@@ -1,8 +1,8 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-use bevy::prelude::Vec2;
+use bevy::prelude::{Vec2, Gizmos, Color};
 
-use crate::{RaycastTarget, RayCaster, Projection, ProjectOnAxis, NormalAtPoint};
+use crate::{RaycastTarget, RayCaster, Projection, ProjectOnAxis, NormalAtPoint, GizmoRenderable};
 
 #[derive(Debug, Clone, Copy)]
 pub struct SlopeRoundedData {
@@ -109,5 +109,37 @@ impl NormalAtPoint for SlopeRoundedData {
             // X, Y, S area
             dp.iter().map(|v| v.abs()).zip(n).min_by(|(a, _), (b, _)| a.total_cmp(b)).unwrap().1
         }
+    }
+}
+
+impl GizmoRenderable for SlopeRoundedData {
+    fn render(&self, gizmos: &mut Gizmos, offset: Vec2, color: Color) {
+        let size = self.size();
+        
+        gizmos.circle_2d(offset, self.radius, color);
+        gizmos.circle_2d(offset + Vec2::new(size.x, 0.0), self.radius, color);
+        gizmos.circle_2d(offset + Vec2::new(0.0, size.y), self.radius, color);
+
+        let off_slope = self.normal() * self.radius;
+        let off_x = size.x.signum() * self.radius;
+        let off_y = size.y.signum() * self.radius;
+
+        gizmos.line_2d(
+            offset + Vec2::new(   0.0, -off_y),
+            offset + Vec2::new(size.x, -off_y),
+            color
+        );
+
+        gizmos.line_2d(
+            offset + Vec2::new(-off_x,    0.0),
+            offset + Vec2::new(-off_x, size.y),
+            color
+        );
+
+        gizmos.line_2d(
+            offset + off_slope + Vec2::new(size.x, 0.0),
+            offset + off_slope + Vec2::new(0.0, size.y),
+            color
+        );
     }
 }

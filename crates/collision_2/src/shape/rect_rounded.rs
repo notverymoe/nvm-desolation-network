@@ -1,8 +1,8 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-use bevy::prelude::Vec2;
+use bevy::prelude::{Vec2, Gizmos, Color};
 
-use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster, NormalAtPoint};
+use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster, NormalAtPoint, GizmoRenderable};
 
 #[derive(Debug, Clone, Copy)]
 pub struct RectRoundedData {
@@ -91,6 +91,39 @@ impl RaycastTarget for RectRoundedData {
             ray.find_rect_intersection(Vec2::new(-min_x, -max_y), Vec2::new(min_x,  max_y)), // vert test
             ray.find_rect_intersection(Vec2::new(-max_x, -min_y), Vec2::new(max_x,  min_y)), // horz test
         ].iter().filter_map(|v| *v).reduce(|p, c| p.merged_with(c))
+    }
+}
+
+impl GizmoRenderable for RectRoundedData {
+    fn render(&self, gizmos: &mut Gizmos, offset: Vec2, color: Color) {
+        gizmos.arc_2d(offset + Vec2::new( self.size.x,  self.size.y), f32::to_radians( 45.0), f32::to_radians(90.0), self.radius, color);
+        gizmos.arc_2d(offset + Vec2::new(-self.size.x,  self.size.y), f32::to_radians(315.0), f32::to_radians(90.0), self.radius, color);
+        gizmos.arc_2d(offset + Vec2::new(-self.size.x, -self.size.y), f32::to_radians(225.0), f32::to_radians(90.0), self.radius, color);
+        gizmos.arc_2d(offset + Vec2::new( self.size.x, -self.size.y), f32::to_radians(135.0), f32::to_radians(90.0), self.radius, color);
+
+        gizmos.line_2d(
+            offset + Vec2::new( self.size.x, self.size.y + self.radius ),
+            offset + Vec2::new(-self.size.x, self.size.y + self.radius ),
+            color
+        );
+
+        gizmos.line_2d(
+            offset + Vec2::new(-(self.size.x + self.radius),  self.size.y),
+            offset + Vec2::new(-(self.size.x + self.radius), -self.size.y),
+            color
+        );
+
+        gizmos.line_2d(
+            offset + Vec2::new(-self.size.x, -(self.size.y + self.radius)),
+            offset + Vec2::new( self.size.x, -(self.size.y + self.radius)),
+            color
+        );
+
+        gizmos.line_2d(
+            offset + Vec2::new(self.size.x + self.radius, -self.size.y),
+            offset + Vec2::new(self.size.x + self.radius,  self.size.y),
+            color
+        );
     }
 }
 

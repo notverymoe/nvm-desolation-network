@@ -1,8 +1,8 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-use bevy::prelude::Vec2;
+use bevy::prelude::{Vec2, Gizmos, Color};
 
-use crate::{RaycastTarget, RayCaster, Projection, ProjectOnAxis, NormalAtPoint};
+use crate::{RaycastTarget, RayCaster, Projection, ProjectOnAxis, NormalAtPoint, GizmoRenderable};
 
 #[derive(Debug, Clone, Copy)]
 pub struct SlopeData {
@@ -103,5 +103,20 @@ impl NormalAtPoint for SlopeData {
             // X, Y, S area
             dp.iter().map(|v| v.abs()).zip(n).min_by(|(a, _), (b, _)| a.total_cmp(b)).unwrap().1
         }
+    }
+}
+
+impl GizmoRenderable for SlopeData {
+    fn render(&self, gizmos: &mut Gizmos, offset: Vec2, color: Color) {
+        let size = self.size();
+        gizmos.linestrip_2d(
+            [
+                offset,
+                offset + Vec2::new(0.0, size.y),
+                offset + Vec2::new(size.x, 0.0),
+                offset,
+            ],
+            color
+        );
     }
 }

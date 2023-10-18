@@ -1,8 +1,8 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-use bevy::prelude::Vec2;
+use bevy::prelude::{Vec2, Color, Gizmos};
 
-use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster, NormalAtPoint};
+use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster, NormalAtPoint, GizmoRenderable};
 
 mod rect;
 pub use rect::*;
@@ -104,6 +104,18 @@ impl RaycastTarget for ShapeData {
     }
 }
 
+impl GizmoRenderable for ShapeData {
+    fn render(&self, gizmos: &mut Gizmos, offset: Vec2, color: Color) {
+        match self {
+            ShapeData::Rect(data)         => data.render(gizmos, offset, color),
+            ShapeData::Circle(data)       => data.render(gizmos, offset, color),
+            ShapeData::RectRounded(data)  => data.render(gizmos, offset, color),
+            ShapeData::Slope(data)        => data.render(gizmos, offset, color),
+            ShapeData::SlopeRounded(data) => data.render(gizmos, offset, color),
+        }
+    }
+}
+
 impl ShapeData {
 
     pub fn rect(size: Vec2) -> Self {
@@ -181,5 +193,11 @@ impl ProjectOnAxis for Shape {
 impl RaycastTarget for Shape {
     fn raycast(&self, ray: &RayCaster) -> Option<Projection> {
         self.data.raycast(&ray.with_offset(-self.origin))
+    }
+}
+
+impl GizmoRenderable for Shape {
+    fn render(&self, gizmos: &mut Gizmos, offset: Vec2, color: Color) {
+        self.data.render(gizmos, self.origin + offset, color)
     }
 }

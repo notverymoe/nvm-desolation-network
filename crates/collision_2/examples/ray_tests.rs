@@ -2,7 +2,7 @@
 
 use bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
 
-use collision_2::{RectRoundedData, RectData, CircleData, ShapeData, Shape, RayCaster, Projection, NormalAtPoint, SlopeData, SlopeRoundedData};
+use collision_2::{RectRoundedData, RectData, CircleData, ShapeData, Shape, RayCaster, Projection, NormalAtPoint, SlopeData, SlopeRoundedData, GizmoRenderable};
 
 pub fn main() {
     App::new()
@@ -150,7 +150,7 @@ fn render(
     q_static: Query<(Entity, &StaticCollider)>,
 ) {
     for (shape_id, StaticCollider(shape)) in q_static.iter() {
-        render_shape(&mut gizmos, shape, if q_caster.iter().any(|v| v.hits.iter().any(|v| shape_id == v.0)) {
+        shape.render(&mut gizmos, Vec2::ZERO, if q_caster.iter().any(|v| v.hits.iter().any(|v| shape_id == v.0)) {
             Color::RED
         } else {
             Color::GREEN
@@ -178,73 +178,3 @@ fn render(
         
     }
 }
-
-fn render_shape(gizmos: &mut Gizmos, shape: &Shape, color: Color) {
-    match shape.data {
-        ShapeData::Circle(s) => {
-            gizmos.circle_2d(shape.origin, s.radius, color);
-        },
-        ShapeData::Rect(s) => {
-            gizmos.rect_2d(shape.origin, 0.0, s.size*2.0, color);
-        },
-        ShapeData::RectRounded(s) => {
-            gizmos.arc_2d(shape.origin + Vec2::new( s.size.x,  s.size.y), f32::to_radians( 45.0), f32::to_radians(90.0), s.radius, color);
-            gizmos.arc_2d(shape.origin + Vec2::new(-s.size.x,  s.size.y), f32::to_radians(315.0), f32::to_radians(90.0), s.radius, color);
-            gizmos.arc_2d(shape.origin + Vec2::new(-s.size.x, -s.size.y), f32::to_radians(225.0), f32::to_radians(90.0), s.radius, color);
-            gizmos.arc_2d(shape.origin + Vec2::new( s.size.x, -s.size.y), f32::to_radians(135.0), f32::to_radians(90.0), s.radius, color);
-
-            gizmos.line_2d(
-                shape.origin + Vec2::new( s.size.x, s.size.y + s.radius ),
-                shape.origin + Vec2::new(-s.size.x, s.size.y + s.radius ),
-                color
-            );
-
-            gizmos.line_2d(
-                shape.origin + Vec2::new(-(s.size.x + s.radius),  s.size.y),
-                shape.origin + Vec2::new(-(s.size.x + s.radius), -s.size.y),
-                color
-            );
-
-            gizmos.line_2d(
-                shape.origin + Vec2::new(-s.size.x, -(s.size.y + s.radius)),
-                shape.origin + Vec2::new( s.size.x, -(s.size.y + s.radius)),
-                color
-            );
-
-            gizmos.line_2d(
-                shape.origin + Vec2::new(s.size.x + s.radius, -s.size.y),
-                shape.origin + Vec2::new(s.size.x + s.radius,  s.size.y),
-                color
-            );
-        },
-        ShapeData::Slope(s) => {
-            let size = s.size();
-            gizmos.linestrip_2d(
-                [
-                    shape.origin,
-                    shape.origin + Vec2::new(0.0, size.y),
-                    shape.origin + Vec2::new(size.x, 0.0),
-                    shape.origin,
-                ],
-                color
-            );
-        },
-        ShapeData::SlopeRounded(s) => {
-            let size = s.size();
-            gizmos.circle_2d(shape.origin, s.radius, color);
-            gizmos.circle_2d(shape.origin + Vec2::new( size.x,      0.0), s.radius, color);
-            gizmos.circle_2d(shape.origin + Vec2::new(      0.0, size.y), s.radius, color);
-            
-            gizmos.linestrip_2d(
-                [
-                    shape.origin,
-                    shape.origin + Vec2::new(0.0, size.y),
-                    shape.origin + Vec2::new(size.x, 0.0),
-                    shape.origin,
-                ],
-                color
-            );
-        },
-    }
-}
-

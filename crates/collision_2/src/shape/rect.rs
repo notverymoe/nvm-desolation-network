@@ -1,8 +1,8 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-use bevy::prelude::Vec2;
+use bevy::prelude::{Vec2, Gizmos, Color};
 
-use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster, NormalAtPoint};
+use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster, NormalAtPoint, GizmoRenderable};
 
 #[derive(Debug, Clone, Copy)]
 pub struct RectData {
@@ -81,6 +81,12 @@ impl ProjectOnAxis for RectData {
 impl RaycastTarget for RectData {
     fn raycast(&self, ray: &RayCaster) -> Option<Projection> {
         ray.find_rect_intersection(-self.size, self.size)
+    }
+}
+
+impl GizmoRenderable for RectData {
+    fn render(&self, gizmos: &mut Gizmos, offset: Vec2, color: Color) {
+        gizmos.rect_2d(offset, 0.0, self.size*2.0, color);
     }
 }
 
