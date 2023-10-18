@@ -66,6 +66,7 @@ impl ProjectOnAxis for SlopeRoundedData {
 impl RaycastTarget for SlopeRoundedData {
     fn raycast(&self, ray: &RayCaster) -> Option<Projection> {
         let size = self.size();
+        let off_slope = self.normal() * self.radius;
         let x_off = size.x.signum() * self.radius;
         let y_off = size.y.signum() * self.radius;
         [
@@ -74,7 +75,7 @@ impl RaycastTarget for SlopeRoundedData {
             ray.find_circle_intersection(Vec2::new(0.0, size.y), self.radius),
             ray.find_bounded_ray_intersection(Vec2::new(-x_off, 0.0), size.x.signum() * Vec2::X, size.x.abs()),
             ray.find_bounded_ray_intersection(Vec2::new(0.0, -y_off), size.y.signum() * Vec2::Y, size.y.abs()),
-            ray.find_bounded_ray_intersection(Vec2::new(x_off, y_off + size.y), self.direction, self.length),
+            ray.find_bounded_ray_intersection(off_slope + Vec2::new(0.0, size.y), self.direction, self.length),
         ].iter().filter_map(|v| *v).reduce(|c, v| c.merged_with(v))
     }
 }
