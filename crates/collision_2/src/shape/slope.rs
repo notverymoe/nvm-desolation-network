@@ -79,8 +79,6 @@ impl RaycastTarget for SlopeData {
 
 impl NormalAtPoint for SlopeData {
     fn normal_at(&self, point: Vec2) -> Vec2 {
-        // TODO improve this. this isn't correct. but works well enough for our use case.
-
         let size = self.size();
 
         let n = [
@@ -90,11 +88,24 @@ impl NormalAtPoint for SlopeData {
         ];
 
         let dp = [
-            n[0].dot(point).abs(),
-            n[1].dot(point).abs(),
-            (n[2].dot(point) - self.length*0.5).abs(),
+            -size.x.signum() * point.x,
+            -size.y.signum() * point.y,
+            n[2].dot(point) - self.length*0.5,
         ];
 
-        n[dp.iter().enumerate().min_by(|(_, a), (_, b)| a.total_cmp(b)).unwrap().0]
+        let [dp_x, dp_y, dp_s] = dp;
+        if (dp_x >= 0.0) && (dp_y >= 0.0) {
+            // +XY area
+            (point - Vec2::new(size.x, 0.0)).normalize()
+        } else if (dp_x >= 0.0) && (dp_s >= 0.0) {
+            // +XS area
+            (point - Vec2::new(0.0, size.y)).normalize()
+        } else if (dp_y >= 0.0) && (dp_s >= 0.0) {
+            // +XY area
+            point.normalize()
+        } else {
+            // X, Y, S area
+            dp.iter().map(|v| v.abs()).zip(n).min_by(|(a, _), (b, _)| a.total_cmp(b)).unwrap().1
+        }
     }
 }
