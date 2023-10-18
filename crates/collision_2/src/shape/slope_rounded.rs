@@ -73,8 +73,8 @@ impl RaycastTarget for SlopeRoundedData {
             ray.find_circle_intersection(Vec2::ZERO,             self.radius),
             ray.find_circle_intersection(Vec2::new(size.x, 0.0), self.radius),
             ray.find_circle_intersection(Vec2::new(0.0, size.y), self.radius),
-            ray.find_bounded_ray_intersection(Vec2::new(-x_off, 0.0), size.x.signum() * Vec2::X, size.x.abs()),
-            ray.find_bounded_ray_intersection(Vec2::new(0.0, -y_off), size.y.signum() * Vec2::Y, size.y.abs()),
+            ray.find_bounded_ray_intersection(Vec2::new(0.0, -y_off), size.x.signum() * Vec2::X, size.x.abs()),
+            ray.find_bounded_ray_intersection(Vec2::new(-x_off, 0.0), size.y.signum() * Vec2::Y, size.y.abs()),
             ray.find_bounded_ray_intersection(off_slope + Vec2::new(0.0, size.y), self.direction, self.length),
         ].iter().filter_map(|v| *v).reduce(|c, v| c.merged_with(v))
     }
