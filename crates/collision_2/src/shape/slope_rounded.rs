@@ -83,6 +83,7 @@ impl RaycastTarget for SlopeRoundedData {
 impl NormalAtPoint for SlopeRoundedData {
     fn normal_at(&self, point: Vec2) -> Vec2 {
         let size = self.size();
+        let size_abs = size.abs();
 
         let n = [
             -size.x.signum() * Vec2::X,
@@ -96,26 +97,47 @@ impl NormalAtPoint for SlopeRoundedData {
             n[2].dot(point) - self.length*0.5,
         ];
 
-        let [dp_x, dp_y, dp_s] = dp;
-        if (dp_x >= 0.0) && (dp_y >= 0.0) {
-            // +XY area
-            (point - Vec2::new(size.x, 0.0)).normalize()
-        } else if (dp_x >= 0.0) && (dp_s >= 0.0) {
-            // +XS area
-            (point - Vec2::new(0.0, size.y)).normalize()
-        } else if (dp_y >= 0.0) && (dp_s >= 0.0) {
-            // +XY area
-            point.normalize()
-        } else {
-            // X, Y, S area
-            dp.iter().map(|v| v.abs()).zip(n).min_by(|(a, _), (b, _)| a.total_cmp(b)).unwrap().1
+        if dp.iter().any(|&v| v > 0.0) {
+            // Is outside
+
+            // if outside n[0] and n[1] segment
+            if (dp[1] > 0.0) && (dp[0] > 0.0) {
+                // O Region
+                return point.normalize();
+            }
+
+            let dp_s_perp = self.direction.dot(Vec2::new(point.x, point.y - size.y));
+
+            if (dp[1] < -size_abs.y) && (dp_s_perp < 0.0) {
+                // I region
+                return (point - Vec2::new(0.0, size.y)).normalize();
+            }
+
+            if (dp[0] < -size_abs.x) && (dp_s_perp > self.length) {
+                // U region
+                return (point - Vec2::new(size.x, 0.0)).normalize();
+            }
+
+            return dp.iter().zip(n).filter(|(&v, _)| v >= 0.0).min_by(|(a, _), (b, _)| a.total_cmp(b)).unwrap().1;
         }
+
+        dp.iter().zip(n).max_by(|(a, _), (b, _)| a.total_cmp(b)).unwrap().1
     }
 }
 
 impl GizmoRenderable for SlopeRoundedData {
     fn render(&self, gizmos: &mut Gizmos, offset: Vec2, color: Color) {
         let size = self.size();
+
+        gizmos.linestrip_2d(
+            [
+                offset,
+                offset + Vec2::new(0.0, size.y),
+                offset + Vec2::new(size.x, 0.0),
+                offset,
+            ],
+            color
+        );
         
         gizmos.circle_2d(offset, self.radius, color);
         gizmos.circle_2d(offset + Vec2::new(size.x, 0.0), self.radius, color);
