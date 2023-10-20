@@ -2,7 +2,7 @@
 
 use bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
 
-use collision_2::{RectRoundedData, RectData, CircleData, ShapeData, Shape, RayCaster, Projection, NormalAtPoint, SlopeData, SlopeRoundedData, GizmoRenderable};
+use collision_2::{RectRoundedData, RectData, CircleData, ShapeData, Shape, RayCaster, Projection, NormalAtPoint, SlopeData, SlopeRoundedData, GizmoRenderable, NGonData};
 
 pub fn main() {
     App::new()
@@ -34,7 +34,8 @@ impl StaticCollider {
             ShapeData::Rect(_)         => Self::RECT_ROUNDED.into(),
             ShapeData::RectRounded(_)  => SlopeData::new(Vec2::new(100.0, 100.0)).into(),
             ShapeData::Slope(_)        => SlopeRoundedData::new(Vec2::new(75.0, 75.0), 25.0).into(),
-            ShapeData::SlopeRounded(_) => Self::CIRCLE.into(),
+            ShapeData::SlopeRounded(s) => NGonData::<3>::new(s.points_sorted()).into(),
+            ShapeData::NGon3(_)        => Self::CIRCLE.into(),
         }
     }
 

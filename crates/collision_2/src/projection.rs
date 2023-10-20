@@ -20,6 +20,7 @@ impl Projection {
     }
 
     pub fn from_points_iter(axis: Vec2, points: impl IntoIterator<Item = Vec2>) -> Self {
+        // TODO OPT are we copying points?
         // OPT we might be able to get this neater
         points.into_iter().fold(Self([f32::INFINITY, f32::NEG_INFINITY]), |p, c| p.expanded_by(axis.dot(c)))
     }

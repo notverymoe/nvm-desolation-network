@@ -19,6 +19,9 @@ pub use slope::*;
 mod slope_rounded;
 pub use slope_rounded::*;
 
+mod ngon;
+pub use ngon::*;
+
 #[derive(Debug, Clone, Copy)]
 pub enum ShapeData {
     Rect(RectData),
@@ -26,6 +29,7 @@ pub enum ShapeData {
     RectRounded(RectRoundedData),
     Slope(SlopeData),
     SlopeRounded(SlopeRoundedData),
+    NGon3(NGonData<3>),
 }
 
 impl From<RectData> for ShapeData {
@@ -58,6 +62,12 @@ impl From<SlopeRoundedData> for ShapeData {
     }
 }
 
+impl From<NGonData<3>> for ShapeData {
+    fn from(value: NGonData<3>) -> Self {
+        Self::NGon3(value)
+    }
+}
+
 impl NormalAtPoint for ShapeData {
     fn normal_at(&self, point: Vec2) -> Vec2 {
         match self {
@@ -66,6 +76,7 @@ impl NormalAtPoint for ShapeData {
             ShapeData::RectRounded(data)  => data.normal_at(point),
             ShapeData::Slope(data)        => data.normal_at(point),
             ShapeData::SlopeRounded(data) => data.normal_at(point),
+            ShapeData::NGon3(data)        => data.normal_at(point),
         }
     }
 }
@@ -78,6 +89,7 @@ impl ProjectOnAxis for ShapeData {
             ShapeData::RectRounded(data)  => data.project_aabb(),
             ShapeData::Slope(data)        => data.project_aabb(),
             ShapeData::SlopeRounded(data) => data.project_aabb(),
+            ShapeData::NGon3(data)        => data.project_aabb(),
         }
     }
 
@@ -88,6 +100,7 @@ impl ProjectOnAxis for ShapeData {
             ShapeData::RectRounded(data)  => data.project_on_axis(axis),
             ShapeData::Slope(data)        => data.project_on_axis(axis),
             ShapeData::SlopeRounded(data) => data.project_on_axis(axis),
+            ShapeData::NGon3(data)        => data.project_on_axis(axis),
         }
     }
 }
@@ -100,6 +113,7 @@ impl RaycastTarget for ShapeData {
             ShapeData::RectRounded(data)  => data.raycast(ray),
             ShapeData::Slope(data)        => data.raycast(ray),
             ShapeData::SlopeRounded(data) => data.raycast(ray),
+            ShapeData::NGon3(data)        => data.raycast(ray),
         }
     }
 }
@@ -112,6 +126,7 @@ impl GizmoRenderable for ShapeData {
             ShapeData::RectRounded(data)  => data.render(gizmos, offset, color),
             ShapeData::Slope(data)        => data.render(gizmos, offset, color),
             ShapeData::SlopeRounded(data) => data.render(gizmos, offset, color),
+            ShapeData::NGon3(data)        => data.render(gizmos, offset, color),
         }
     }
 }
@@ -155,6 +170,17 @@ impl ShapeData {
             (ShapeData::SlopeRounded(_), ShapeData::RectRounded(_)) => todo!(),
             (ShapeData::SlopeRounded(_), ShapeData::Slope(_)) => todo!(),
             (ShapeData::SlopeRounded(_), ShapeData::SlopeRounded(_)) => todo!(),
+            (ShapeData::Rect(_), ShapeData::NGon3(_)) => todo!(),
+            (ShapeData::Circle(_), ShapeData::NGon3(_)) => todo!(),
+            (ShapeData::RectRounded(_), ShapeData::NGon3(_)) => todo!(),
+            (ShapeData::Slope(_), ShapeData::NGon3(_)) => todo!(),
+            (ShapeData::SlopeRounded(_), ShapeData::NGon3(_)) => todo!(),
+            (ShapeData::NGon3(_), ShapeData::Rect(_)) => todo!(),
+            (ShapeData::NGon3(_), ShapeData::Circle(_)) => todo!(),
+            (ShapeData::NGon3(_), ShapeData::RectRounded(_)) => todo!(),
+            (ShapeData::NGon3(_), ShapeData::Slope(_)) => todo!(),
+            (ShapeData::NGon3(_), ShapeData::SlopeRounded(_)) => todo!(),
+            (ShapeData::NGon3(_), ShapeData::NGon3(_)) => todo!(),
         }
     }
 
