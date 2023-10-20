@@ -26,15 +26,11 @@ impl<const N: usize> NGonData<N> {
         }
     }
 
-    pub fn into_edge_iter(&self) -> EdgeIter<'_> {
-        EdgeIter { points: &self.points, norms: &self.normals, lengths: &self.lengths, offset: 0 }
-    }
-
 } 
 
 impl<const N: usize> RaycastTarget for NGonData<N> {
     fn raycast(&self, ray: &RayCaster) -> Option<Projection> {
-        (0..N).map(|i| ray.find_bounded_ray_intersection(self.points[i], self.normals[i].perp(), self.lengths[i])).filter_map(|v| v).reduce(|c, v| c.merged_with(v))
+        (0..N).filter_map(|i| ray.find_bounded_ray_intersection(self.points[i], self.normals[i].perp(), self.lengths[i])).reduce(|c, v| c.merged_with(v))
     }
 }
 
@@ -42,28 +38,32 @@ impl<const N: usize> NormalAtPoint for NGonData<N> {
     fn normal_at(&self, point: Vec2) -> Vec2 {
         let dp: [[f32; 2]; N] = (0..N).map(|i| [
             self.normals[i].dot(point - self.points[i]),
-            self.normals[i].perp().dot(point - self.points[i])
+            self.normals[i].perp_dot(point - self.points[i])
         ]).try_collect_array().unwrap();
 
+        // TODO OPT lazy evaluation, iterator with a ring buffer of n=2, caches this first
         for [i, j] in PairIndexIter::new(N) {
-            let len = self.lengths[i];
             let [i_dp, i_pdp] = dp[i];
 
             if i_dp < 0.0 {
+                // is behind this segment
                 continue;
             }
 
+            let len = self.lengths[i];
             if (i_pdp >= 0.0) && (i_pdp <= len) {
+                // is within the edge of this segment
                 return self.normals[i];
             }
 
             let [j_dp, j_pdp] = dp[j];
-
             if j_dp < 0.0 {
+                // is behind the next segment
                 continue;
             }
 
             if (i_pdp > len) && (j_pdp < 0.0) {
+                // is between segments, vertex is nearest
                 return (point - self.points[j]).normalize();
             }
         }
@@ -135,35 +135,4 @@ fn calculate_lengths_for<const N: usize>(points: &[Vec2; N]) -> [f32; N] {
 
 fn calculate_normals_for<const N: usize>(points: &[Vec2; N]) -> [Vec2; N] {
     points.iter().enumerate().map(|(i, &v)| (v - points[(i+1) % N]).normalize().perp()).try_collect_array().unwrap()
-}
-
-pub struct EdgeIter<'a> {
-    points:  &'a [Vec2],
-    norms:   &'a [Vec2], 
-    lengths: &'a [ f32],
-    offset: usize,
-}
-
-impl<'a> Iterator for EdgeIter<'a> {
-    type Item = (
-        Vec2,
-        Vec2,
-        Vec2,
-        f32,
-    );
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.offset < self.points.len() {
-            let result = Some((
-                self.points[self.offset], 
-                self.points[(self.offset + 1) % self.points.len()], 
-                self.norms[self.offset],
-                self.lengths[self.offset],
-            ));
-            self.offset += 1;
-            result
-        } else {
-            None
-        }
-    }
 }
