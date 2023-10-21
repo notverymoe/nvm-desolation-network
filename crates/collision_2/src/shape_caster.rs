@@ -11,7 +11,7 @@ pub struct ShapeCaster {
 
 impl ShapeCaster {
 
-    pub fn new(shape: &Shape, direction: Vec2) -> Self {
+    pub fn new(shape: Shape, direction: Vec2) -> Self {
         Self{
             shape: shape.data,
             caster: RayCaster::new(shape.origin, direction),
@@ -25,7 +25,7 @@ impl ShapeCaster {
     pub fn test_static(&self, other: &Shape) -> Option<(Projection, Shape)> {
         let target = Shape{
             origin: other.origin,
-            data: other.data.combine(self.shape),
+            data: other.data.combine(&self.shape),
         };
         self.caster.test_static(&target).map(|v| (v, target))
     }

@@ -33,6 +33,7 @@ pub enum ShapeData {
     Slope(SlopeData),
     SlopeRounded(SlopeRoundedData),
     NGon3(NGonData<3>),
+    NGonTraced3(NGonDataTraced<RectData, 3>),
 }
 
 impl From<RectData> for ShapeData {
@@ -71,6 +72,12 @@ impl From<NGonData<3>> for ShapeData {
     }
 }
 
+impl From<NGonDataTraced<RectData, 3>> for ShapeData {
+    fn from(value: NGonDataTraced<RectData, 3>) -> Self {
+        Self::NGonTraced3(value)
+    }
+}
+
 impl ProjectOnAxis for ShapeData {
     fn project_aabb(&self) -> [Projection; 2] {
         match self {
@@ -80,6 +87,7 @@ impl ProjectOnAxis for ShapeData {
             ShapeData::Slope(data)        => data.project_aabb(),
             ShapeData::SlopeRounded(data) => data.project_aabb(),
             ShapeData::NGon3(data)        => data.project_aabb(),
+            ShapeData::NGonTraced3(data)  => data.project_aabb(),
         }
     }
 
@@ -91,6 +99,7 @@ impl ProjectOnAxis for ShapeData {
             ShapeData::Slope(data)        => data.project_on_axis(axis),
             ShapeData::SlopeRounded(data) => data.project_on_axis(axis),
             ShapeData::NGon3(data)        => data.project_on_axis(axis),
+            ShapeData::NGonTraced3(data)  => data.project_on_axis(axis),
         }
     }
 }
@@ -104,6 +113,7 @@ impl RaycastTarget for ShapeData {
             ShapeData::Slope(data)        => data.raycast(ray),
             ShapeData::SlopeRounded(data) => data.raycast(ray),
             ShapeData::NGon3(data)        => data.raycast(ray),
+            ShapeData::NGonTraced3(data)  => data.raycast(ray),
         }
     }
     
@@ -115,6 +125,7 @@ impl RaycastTarget for ShapeData {
             ShapeData::Slope(data)        => data.normal_at(point),
             ShapeData::SlopeRounded(data) => data.normal_at(point),
             ShapeData::NGon3(data)        => data.normal_at(point),
+            ShapeData::NGonTraced3(data)  => data.normal_at(point),
         }
     }
 }
@@ -128,6 +139,7 @@ impl GizmoRenderable for ShapeData {
             ShapeData::Slope(data)        => data.render(gizmos, offset, color),
             ShapeData::SlopeRounded(data) => data.render(gizmos, offset, color),
             ShapeData::NGon3(data)        => data.render(gizmos, offset, color),
+            ShapeData::NGonTraced3(data)  => data.render(gizmos, offset, color),
         }
     }
 }
@@ -146,7 +158,7 @@ impl ShapeData {
         Self::RectRounded(RectRoundedData{ size, radius })
     }
 
-    pub fn combine(self, other: Self) -> Self {
+    pub fn combine(&self, other: &Self) -> Self {
         match (self, other) {
             (ShapeData::Rect(r0),        ShapeData::Rect(r1)       ) => Self::rect(r0.size + r1.size),
             (ShapeData::Circle(c0),      ShapeData::Circle(c1)     ) => Self::circle(c0.radius + c1.radius),
@@ -182,11 +194,25 @@ impl ShapeData {
             (ShapeData::NGon3(_), ShapeData::Slope(_)) => todo!(),
             (ShapeData::NGon3(_), ShapeData::SlopeRounded(_)) => todo!(),
             (ShapeData::NGon3(_), ShapeData::NGon3(_)) => todo!(),
+            (ShapeData::Rect(_), ShapeData::NGonTraced3(_)) => todo!(),
+            (ShapeData::Circle(_), ShapeData::NGonTraced3(_)) => todo!(),
+            (ShapeData::RectRounded(_), ShapeData::NGonTraced3(_)) => todo!(),
+            (ShapeData::Slope(_), ShapeData::NGonTraced3(_)) => todo!(),
+            (ShapeData::SlopeRounded(_), ShapeData::NGonTraced3(_)) => todo!(),
+            (ShapeData::NGon3(_), ShapeData::NGonTraced3(_)) => todo!(),
+            (ShapeData::NGonTraced3(_), ShapeData::Rect(_)) => todo!(),
+            (ShapeData::NGonTraced3(_), ShapeData::Circle(_)) => todo!(),
+            (ShapeData::NGonTraced3(_), ShapeData::RectRounded(_)) => todo!(),
+            (ShapeData::NGonTraced3(_), ShapeData::Slope(_)) => todo!(),
+            (ShapeData::NGonTraced3(_), ShapeData::SlopeRounded(_)) => todo!(),
+            (ShapeData::NGonTraced3(_), ShapeData::NGon3(_)) => todo!(),
+            (ShapeData::NGonTraced3(_), ShapeData::NGonTraced3(_)) => todo!(),
         }
     }
 
 }
 
+#[derive(Debug, Clone, Copy)]
 pub struct Shape {
     pub origin: Vec2,
     pub data:   ShapeData,

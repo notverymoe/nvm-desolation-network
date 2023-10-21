@@ -26,6 +26,10 @@ impl<const N: usize> NGonData<N> {
         }
     }
 
+    pub fn points(&self) -> &[Vec2; N] {
+        &self.points
+    }
+
 } 
 
 impl<const N: usize> RaycastTarget for NGonData<N> {

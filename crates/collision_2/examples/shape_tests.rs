@@ -2,7 +2,7 @@
 
 use bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
 
-use collision_2::{SlopeRoundedData, RectRoundedData, RectData, CircleData, ShapeData, Shape, Projection, ShapeCaster, SlopeData, GizmoRenderable, NGonData, RaycastTarget};
+use collision_2::{SlopeRoundedData, RectRoundedData, RectData, CircleData, ShapeData, Shape, Projection, ShapeCaster, SlopeData, GizmoRenderable, NGonData, RaycastTarget, NGonDataTraced};
 
 pub fn main() {
     App::new()
@@ -35,7 +35,8 @@ impl StaticCollider {
             ShapeData::RectRounded(_)  => SlopeData::new(Vec2::new(100.0, 100.0)).into(),
             ShapeData::Slope(_)        => SlopeRoundedData::new(Vec2::new(75.0, 75.0), 25.0).into(),
             ShapeData::SlopeRounded(s) => NGonData::<3>::new(s.points_sorted()).into(),
-            ShapeData::NGon3(_)        => Self::CIRCLE.into(),
+            ShapeData::NGon3(s)        => NGonDataTraced::<RectData, 3>::new(*s.points(), RectData::new(Vec2::new(20.0, 20.0))).into(),
+            ShapeData::NGonTraced3(_)  => Self::CIRCLE.into(),
         }
     }
 
@@ -142,7 +143,7 @@ fn check_colliders(
 ) {
     for mut caster in q_caster.iter_mut() {
         caster.hits.clear();
-        let ray = ShapeCaster::new(&caster.collider.0, (caster.target - caster.collider.0.origin).normalize());
+        let ray = ShapeCaster::new(caster.collider.0, (caster.target - caster.collider.0.origin).normalize());
         for (shape_id, StaticCollider(shape)) in q_static.iter() {
             if let Some((projection, shape)) = ray.test_static(shape) {
                 caster.hits.push((shape_id, projection, shape));

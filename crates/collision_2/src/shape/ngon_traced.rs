@@ -1,11 +1,17 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
+use std::fmt::Debug;
+
 use bevy::prelude::{Vec2, Gizmos, Color};
 
 use crate::{CollectSizedArray, RaycastTarget, RayCaster, Projection, ProjectOnAxis, GizmoRenderable, calculate_offsets_for, calculate_normals_for, calculate_lengths_for, PairIndexIter};
 
-pub struct NGonDataTraced<const N: usize> {
-    inner:     Box<dyn RaycastTarget>,
+pub trait NGonInner: GizmoRenderable + RaycastTarget + ProjectOnAxis + Debug + Sync + Send + Clone + Copy {}
+impl<T: GizmoRenderable + RaycastTarget + ProjectOnAxis + Debug + Clone + Sync + Send + Copy> NGonInner for T {}
+
+#[derive(Debug, Clone, Copy)]
+pub struct NGonDataTraced<T: NGonInner, const N: usize> {
+    inner:     T,
     points:    [Vec2; N],
     normals:   [Vec2; N],
     lengths:   [ f32; N],
@@ -13,26 +19,31 @@ pub struct NGonDataTraced<const N: usize> {
     proj_aabb: [Projection; 2],
 }
 
-impl<const N: usize> NGonDataTraced<N> {
+impl<T: NGonInner, const N: usize> NGonDataTraced<T, N> {
 
-    pub fn new(points: [Vec2; N], other: impl RaycastTarget + ProjectOnAxis + 'static) -> Self {
+    pub fn new(points: [Vec2; N], inner: T) -> Self {
+        let other_aabb = inner.project_aabb();
         let normals = calculate_normals_for(&points);
         Self{
             lengths: calculate_lengths_for(&points),
-            offsets: calculate_offsets_for(&normals, &other),
-            inner: Box::new(other),
+            offsets: calculate_offsets_for(&normals, &inner),
             normals,
-            proj_aabb: [ // OPT we can just min-max components
-                Projection::from_points_iter(Vec2::X, points), 
-                Projection::from_points_iter(Vec2::Y, points), 
+            proj_aabb: [
+                Projection::from_points_iter(Vec2::X, points).swept_by(other_aabb[0]), 
+                Projection::from_points_iter(Vec2::Y, points).swept_by(other_aabb[1]), 
             ],
             points,
+            inner,
         }
+    }
+
+    pub fn points(&self) -> &[Vec2; N] {
+        &self.points
     }
 
 } 
 
-impl<const N: usize> RaycastTarget for NGonDataTraced<N> {
+impl<T: NGonInner, const N: usize> RaycastTarget for NGonDataTraced<T, N> {
     fn raycast(&self, ray: &RayCaster) -> Option<Projection> {
         (0..N)
             .filter_map(|i| 
@@ -41,7 +52,7 @@ impl<const N: usize> RaycastTarget for NGonDataTraced<N> {
                     self.normals[i].perp(), self.lengths[i]
                 )
             )
-            .chain(std::iter::once(self.inner.raycast(ray)).flatten())
+            .chain(self.points.iter().filter_map(|&p| self.inner.raycast(&ray.with_offset(-p))))
             .reduce(|c, v| c.merged_with(v))
     }
     
@@ -85,7 +96,7 @@ impl<const N: usize> RaycastTarget for NGonDataTraced<N> {
     }
 }
 
-impl<const N: usize> ProjectOnAxis for NGonDataTraced<N> {
+impl<T: NGonInner, const N: usize> ProjectOnAxis for NGonDataTraced<T, N> {
     fn project_aabb(&self) -> [Projection; 2] {
         self.proj_aabb
     }
@@ -96,11 +107,21 @@ impl<const N: usize> ProjectOnAxis for NGonDataTraced<N> {
 }
 
 
-impl<const N: usize> GizmoRenderable for NGonDataTraced<N> {
+impl<T: NGonInner, const N: usize> GizmoRenderable for NGonDataTraced<T, N> {
     fn render(&self, gizmos: &mut Gizmos, offset: Vec2, color: Color) {
         gizmos.linestrip_2d(
             self.points.iter().map(|&v| v + offset).chain(std::iter::once(self.points[0] + offset)),
             color
         );
+
+        for [i, j] in PairIndexIter::new(N) {
+            gizmos.line_2d(
+                self.points[i] + self.normals[i]*self.offsets[i] + offset,
+                self.points[j] + self.normals[i]*self.offsets[i] + offset,
+                color
+            );
+        }
+
+        self.points.iter().for_each(|&v| self.inner.render(gizmos, v + offset, color))
     }
 }
