@@ -2,7 +2,7 @@
 
 use bevy::prelude::{Vec2, Gizmos, Color};
 
-use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster, NormalAtPoint, GizmoRenderable};
+use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster, GizmoRenderable};
 
 #[derive(Debug, Clone, Copy)]
 pub struct RectRoundedData {
@@ -16,7 +16,40 @@ impl RectRoundedData {
     }
 }
 
-impl NormalAtPoint for RectRoundedData {
+impl ProjectOnAxis for RectRoundedData {
+    fn project_aabb(&self) -> [Projection; 2] {
+        [
+            Projection([-self.size.x - self.radius, self.size.x + self.radius]),
+            Projection([-self.size.y - self.radius, self.size.y + self.radius]),
+        ]
+    }
+
+    fn project_on_axis(&self, axis: Vec2) -> Projection {
+        // Don't ask, this works, it's magic. See RectData for some info.
+        let axis_dp = axis.abs().dot(self.size) + self.radius;
+        Projection([-axis_dp, axis_dp])
+    }
+}
+
+impl RaycastTarget for RectRoundedData {
+    fn raycast(&self, ray: &RayCaster) -> Option<Projection> {
+        let min_x = self.size.x;
+        let max_x = self.size.x + self.radius;
+
+        let min_y = self.size.y;
+        let max_y = self.size.y + self.radius;
+
+        // OPT we could use a modified rect intersecton to only operate on one axis
+        [
+            ray.find_circle_intersection(Vec2::new( self.size.x,  self.size.y), self.radius),
+            ray.find_circle_intersection(Vec2::new(-self.size.x,  self.size.y), self.radius),
+            ray.find_circle_intersection(Vec2::new(-self.size.x, -self.size.y), self.radius),
+            ray.find_circle_intersection(Vec2::new( self.size.x, -self.size.y), self.radius),
+            ray.find_rect_intersection(Vec2::new(-min_x, -max_y), Vec2::new(min_x,  max_y)), // vert test
+            ray.find_rect_intersection(Vec2::new(-max_x, -min_y), Vec2::new(max_x,  min_y)), // horz test
+        ].iter().filter_map(|v| *v).reduce(|p, c| p.merged_with(c))
+    }
+    
     fn normal_at(&self, point: Vec2) -> Vec2 {
         let pnt_abs = point.abs();
         let dist_x = pnt_abs.x - self.size.x; 
@@ -59,41 +92,6 @@ impl NormalAtPoint for RectRoundedData {
     }
 }
 
-impl ProjectOnAxis for RectRoundedData {
-    fn project_aabb(&self) -> [Projection; 2] {
-        [
-            Projection([-self.size.x - self.radius, self.size.x + self.radius]),
-            Projection([-self.size.y - self.radius, self.size.y + self.radius]),
-        ]
-    }
-
-    fn project_on_axis(&self, axis: Vec2) -> Projection {
-        // Don't ask, this works, it's magic. See RectData for some info.
-        let axis_dp = axis.abs().dot(self.size) + self.radius;
-        Projection([-axis_dp, axis_dp])
-    }
-}
-
-impl RaycastTarget for RectRoundedData {
-    fn raycast(&self, ray: &RayCaster) -> Option<Projection> {
-        let min_x = self.size.x;
-        let max_x = self.size.x + self.radius;
-
-        let min_y = self.size.y;
-        let max_y = self.size.y + self.radius;
-
-        // OPT we could use a modified rect intersecton to only operate on one axis
-        [
-            ray.find_circle_intersection(Vec2::new( self.size.x,  self.size.y), self.radius),
-            ray.find_circle_intersection(Vec2::new(-self.size.x,  self.size.y), self.radius),
-            ray.find_circle_intersection(Vec2::new(-self.size.x, -self.size.y), self.radius),
-            ray.find_circle_intersection(Vec2::new( self.size.x, -self.size.y), self.radius),
-            ray.find_rect_intersection(Vec2::new(-min_x, -max_y), Vec2::new(min_x,  max_y)), // vert test
-            ray.find_rect_intersection(Vec2::new(-max_x, -min_y), Vec2::new(max_x,  min_y)), // horz test
-        ].iter().filter_map(|v| *v).reduce(|p, c| p.merged_with(c))
-    }
-}
-
 impl GizmoRenderable for RectRoundedData {
     fn render(&self, gizmos: &mut Gizmos, offset: Vec2, color: Color) {
         gizmos.arc_2d(offset + Vec2::new( self.size.x,  self.size.y), f32::to_radians( 45.0), f32::to_radians(90.0), self.radius, color);
@@ -131,7 +129,7 @@ impl GizmoRenderable for RectRoundedData {
 mod test {
     use bevy::prelude::Vec2;
 
-    use crate::{RayCaster, RaycastTarget, Projection, RectRoundedData, NormalAtPoint, assert_vec_eq};
+    use crate::{RayCaster, RaycastTarget, Projection, RectRoundedData, assert_vec_eq};
 
     #[test]
     fn raycast_rect_rounded() {

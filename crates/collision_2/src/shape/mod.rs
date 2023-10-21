@@ -2,7 +2,7 @@
 
 use bevy::prelude::{Vec2, Color, Gizmos};
 
-use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster, NormalAtPoint, GizmoRenderable};
+use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster, GizmoRenderable};
 
 mod rect;
 pub use rect::*;
@@ -21,6 +21,9 @@ pub use slope_rounded::*;
 
 mod ngon;
 pub use ngon::*;
+
+mod ngon_traced;
+pub use ngon_traced::*;
 
 #[derive(Debug, Clone, Copy)]
 pub enum ShapeData {
@@ -68,19 +71,6 @@ impl From<NGonData<3>> for ShapeData {
     }
 }
 
-impl NormalAtPoint for ShapeData {
-    fn normal_at(&self, point: Vec2) -> Vec2 {
-        match self {
-            ShapeData::Rect(data)         => data.normal_at(point),
-            ShapeData::Circle(data)       => data.normal_at(point),
-            ShapeData::RectRounded(data)  => data.normal_at(point),
-            ShapeData::Slope(data)        => data.normal_at(point),
-            ShapeData::SlopeRounded(data) => data.normal_at(point),
-            ShapeData::NGon3(data)        => data.normal_at(point),
-        }
-    }
-}
-
 impl ProjectOnAxis for ShapeData {
     fn project_aabb(&self) -> [Projection; 2] {
         match self {
@@ -114,6 +104,17 @@ impl RaycastTarget for ShapeData {
             ShapeData::Slope(data)        => data.raycast(ray),
             ShapeData::SlopeRounded(data) => data.raycast(ray),
             ShapeData::NGon3(data)        => data.raycast(ray),
+        }
+    }
+    
+    fn normal_at(&self, point: Vec2) -> Vec2 {
+        match self {
+            ShapeData::Rect(data)         => data.normal_at(point),
+            ShapeData::Circle(data)       => data.normal_at(point),
+            ShapeData::RectRounded(data)  => data.normal_at(point),
+            ShapeData::Slope(data)        => data.normal_at(point),
+            ShapeData::SlopeRounded(data) => data.normal_at(point),
+            ShapeData::NGon3(data)        => data.normal_at(point),
         }
     }
 }
@@ -199,12 +200,6 @@ impl Shape {
 
 }
 
-impl NormalAtPoint for Shape {
-    fn normal_at(&self, point: Vec2) -> Vec2 {
-        self.data.normal_at(point - self.origin)
-    }
-}
-
 impl ProjectOnAxis for Shape {
     fn project_aabb(&self) -> [Projection; 2] {
         let [x, y] = self.data.project_aabb();
@@ -219,6 +214,10 @@ impl ProjectOnAxis for Shape {
 impl RaycastTarget for Shape {
     fn raycast(&self, ray: &RayCaster) -> Option<Projection> {
         self.data.raycast(&ray.with_offset(-self.origin))
+    }
+    
+    fn normal_at(&self, point: Vec2) -> Vec2 {
+        self.data.normal_at(point - self.origin)
     }
 }
 

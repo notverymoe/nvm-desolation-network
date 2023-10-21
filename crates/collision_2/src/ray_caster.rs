@@ -6,6 +6,7 @@ use crate::Projection;
 
 pub trait RaycastTarget {
     fn raycast(&self, ray: &RayCaster) -> Option<Projection>;
+    fn normal_at(&self, point: Vec2) -> Vec2;
 }
 
 #[derive(Debug, Clone, Copy)]

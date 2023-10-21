@@ -2,7 +2,7 @@
 
 use bevy::prelude::{Vec2, Gizmos, Color};
 
-use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster, NormalAtPoint, GizmoRenderable};
+use crate::{Projection, ProjectOnAxis, RaycastTarget, RayCaster, GizmoRenderable};
 
 #[derive(Debug, Clone, Copy)]
 pub struct RectData {
@@ -15,7 +15,28 @@ impl RectData {
     }
 }
 
-impl NormalAtPoint for RectData {
+impl ProjectOnAxis for RectData {
+    fn project_aabb(&self) -> [Projection; 2] {
+        [
+            Projection([-self.size.x, self.size.x]),
+            Projection([-self.size.y, self.size.y]),
+        ]
+    }
+
+    fn project_on_axis(&self, axis: Vec2) -> Projection {
+        // Axis points towards a particular corner, Vec2::abs() will 
+        // make it point towards Self::size's corner without changing
+        // the relative position.
+        let axis_dp = axis.abs().dot(self.size);
+        Projection([-axis_dp, axis_dp])
+    }
+}
+
+impl RaycastTarget for RectData {
+    fn raycast(&self, ray: &RayCaster) -> Option<Projection> {
+        ray.find_rect_intersection(-self.size, self.size)
+    }
+    
     fn normal_at(&self, point: Vec2) -> Vec2 {
         let pnt_abs = point.abs();
         let dist_x = pnt_abs.x - self.size.x; 
@@ -61,29 +82,6 @@ impl NormalAtPoint for RectData {
     }
 }
 
-impl ProjectOnAxis for RectData {
-    fn project_aabb(&self) -> [Projection; 2] {
-        [
-            Projection([-self.size.x, self.size.x]),
-            Projection([-self.size.y, self.size.y]),
-        ]
-    }
-
-    fn project_on_axis(&self, axis: Vec2) -> Projection {
-        // Axis points towards a particular corner, Vec2::abs() will 
-        // make it point towards Self::size's corner without changing
-        // the relative position.
-        let axis_dp = axis.abs().dot(self.size);
-        Projection([-axis_dp, axis_dp])
-    }
-}
-
-impl RaycastTarget for RectData {
-    fn raycast(&self, ray: &RayCaster) -> Option<Projection> {
-        ray.find_rect_intersection(-self.size, self.size)
-    }
-}
-
 impl GizmoRenderable for RectData {
     fn render(&self, gizmos: &mut Gizmos, offset: Vec2, color: Color) {
         gizmos.rect_2d(offset, 0.0, self.size*2.0, color);
@@ -94,7 +92,7 @@ impl GizmoRenderable for RectData {
 mod test {
     use bevy::prelude::Vec2;
 
-    use crate::{RayCaster, RaycastTarget, Projection, RectData, NormalAtPoint, assert_vec_eq};
+    use crate::{RayCaster, RaycastTarget, Projection, RectData, assert_vec_eq};
 
     #[test]
     fn raycast_rect() {

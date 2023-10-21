@@ -2,7 +2,7 @@
 
 use bevy::prelude::{Vec2, Gizmos, Color};
 
-use crate::{RaycastTarget, RayCaster, Projection, ProjectOnAxis, NormalAtPoint, GizmoRenderable};
+use crate::{RaycastTarget, RayCaster, Projection, ProjectOnAxis, GizmoRenderable};
 
 #[derive(Debug, Clone, Copy)]
 pub struct SlopeRoundedData {
@@ -78,9 +78,7 @@ impl RaycastTarget for SlopeRoundedData {
             ray.find_bounded_ray_intersection(off_slope + Vec2::new(0.0, size.y), self.direction, self.length),
         ].iter().filter_map(|v| *v).reduce(|c, v| c.merged_with(v))
     }
-}
-
-impl NormalAtPoint for SlopeRoundedData {
+    
     fn normal_at(&self, point: Vec2) -> Vec2 {
         let size = self.size();
         let size_abs = size.abs();

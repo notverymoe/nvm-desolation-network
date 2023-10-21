@@ -2,7 +2,7 @@
 
 use bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
 
-use collision_2::{SlopeRoundedData, RectRoundedData, RectData, CircleData, ShapeData, Shape, Projection, ShapeCaster, NormalAtPoint, SlopeData, GizmoRenderable, NGonData};
+use collision_2::{SlopeRoundedData, RectRoundedData, RectData, CircleData, ShapeData, Shape, Projection, ShapeCaster, SlopeData, GizmoRenderable, NGonData, RaycastTarget};
 
 pub fn main() {
     App::new()

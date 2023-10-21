@@ -2,7 +2,7 @@
 
 use bevy::prelude::{Gizmos, Vec2, Color};
 
-use crate::{Projection, ProjectOnAxis, RayCaster, RaycastTarget, NormalAtPoint, GizmoRenderable};
+use crate::{Projection, ProjectOnAxis, RayCaster, RaycastTarget, GizmoRenderable};
 
 #[derive(Debug, Clone, Copy)]
 pub struct CircleData {
@@ -12,12 +12,6 @@ pub struct CircleData {
 impl CircleData {
     pub const fn new(radius: f32) -> Self {
         Self{radius}
-    }
-}
-
-impl NormalAtPoint for CircleData {
-    fn normal_at(&self, point: Vec2) -> Vec2 {
-        point.normalize()
     }
 }
 
@@ -38,6 +32,10 @@ impl RaycastTarget for CircleData {
     fn raycast(&self, ray: &RayCaster) -> Option<Projection> {
         ray.find_circle_intersection_at_origin(self.radius)
     }
+    
+    fn normal_at(&self, point: Vec2) -> Vec2 {
+        point.normalize()
+    }
 }
 
 impl GizmoRenderable for CircleData {
@@ -50,7 +48,7 @@ impl GizmoRenderable for CircleData {
 mod test {
     use bevy::prelude::Vec2;
 
-    use crate::{RayCaster, RaycastTarget, Projection, CircleData, NormalAtPoint, assert_vec_eq};
+    use crate::{RayCaster, RaycastTarget, Projection, CircleData, assert_vec_eq};
 
     #[test]
     fn raycast_circle() {

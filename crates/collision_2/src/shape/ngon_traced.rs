@@ -2,22 +2,26 @@
 
 use bevy::prelude::{Vec2, Gizmos, Color};
 
-use crate::{CollectSizedArray, RaycastTarget, RayCaster, Projection, ProjectOnAxis, GizmoRenderable};
+use crate::{CollectSizedArray, RaycastTarget, RayCaster, Projection, ProjectOnAxis, GizmoRenderable, calculate_offsets_for, calculate_normals_for, calculate_lengths_for, PairIndexIter};
 
-#[derive(Debug, Clone, Copy)]
-pub struct NGonData<const N: usize> {
-    points:  [Vec2; N],
-    normals: [Vec2; N],
-    lengths: [ f32; N],
+pub struct NGonDataTraced<const N: usize> {
+    inner:     Box<dyn RaycastTarget>,
+    points:    [Vec2; N],
+    normals:   [Vec2; N],
+    lengths:   [ f32; N],
+    offsets:   [ f32; N],
     proj_aabb: [Projection; 2],
 }
 
-impl<const N: usize> NGonData<N> {
+impl<const N: usize> NGonDataTraced<N> {
 
-    pub fn new(points: [Vec2; N]) -> Self {
+    pub fn new(points: [Vec2; N], other: impl RaycastTarget + ProjectOnAxis + 'static) -> Self {
+        let normals = calculate_normals_for(&points);
         Self{
-            normals: calculate_normals_for(&points),
             lengths: calculate_lengths_for(&points),
+            offsets: calculate_offsets_for(&normals, &other),
+            inner: Box::new(other),
+            normals,
             proj_aabb: [ // OPT we can just min-max components
                 Projection::from_points_iter(Vec2::X, points), 
                 Projection::from_points_iter(Vec2::Y, points), 
@@ -28,9 +32,17 @@ impl<const N: usize> NGonData<N> {
 
 } 
 
-impl<const N: usize> RaycastTarget for NGonData<N> {
+impl<const N: usize> RaycastTarget for NGonDataTraced<N> {
     fn raycast(&self, ray: &RayCaster) -> Option<Projection> {
-        (0..N).filter_map(|i| ray.find_bounded_ray_intersection(self.points[i], self.normals[i].perp(), self.lengths[i])).reduce(|c, v| c.merged_with(v))
+        (0..N)
+            .filter_map(|i| 
+                ray.find_bounded_ray_intersection(
+                    self.points[i] + self.normals[i]*self.offsets[i], 
+                    self.normals[i].perp(), self.lengths[i]
+                )
+            )
+            .chain(std::iter::once(self.inner.raycast(ray)).flatten())
+            .reduce(|c, v| c.merged_with(v))
     }
     
     fn normal_at(&self, point: Vec2) -> Vec2 {
@@ -38,7 +50,7 @@ impl<const N: usize> RaycastTarget for NGonData<N> {
             let point = point - self.points[i];
             [
                 self.normals[i].dot(point),
-                self.normals[i].perp_dot(point)
+                self.normals[i].perp_dot(point),
             ]
         }).try_collect_array().unwrap();
 
@@ -65,7 +77,7 @@ impl<const N: usize> RaycastTarget for NGonData<N> {
 
             if (i_pdp > len) && (j_pdp < 0.0) {
                 // is between segments, vertex is nearest
-                return (point - self.points[j]).normalize();
+                return self.inner.normal_at(point - self.points[j]);
             }
         }
 
@@ -73,7 +85,7 @@ impl<const N: usize> RaycastTarget for NGonData<N> {
     }
 }
 
-impl<const N: usize> ProjectOnAxis for NGonData<N> {
+impl<const N: usize> ProjectOnAxis for NGonDataTraced<N> {
     fn project_aabb(&self) -> [Projection; 2] {
         self.proj_aabb
     }
@@ -84,60 +96,11 @@ impl<const N: usize> ProjectOnAxis for NGonData<N> {
 }
 
 
-impl<const N: usize> GizmoRenderable for NGonData<N> {
+impl<const N: usize> GizmoRenderable for NGonDataTraced<N> {
     fn render(&self, gizmos: &mut Gizmos, offset: Vec2, color: Color) {
         gizmos.linestrip_2d(
             self.points.iter().map(|&v| v + offset).chain(std::iter::once(self.points[0] + offset)),
             color
         );
     }
-}
-
-
-
-
-pub struct PairIndexIter {
-    current: usize,
-    size: usize,
-}
-
-impl PairIndexIter {
-    pub fn new(size: usize) -> Self {
-        Self{current: 0, size}
-    }
-}
-
-impl Iterator for PairIndexIter {
-    type Item = [usize; 2];
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.current < self.size {
-            let result = Some([self.current, (self.current + 1) % self.size]);
-            self.current += 1;
-            result
-        } else {
-            None
-        }
-    }
-}
-
-
-
-
-
-
-
-
-
-
-pub fn calculate_lengths_for<const N: usize>(points: &[Vec2; N]) -> [f32; N] {
-    points.iter().enumerate().map(|(i, &v)| (v - points[(i+1) % N]).length()).try_collect_array().unwrap()
-}
-
-pub fn calculate_normals_for<const N: usize>(points: &[Vec2; N]) -> [Vec2; N] {
-    points.iter().enumerate().map(|(i, &v)| (v - points[(i+1) % N]).normalize().perp()).try_collect_array().unwrap()
-}
-
-pub fn calculate_offsets_for<const N: usize>(normals: &[Vec2; N], other: &impl ProjectOnAxis) -> [f32; N] {
-    normals.iter().map(|&n| other.project_on_axis(n).max()).try_collect_array().unwrap()
 }
