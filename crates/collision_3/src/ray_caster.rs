@@ -2,7 +2,6 @@
 
 use bevy::prelude::Vec2;
 
-
 #[derive(Debug, Clone, Copy)]
 pub struct RayIntersection {
     pub distance: f32,
@@ -10,8 +9,7 @@ pub struct RayIntersection {
     pub normal:   Vec2,
 }
 
-
-pub trait RayTarget {
+pub trait RaycastTarget {
     fn raycast(&self, ray: RayCaster) -> Option<[RayIntersection; 2]>;
 
     fn raycast_enter(&self, ray: RayCaster) -> Option<RayIntersection> {

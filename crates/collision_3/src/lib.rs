@@ -1,3 +1,7 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-pub mod ray_caster;
+mod ray_caster;
+pub use ray_caster::*;
+
+mod shape;
+pub use shape::*;
