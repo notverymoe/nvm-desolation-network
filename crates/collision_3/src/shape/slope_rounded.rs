@@ -11,12 +11,6 @@ pub struct SlopeRounded {
     pub radius:    f32,
 }
 
-impl SlopeRounded {
-    pub fn size(&self) -> Vec2 {
-        self.direction.perp() * self.length
-    }
-}
-
 impl RaycastTarget for SlopeRounded {
     fn raycast(&self, ray: RayCaster) -> Option<[RayIntersection; 2]> {
         let (points, normals, lengths) = get_polygon_data_for_slope(self.direction, self.length);

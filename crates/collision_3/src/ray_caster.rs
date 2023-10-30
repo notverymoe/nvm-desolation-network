@@ -370,5 +370,22 @@ impl RayIntersection {
 
         (exit.distance >= entry.distance).then_some([entry, exit])
     }
+
+    pub fn find_polygon_entry_exit_pairs(v: impl IntoIterator<Item = [RayIntersection; 2]>) -> Option<[RayIntersection; 2]> {
+
+        let mut entry = RayIntersection{ distance:  f32::MAX, point: Vec2::ZERO, normal: Vec2::ZERO };
+        let mut exit  = RayIntersection{ distance: -f32::MAX, point: Vec2::ZERO, normal: Vec2::ZERO };
+        for [entry_intersection, exit_intersection] in v.into_iter() {
+            if entry_intersection.distance < entry.distance {
+                entry = entry_intersection;
+            } 
+
+            if exit_intersection.distance > exit.distance {
+                exit = exit_intersection;
+            }
+        }
+
+        (exit.distance >= entry.distance).then_some([entry, exit])
+    }
     
 }
