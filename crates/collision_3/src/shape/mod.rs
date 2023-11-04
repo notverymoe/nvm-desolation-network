@@ -17,3 +17,6 @@ pub use slope_rounded::*;
 
 mod slope_rected;
 pub use slope_rected::*;
+
+mod slope_rected_rounded;
+pub use slope_rected_rounded::*;

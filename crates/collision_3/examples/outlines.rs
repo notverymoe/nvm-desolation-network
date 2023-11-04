@@ -1,7 +1,7 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
 use bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
-use collision_3::{CollisionDebugShape, Circle, Rect, RectRounded, Slope, SlopeRounded, SlopeRected};
+use collision_3::{CollisionDebugShape, Circle, Rect, RectRounded, Slope, SlopeRounded, SlopeRected, SlopeRectedRounded};
 
 pub fn main() {
     App::new()
@@ -46,6 +46,11 @@ fn setup(mut commands: Commands) {
     commands.spawn(Shape::new(SlopeRounded::new(Vec2::X*500.0 + Vec2::new(-30.0,  30.0), Vec2::new(-2.0, -1.0).normalize(), 200.0, 25.0)));
     commands.spawn(Shape::new(SlopeRounded::new(Vec2::X*500.0 + Vec2::new(-30.0, -30.0), Vec2::new(-2.0,  1.0).normalize(), 200.0, 25.0)));
     commands.spawn(Shape::new(SlopeRounded::new(Vec2::X*500.0 + Vec2::new( 30.0, -30.0), Vec2::new( 2.0,  1.0).normalize(), 200.0, 25.0)));
+
+    commands.spawn(Shape::new(SlopeRectedRounded::new(Vec2::X*-500.0 - Vec2::Y*250.0 + Vec2::new( 115.0,  50.0), Vec2::new( 2.0, -1.0).normalize(), 200.0, Vec2::new(50.0, 25.0), 25.0)));
+    commands.spawn(Shape::new(SlopeRectedRounded::new(Vec2::X*-500.0 - Vec2::Y*250.0 + Vec2::new(-115.0,  50.0), Vec2::new(-2.0, -1.0).normalize(), 200.0, Vec2::new(50.0, 25.0), 25.0)));
+    commands.spawn(Shape::new(SlopeRectedRounded::new(Vec2::X*-500.0 - Vec2::Y*250.0 + Vec2::new(-115.0, -50.0), Vec2::new(-2.0,  1.0).normalize(), 200.0, Vec2::new(50.0, 25.0), 25.0)));
+    commands.spawn(Shape::new(SlopeRectedRounded::new(Vec2::X*-500.0 - Vec2::Y*250.0 + Vec2::new( 115.0, -50.0), Vec2::new( 2.0,  1.0).normalize(), 200.0, Vec2::new(50.0, 25.0), 25.0)));
 
     
 }
