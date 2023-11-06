@@ -56,7 +56,7 @@ pub fn get_polygon_data_for_rect_slope(direction: Vec2, length: f32, rect_size_a
     if (tri_size.x >= 0.0) == (tri_size.y >= 0.0) {
         (
             [     origin,  point_vert_out, point_vert_in,   point_horz_in, point_horz_out],
-            [     -right,             -up,        normal,           right,             up],
+            [     -right,              up,        normal,           right,            -up],
             [aabb_size.x, rect_size_abs.y,        length, rect_size_abs.x,    aabb_size.y],
         )
     } else {
