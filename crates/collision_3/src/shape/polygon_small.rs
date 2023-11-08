@@ -13,6 +13,14 @@ pub struct PolygonSmall {
 }
 
 impl PolygonSmall {
+    pub fn new(points: impl IntoIterator<Item = Vec2>, normals: impl IntoIterator<Item = Vec2>, lengths: impl IntoIterator<Item = f32>) -> Self {
+        Self{
+            points:  ArrayVec::from_iter(points ),
+            normals: ArrayVec::from_iter(normals),
+            lengths: ArrayVec::from_iter(lengths),
+        }
+    }
+
     pub fn new_from_points(points: impl IntoIterator<Item = Vec2>) -> Self {
         let points:      ArrayVec<[Vec2; 12]> = ArrayVec::from_iter(points);
         let mut normals: ArrayVec<[Vec2; 12]> = Default::default();
