@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, RayCaster, RayIntersection, CollisionDebugShape, RenderData, PolygonSmallRound};
+use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, PolygonSmallRound};
 use super::get_polygon_data_for_oriented_rect_rected;
 
 pub struct BoxOrientedBoxyRound(PolygonSmallRound);
@@ -19,8 +19,8 @@ impl RaycastTarget for BoxOrientedBoxyRound {
     }
 }
 
-impl CollisionDebugShape for BoxOrientedBoxyRound {
-    fn get_debug_render_data(&self) -> RenderData {
-        self.0.get_debug_render_data()
+impl DebugShape for BoxOrientedBoxyRound {
+    fn get_debug_shape_data(&self) -> DebugShapeData {
+        self.0.get_debug_shape_data()
     }
 }

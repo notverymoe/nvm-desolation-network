@@ -4,7 +4,7 @@ use bevy::prelude::Vec2;
 
 use tinyvec::ArrayVec;
 
-use crate::{RaycastTarget, CollisionDebugShape, RayCaster, RayIntersection, RenderData};
+use crate::{RaycastTarget, DebugShape, RayCaster, RayIntersection, DebugShapeData};
 
 pub struct PolygonSmall {
     pub(super) points:  ArrayVec<[Vec2; 12]>,
@@ -46,11 +46,11 @@ impl RaycastTarget for PolygonSmall {
     }
 }
 
-impl CollisionDebugShape for PolygonSmall {
-    fn get_debug_render_data(&self) -> RenderData {
-        RenderData::Polygon {  
-            points:  self.points.to_vec().into_boxed_slice(),
-            normals: self.normals.to_vec().into_boxed_slice(),
-        }
+impl DebugShape for PolygonSmall {
+    fn get_debug_shape_data(&self) -> DebugShapeData {
+        DebugShapeData::polygon(  
+            self.points.to_vec().into_boxed_slice(),
+            self.normals.to_vec().into_boxed_slice(),
+        )
     }
 }

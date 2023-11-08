@@ -1,7 +1,7 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
 use bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
-use collision_3::{CollisionDebugShape, Ball, BoxAligned, BoxAlignedRound, Ramp, RampRound, RampBoxy, RampBoxyRound, BoxOriented, BoxOrientedRound, BoxOrientedBoxy, BoxOrientedBoxyRound};
+use collision_3::{DebugShape, Ball, BoxAligned, BoxAlignedRound, Ramp, RampRound, RampBoxy, RampBoxyRound, BoxOriented, BoxOrientedRound, BoxOrientedBoxy, BoxOrientedBoxyRound, DebugShapeData};
 
 pub fn main() {
     App::new()
@@ -14,11 +14,11 @@ pub fn main() {
 }
 
 #[derive(Component)]
-pub struct Shape(Box<dyn CollisionDebugShape + Send + Sync + 'static>);
+pub struct Shape(Box<dyn DebugShape + Send + Sync + 'static>);
 
 impl Shape {
 
-    pub fn new(v: impl CollisionDebugShape + Send + Sync + 'static) -> Self {
+    pub fn new(v: impl DebugShape + Send + Sync + 'static) -> Self {
         Self(Box::new(v))
     }
 
@@ -63,36 +63,31 @@ fn setup(mut commands: Commands) {
 fn render(mut gizmos: Gizmos, q_shapes: Query<&Shape>) {
 
     for Shape(shape) in q_shapes.iter() {
-        match shape.get_debug_render_data() {
-            collision_3::RenderData::Circle { origin, radius } => { gizmos.circle_2d(origin, radius, Color::RED); },
-            collision_3::RenderData::Polygon { points, normals } => {
+        let data = shape.get_debug_shape_data();
+        match data {
+            collision_3::DebugShapeData::Circle { origin, radius } => { 
+                gizmos.circle_2d(origin, radius, Color::RED); 
+            },
+            collision_3::DebugShapeData::Polygon { .. } => {
+                let DebugShapeData::Polygon { points, .. } = &data else { unreachable!() };
                 gizmos.linestrip_2d((0..points.len()).chain(std::iter::once(0)).map(|i| points[i]), Color::RED);
-                for i in 0..points.len() {
-                    let from = points[i];
-                    let to   = points[(i+1) % points.len()];
-                    let mid  = (from + to)*0.5;
-                    let norm = normals[i];
+                for [from, to, norm] in data.iter_segments() {
+                    let mid = (from + to)*0.5;
+                    gizmos.line_2d(from, to, Color::RED);
                     gizmos.line_2d(mid, mid + norm*20.0, Color::BLUE);
                 }
             },
-            collision_3::RenderData::RoundedPoly { points, normals, radius } => {
-                gizmos.linestrip_2d((0..points.len()).chain(std::iter::once(0)).map(|i| points[i]), Color::RED);
-                for i in 0..points.len() {
-                    let from = points[i];
-                    gizmos.circle_2d(from, radius, Color::GREEN);
-
-                    
-                    let to   = points[(i+1) % points.len()];
-                    let mid  = (from + to)*0.5;
-                    let norm = normals[i];
+            collision_3::DebugShapeData::PolygonRound { radius, .. } => {
+                for [from, to, norm] in data.iter_segments() {
+                    let mid = (from + to)*0.5;
+                    if radius > 0.0 {
+                        gizmos.circle_2d(from, radius, Color::GREEN);
+                    }
+                    gizmos.line_2d(from, to, Color::RED);
                     gizmos.line_2d(mid, mid + norm*20.0, Color::BLUE);
                 }
-                // TODO offset polygon
             },
         };
-
-
-        
     }
 
 }

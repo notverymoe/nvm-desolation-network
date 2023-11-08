@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, RayCaster, RayIntersection, RenderData, CollisionDebugShape, get_polygon_data_for_ramp_boxy, PolygonSmallRound, PolygonSmall};
+use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShapeData, DebugShape, get_polygon_data_for_ramp_boxy, PolygonSmallRound, PolygonSmall};
 
 pub struct RampBoxyRound(PolygonSmallRound);
 
@@ -19,8 +19,8 @@ impl RaycastTarget for RampBoxyRound {
     }
 }
 
-impl CollisionDebugShape for RampBoxyRound {
-    fn get_debug_render_data(&self) -> RenderData {
-        self.0.get_debug_render_data()
+impl DebugShape for RampBoxyRound {
+    fn get_debug_shape_data(&self) -> DebugShapeData {
+        self.0.get_debug_shape_data()
     }
 }

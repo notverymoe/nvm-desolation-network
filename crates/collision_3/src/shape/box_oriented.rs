@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, RayCaster, RayIntersection, CollisionDebugShape, RenderData};
+use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData};
 
 pub struct BoxOriented {
     pub origin:    Vec2,
@@ -22,21 +22,21 @@ impl RaycastTarget for BoxOriented {
     }
 }
 
-impl CollisionDebugShape for BoxOriented {
-    fn get_debug_render_data(&self) -> RenderData {
-        RenderData::Polygon { 
-            points: Box::new([
+impl DebugShape for BoxOriented {
+    fn get_debug_shape_data(&self) -> DebugShapeData {
+        DebugShapeData::polygon( 
+            Box::new([
                 self.origin + Vec2::new( self.size.x,  self.size.y).rotate(self.direction),
                 self.origin + Vec2::new(-self.size.x,  self.size.y).rotate(self.direction),
                 self.origin + Vec2::new(-self.size.x, -self.size.y).rotate(self.direction),
                 self.origin + Vec2::new( self.size.x, -self.size.y).rotate(self.direction),
             ]), 
-            normals: Box::new([
+            Box::new([
                  self.direction.perp(),
                 -self.direction,
                 -self.direction.perp(),
                  self.direction
             ]),
-        }
+        )
     }
 }

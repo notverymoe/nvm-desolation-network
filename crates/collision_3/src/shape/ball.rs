@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, RayCaster, RayIntersection, CollisionDebugShape, RenderData};
+use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData};
 
 pub struct Ball {
     pub origin: Vec2,
@@ -23,11 +23,8 @@ impl RaycastTarget for Ball {
     }
 }
 
-impl CollisionDebugShape for Ball {
-    fn get_debug_render_data(&self) -> RenderData {
-        RenderData::Circle{
-            origin: self.origin,
-            radius: self.radius
-        }
+impl DebugShape for Ball {
+    fn get_debug_shape_data(&self) -> DebugShapeData {
+        DebugShapeData::circle(self.origin, self.radius)
     }
 }

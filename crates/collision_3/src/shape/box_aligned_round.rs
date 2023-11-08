@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, RayCaster, RayIntersection, RenderData, CollisionDebugShape};
+use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShapeData, DebugShape};
 
 pub struct BoxAlignedRound {
     pub origin: Vec2,
@@ -22,23 +22,23 @@ impl RaycastTarget for BoxAlignedRound {
     }
 }
 
-impl CollisionDebugShape for BoxAlignedRound {
-    fn get_debug_render_data(&self) -> RenderData {
-        RenderData::RoundedPoly { 
-            radius: self.radius,
-            points: Box::new([
+impl DebugShape for BoxAlignedRound {
+    fn get_debug_shape_data(&self) -> DebugShapeData {
+        DebugShapeData::polygon_round( 
+            Box::new([
                 self.origin + Vec2::new( self.size.x,  self.size.y),
                 self.origin + Vec2::new(-self.size.x,  self.size.y),
                 self.origin + Vec2::new(-self.size.x, -self.size.y),
                 self.origin + Vec2::new( self.size.x, -self.size.y),
             ]), 
-            normals: Box::new([
+            Box::new([
                  Vec2::Y,
                 -Vec2::X,
                 -Vec2::Y,
                  Vec2::X
             ]),
-        }
+            self.radius,
+        )
     }
 }
 
