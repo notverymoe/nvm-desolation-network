@@ -71,19 +71,20 @@ fn render(mut gizmos: Gizmos, q_shapes: Query<&Shape>) {
             collision_3::DebugShapeData::Polygon { .. } => {
                 let DebugShapeData::Polygon { points, .. } = &data else { unreachable!() };
                 gizmos.linestrip_2d((0..points.len()).chain(std::iter::once(0)).map(|i| points[i]), Color::RED);
-                for [from, to, norm] in data.iter_segments() {
-                    let mid = (from + to)*0.5;
-                    gizmos.line_2d(from, to, Color::RED);
+                for ([from, to, norm], offset) in data.iter_segments() {
+                    gizmos.line_2d(offset + from, offset + to, Color::RED);
+                    let mid = offset + (from + to)*0.5;
                     gizmos.line_2d(mid, mid + norm*20.0, Color::BLUE);
                 }
             },
             collision_3::DebugShapeData::PolygonRound { radius, .. } => {
-                for [from, to, norm] in data.iter_segments() {
-                    let mid = (from + to)*0.5;
+                for ([from, to, norm], offset) in data.iter_segments() {
+                    let offset = norm * offset;
                     if radius > 0.0 {
                         gizmos.circle_2d(from, radius, Color::GREEN);
                     }
-                    gizmos.line_2d(from, to, Color::RED);
+                    gizmos.line_2d(offset + from, offset + to, Color::RED);
+                    let mid = offset + (from + to)*0.5;
                     gizmos.line_2d(mid, mid + norm*20.0, Color::BLUE);
                 }
             },

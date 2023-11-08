@@ -66,11 +66,14 @@ pub fn get_polygon_data_for_oriented_rect_rected(
     size:       Vec2,
     direction:  Vec2,
     outer_size: Vec2,
-) -> ArrayVec<[Vec2; 12]> {
+) -> ArrayVec<[Vec2; 8]> {
+
+    // TODO OPT return normals and lengths
+
     if direction.y == 0.0 {
         let combined = size + outer_size;
         array_vec![
-            [Vec2; 12] =>
+            [Vec2; 8] =>
             origin + Vec2::new( combined.x,  combined.y).rotate(direction),
             origin + Vec2::new(-combined.x,  combined.y).rotate(direction),
             origin + Vec2::new(-combined.x, -combined.y).rotate(direction),
@@ -79,7 +82,7 @@ pub fn get_polygon_data_for_oriented_rect_rected(
     } else if direction.x == 0.0 {
         let combined = size.yx() + outer_size;
         array_vec![
-            [Vec2; 12] =>
+            [Vec2; 8] =>
             origin + Vec2::new( combined.x,  combined.y).rotate(direction),
             origin + Vec2::new(-combined.x,  combined.y).rotate(direction),
             origin + Vec2::new(-combined.x, -combined.y).rotate(direction),
@@ -104,8 +107,9 @@ pub fn get_polygon_data_for_oriented_rect_rected(
     }
 }
 
-fn get_polygon_data_for_oriented_rect_rected_quick_impl(points: &[Vec2; 4], norms: &[Vec2; 4], size: Vec2) -> ArrayVec<[Vec2; 12]> {
-    
+fn get_polygon_data_for_oriented_rect_rected_quick_impl(points: &[Vec2; 4], norms: &[Vec2; 4], size: Vec2) -> ArrayVec<[Vec2; 8]> {
+
+    // TODO OPT return normals and lengths
 
     let rect_points = [
         Vec2::new( size.x,  size.y),
@@ -114,7 +118,7 @@ fn get_polygon_data_for_oriented_rect_rected_quick_impl(points: &[Vec2; 4], norm
         Vec2::new( size.x, -size.y),
     ];
 
-    let mut result = ArrayVec::<[Vec2; 12]>::default();
+    let mut result = ArrayVec::<[Vec2; 8]>::default();
     for i in 0..points.len() {
         let p  =  points[i];
         let n1 =   norms[i];
@@ -127,7 +131,6 @@ fn get_polygon_data_for_oriented_rect_rected_quick_impl(points: &[Vec2; 4], norm
             p + offset_1
         ]);
     }
-
 
     result
 }

@@ -32,7 +32,7 @@ impl DebugShapeData {
         Self::PolygonRound{points, normals, radius}
     }
 
-    pub fn iter_segments(&self) -> impl Iterator<Item = [Vec2; 3]> + '_ {
+    pub fn iter_segments(&self) -> impl Iterator<Item = ([Vec2; 3], f32)> + '_ {
         let ([points, normals], offset) = match self {
             DebugShapeData::Circle { .. } => ([[].as_ref(), [].as_ref()], 0.0_f32),
             DebugShapeData::Polygon { points, normals } => ([points.as_ref(), normals.as_ref()], 0.0_f32),
@@ -41,12 +41,9 @@ impl DebugShapeData {
 
         (0..points.len()).map(move |i| {
             let norm = normals[i];
-
-            let offset = norm * offset;
-            let from = offset + points[i];
-            let to   = offset + points[(i+1) % points.len()];
-
-            [from, to, norm]
+            let from = points[i];
+            let to   = points[(i+1) % points.len()];
+            ([from, to, norm], offset)
         })
     }
 

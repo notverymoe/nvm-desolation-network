@@ -6,10 +6,12 @@ use tinyvec::ArrayVec;
 
 use crate::{RaycastTarget, DebugShape, RayCaster, RayIntersection, DebugShapeData};
 
+pub const POLYGON_SMALL_CAPACITY: usize = 8;
+
 pub struct PolygonSmall {
-    pub(super) points:  ArrayVec<[Vec2; 12]>,
-    pub(super) normals: ArrayVec<[Vec2; 12]>,
-    pub(super) lengths: ArrayVec<[ f32; 12]>,
+    pub(super) points:  ArrayVec<[Vec2; POLYGON_SMALL_CAPACITY]>,
+    pub(super) normals: ArrayVec<[Vec2; POLYGON_SMALL_CAPACITY]>,
+    pub(super) lengths: ArrayVec<[ f32; POLYGON_SMALL_CAPACITY]>,
 }
 
 impl PolygonSmall {
@@ -22,16 +24,16 @@ impl PolygonSmall {
     }
 
     pub fn new_from_points(points: impl IntoIterator<Item = Vec2>) -> Self {
-        let points:      ArrayVec<[Vec2; 12]> = ArrayVec::from_iter(points);
-        let mut normals: ArrayVec<[Vec2; 12]> = Default::default();
-        let mut lengths: ArrayVec<[ f32; 12]> = Default::default();
+        let points:      ArrayVec<[Vec2; POLYGON_SMALL_CAPACITY]> = ArrayVec::from_iter(points);
+        let mut normals: ArrayVec<[Vec2; POLYGON_SMALL_CAPACITY]> = Default::default();
+        let mut lengths: ArrayVec<[ f32; POLYGON_SMALL_CAPACITY]> = Default::default();
 
         for i in 0..points.len() {
             let start = points[i];
             let end   = points[(i+1)%points.len()];
-            let offset = start-end;
+            let offset = end-start;
             let length = offset.length();
-            let normal = offset/length;
+            let normal = -(offset/length).perp();
             lengths.push(length);
             normals.push(normal);
         }
