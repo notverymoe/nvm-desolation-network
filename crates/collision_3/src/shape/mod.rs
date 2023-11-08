@@ -1,34 +1,47 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-mod circle;
-pub use circle::*;
+// // Ball // //
 
-mod rect;
-pub use rect::*;
+mod ball;
+pub use ball::*;
 
-mod rect_rounded;
-pub use rect_rounded::*;
+// // Box Aligned // //
 
-mod oriented_rect;
-pub use oriented_rect::*;
+mod box_aligned;
+pub use box_aligned::*;
 
-mod oriented_rect_rounded;
-pub use oriented_rect_rounded::*;
+mod box_aligned_round;
+pub use box_aligned_round::*;
 
-mod oriented_rect_rected;
-pub use oriented_rect_rected::*;
+// // Box Oriented // //
 
-mod oriented_rect_rected_rounded;
-pub use oriented_rect_rected_rounded::*;
+mod box_oriented;
+pub use box_oriented::*;
 
-mod slope;
-pub use slope::*;
+mod box_oriented_round;
+pub use box_oriented_round::*;
 
-mod slope_rounded;
-pub use slope_rounded::*;
+mod box_oriented_boxy;
+pub use box_oriented_boxy::*;
 
-mod slope_rected;
-pub use slope_rected::*;
+mod box_oriented_boxy_round;
+pub use box_oriented_boxy_round::*;
 
-mod slope_rected_rounded;
-pub use slope_rected_rounded::*;
+// // Ramp // //
+
+mod ramp;
+pub use ramp::*;
+
+mod ramp_round;
+pub use ramp_round::*;
+
+mod ramp_boxy;
+pub use ramp_boxy::*;
+
+mod ramp_boxy_round;
+pub use ramp_boxy_round::*;
+
+// // Misc // //
+
+mod util;
+pub(crate) use util::*;

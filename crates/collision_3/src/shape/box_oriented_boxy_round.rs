@@ -2,10 +2,11 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, RayCaster, RayIntersection, CollisionDebugShape, RenderData, get_polygon_data_for_oriented_rect_rected};
+use crate::{RaycastTarget, RayCaster, RayIntersection, CollisionDebugShape, RenderData};
+use super::get_polygon_data_for_oriented_rect_rected;
 
 
-pub struct OrientedRectRectedRounded {
+pub struct BoxOrientedBoxyRound {
     pub origin:     Vec2,
     pub size:       Vec2,
     pub direction:  Vec2,
@@ -13,19 +14,19 @@ pub struct OrientedRectRectedRounded {
     pub radius:     f32,
 }
 
-impl OrientedRectRectedRounded {
+impl BoxOrientedBoxyRound {
     pub fn new(origin: Vec2, size: Vec2, direction: Vec2, outer_size: Vec2, radius: f32) -> Self {
         Self{origin, size, direction, outer_size, radius}
     }
 }
 
-impl RaycastTarget for OrientedRectRectedRounded {
+impl RaycastTarget for BoxOrientedBoxyRound {
     fn raycast(&self, _ray: RayCaster) -> Option<[RayIntersection; 2]> {
         todo!();
     }
 }
 
-impl CollisionDebugShape for OrientedRectRectedRounded {
+impl CollisionDebugShape for BoxOrientedBoxyRound {
     fn get_debug_render_data(&self) -> RenderData {
         let points = get_polygon_data_for_oriented_rect_rected(self.origin, self.size, self.direction, self.outer_size);
         RenderData::RoundedPoly {  

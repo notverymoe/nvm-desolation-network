@@ -4,25 +4,25 @@ use bevy::prelude::Vec2;
 
 use crate::{RaycastTarget, RayCaster, RayIntersection, CollisionDebugShape, RenderData};
 
-pub struct OrientedRect {
+pub struct BoxOriented {
     pub origin:    Vec2,
     pub size:      Vec2,
     pub direction: Vec2,
 }
 
-impl OrientedRect {
+impl BoxOriented {
     pub fn new(origin: Vec2, size: Vec2, direction: Vec2) -> Self {
         Self{origin, size, direction}
     }
 }
 
-impl RaycastTarget for OrientedRect {
+impl RaycastTarget for BoxOriented {
     fn raycast(&self, _ray: RayCaster) -> Option<[RayIntersection; 2]> {
         todo!();
     }
 }
 
-impl CollisionDebugShape for OrientedRect {
+impl CollisionDebugShape for BoxOriented {
     fn get_debug_render_data(&self) -> RenderData {
         RenderData::Polygon { 
             points: Box::new([

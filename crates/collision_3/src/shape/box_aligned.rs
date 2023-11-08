@@ -2,30 +2,28 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, RayCaster, RayIntersection, RenderData, CollisionDebugShape};
+use crate::{RaycastTarget, RayCaster, RayIntersection, CollisionDebugShape, RenderData};
 
-pub struct RectRounded {
+pub struct BoxAligned {
     pub origin: Vec2,
     pub size:   Vec2,
-    pub radius: f32,
 }
 
-impl RectRounded {
-    pub fn new(origin: Vec2, size: Vec2, radius: f32) -> Self {
-        Self{origin, size, radius}
+impl BoxAligned {
+    pub fn new(origin: Vec2, size: Vec2) -> Self {
+        Self{origin, size}
     }
 }
 
-impl RaycastTarget for RectRounded {
+impl RaycastTarget for BoxAligned {
     fn raycast(&self, ray: RayCaster) -> Option<[RayIntersection; 2]> {
-        ray.test_rect_rounded(self.origin, self.size, self.radius)
+        ray.test_rect(self.origin, self.size)
     }
 }
 
-impl CollisionDebugShape for RectRounded {
+impl CollisionDebugShape for BoxAligned {
     fn get_debug_render_data(&self) -> RenderData {
-        RenderData::RoundedPoly { 
-            radius: self.radius,
+        RenderData::Polygon { 
             points: Box::new([
                 self.origin + Vec2::new( self.size.x,  self.size.y),
                 self.origin + Vec2::new(-self.size.x,  self.size.y),
@@ -41,4 +39,3 @@ impl CollisionDebugShape for RectRounded {
         }
     }
 }
-
