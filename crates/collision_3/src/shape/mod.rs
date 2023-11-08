@@ -41,6 +41,14 @@ pub use ramp_boxy::*;
 mod ramp_boxy_round;
 pub use ramp_boxy_round::*;
 
+// // NGon // //
+
+mod polygon_small;
+pub use polygon_small::*;
+
+mod polygon_small_round;
+pub use polygon_small_round::*;
+
 // // Misc // //
 
 mod util;
