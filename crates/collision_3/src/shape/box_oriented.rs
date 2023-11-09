@@ -17,8 +17,29 @@ impl BoxOriented {
 }
 
 impl RaycastTarget for BoxOriented {
-    fn raycast(&self, _ray: RayCaster) -> Option<[RayIntersection; 2]> {
-        todo!();
+    fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
+        let points = [
+            self.origin + Vec2::new( self.size.x,  self.size.y).rotate(self.direction),
+            self.origin + Vec2::new(-self.size.x,  self.size.y).rotate(self.direction),
+            self.origin + Vec2::new(-self.size.x, -self.size.y).rotate(self.direction),
+            self.origin + Vec2::new( self.size.x, -self.size.y).rotate(self.direction),
+        ];
+
+        let normals = [
+            self.direction.perp(),
+            self.direction,
+            -self.direction.perp(),
+            -self.direction
+        ];
+
+        let lengths = [
+            self.size.x,
+            self.size.y,
+            self.size.x,
+            self.size.x
+        ];
+
+        ray.test_polygon_at_origin(&points, &normals, &lengths)
     }
 }
 

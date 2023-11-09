@@ -17,7 +17,7 @@ impl Ramp {
 }
 
 impl RaycastTarget for Ramp {
-    fn raycast(&self, ray: RayCaster) -> Option<[RayIntersection; 2]> {
+    fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         let (points, normals, lengths) = get_polygon_data_for_ramp(self.direction, self.length);
         ray.test_polygon(self.origin, &points, &normals, &lengths)
     }

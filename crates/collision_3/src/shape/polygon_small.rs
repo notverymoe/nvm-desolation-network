@@ -43,7 +43,7 @@ impl PolygonSmall {
 }
 
 impl RaycastTarget for PolygonSmall {
-    fn raycast(&self, ray: RayCaster) -> Option<[RayIntersection; 2]> {
+    fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         ray.test_polygon_at_origin(&self.points, &self.normals, &self.lengths)
     }
 }

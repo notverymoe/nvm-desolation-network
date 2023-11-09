@@ -17,7 +17,7 @@ impl BoxAlignedRound {
 }
 
 impl RaycastTarget for BoxAlignedRound {
-    fn raycast(&self, ray: RayCaster) -> Option<[RayIntersection; 2]> {
+    fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         ray.test_rect_rounded(self.origin, self.size, self.radius)
     }
 }

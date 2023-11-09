@@ -14,7 +14,7 @@ impl BoxOrientedBoxyRound {
 }
 
 impl RaycastTarget for BoxOrientedBoxyRound {
-    fn raycast(&self, ray: RayCaster) -> Option<[RayIntersection; 2]> {
+    fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         self.0.raycast(ray)
     }
 }

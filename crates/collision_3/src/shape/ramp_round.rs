@@ -18,7 +18,7 @@ impl RampRound {
 }
 
 impl RaycastTarget for RampRound {
-    fn raycast(&self, ray: RayCaster) -> Option<[RayIntersection; 2]> {
+    fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         let (points, normals, lengths) = get_polygon_data_for_ramp(self.direction, self.length);
         ray.test_polygon_rounded(self.origin, &points, &normals, &lengths, self.radius)
     }

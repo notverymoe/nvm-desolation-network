@@ -18,7 +18,7 @@ impl Ball {
 }
 
 impl RaycastTarget for Ball {
-    fn raycast(&self, ray: RayCaster) -> Option<[RayIntersection; 2]> {
+    fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         ray.test_circle(self.origin, self.radius)
     }
 }

@@ -14,7 +14,7 @@ impl RampBoxyRound {
 }
 
 impl RaycastTarget for RampBoxyRound {
-    fn raycast(&self, ray: RayCaster) -> Option<[RayIntersection; 2]> {
+    fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         self.0.raycast(ray)
     }
 }

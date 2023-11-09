@@ -29,7 +29,7 @@ fn setup(mut commands: Commands) {
 
     commands.spawn(Shape::new(Ball::new(Vec2::ZERO, 50.0)));
 
-    commands.spawn(Shape::new(       BoxAligned::new(Vec2::X*-200.0, Vec2::new(100.0, 50.0))));
+    commands.spawn(Shape::new(BoxAligned::new(Vec2::X*-200.0, Vec2::new(100.0, 50.0))));
     commands.spawn(Shape::new(BoxAlignedRound::new(Vec2::X*-200.0 + Vec2::Y*200.0, Vec2::new(100.0, 50.0), 25.0)));
 
     commands.spawn(Shape::new(BoxOriented::new(Vec2::X*-500.0 + Vec2::Y*25.0, Vec2::new(100.0, 50.0), Vec2::new(2.0, 1.0).normalize())));

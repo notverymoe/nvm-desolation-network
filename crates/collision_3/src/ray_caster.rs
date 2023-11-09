@@ -10,13 +10,13 @@ pub struct RayIntersection {
 }
 
 pub trait RaycastTarget {
-    fn raycast(&self, ray: RayCaster) -> Option<[RayIntersection; 2]>;
+    fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]>;
 
-    fn raycast_enter(&self, ray: RayCaster) -> Option<RayIntersection> {
+    fn raycast_enter(&self, ray: &RayCaster) -> Option<RayIntersection> {
         self.raycast(ray).map(|[v, _]| v)
     }
 
-    fn raycast_exit(&self, ray: RayCaster) -> Option<RayIntersection>{
+    fn raycast_exit(&self, ray: &RayCaster) -> Option<RayIntersection>{
         self.raycast(ray).map(|[_, v]| v)
     }
 }
@@ -45,6 +45,18 @@ impl RayCaster {
 
     pub fn direction(&self) -> Vec2 {
         self.direction
+    }
+
+    pub fn test(&self, other: &impl RaycastTarget) -> Option<[RayIntersection; 2]> {
+        other.raycast(self)
+    }
+
+    pub fn test_enter(&self, other: &impl RaycastTarget) -> Option<RayIntersection> {
+        other.raycast_enter(self)
+    }
+
+    pub fn test_exit(&self, other: &impl RaycastTarget) -> Option<RayIntersection> {
+        other.raycast_exit(self)
     }
 
 }

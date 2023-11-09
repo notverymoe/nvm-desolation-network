@@ -16,7 +16,7 @@ impl BoxAligned {
 }
 
 impl RaycastTarget for BoxAligned {
-    fn raycast(&self, ray: RayCaster) -> Option<[RayIntersection; 2]> {
+    fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         ray.test_rect(self.origin, self.size)
     }
 }

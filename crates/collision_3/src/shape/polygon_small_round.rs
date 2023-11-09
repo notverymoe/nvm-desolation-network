@@ -20,7 +20,7 @@ impl PolygonSmallRound {
 }
 
 impl RaycastTarget for PolygonSmallRound {
-    fn raycast(&self, ray: RayCaster) -> Option<[RayIntersection; 2]> {
+    fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         ray.test_polygon_rounded_at_origin(&self.inner.points, &self.inner.normals, &self.inner.lengths, self.radius)
     }
 }
