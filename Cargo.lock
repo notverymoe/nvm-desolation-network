@@ -1224,6 +1224,8 @@ name = "collision_3"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "enum-derive-2018",
+ "macro-attr-2018",
  "tinyvec",
 ]
 
@@ -1474,6 +1476,12 @@ dependencies = [
  "quote",
  "syn 2.0.37",
 ]
+
+[[package]]
+name = "enum-derive-2018"
+version = "3.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bdda1596b510968293c861d7bcce74303321b3d4db91bd4467533b7c9abc8dfe"
 
 [[package]]
 name = "enum_dispatch"
@@ -2070,6 +2078,12 @@ checksum = "6d0d1830bcd151a6fc4aea1369af235b36c1528fe976b8ff678683c9995eade8"
 dependencies = [
  "libc",
 ]
+
+[[package]]
+name = "macro-attr-2018"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f21755d53936fc1663b414dba30636788f2183d3e782bdee4b1e7236637974e7"
 
 [[package]]
 name = "malloc_buf"
