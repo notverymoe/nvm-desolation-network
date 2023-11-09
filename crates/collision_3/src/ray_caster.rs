@@ -162,22 +162,22 @@ impl RayCaster {
         // OPT axis aligned
         self.test_polygon_rounded_at_origin(
             &[
-                origin + Vec2::new( size.x, -size.y),
                 origin + Vec2::new( size.x,  size.y),
                 origin + Vec2::new(-size.x,  size.y),
                 origin + Vec2::new(-size.x, -size.y),
+                origin + Vec2::new( size.x, -size.y),
             ],
             &[
-                 Vec2::X,
                  Vec2::Y,
                 -Vec2::X,
-                -Vec2::X,
+                -Vec2::Y,
+                 Vec2::X,
             ],
             &[
-                size.y,
-                size.x,
-                size.y,
-                size.x
+                2.0*size.x,
+                2.0*size.y,
+                2.0*size.x,
+                2.0*size.y
             ],
             radius
         )
@@ -266,9 +266,9 @@ impl RayCaster {
     }
 
     pub fn test_polygon_rounded(&self, origin: Vec2, points: &[Vec2], normals: &[Vec2], lengths: &[f32], radius: f32) -> Option<[RayIntersection; 2]> {
-        RayIntersection::find_polygon_entry_exit_signed(self.direction, (0..points.len()).flat_map(|i| {
-            let point  = origin + points[i] + normals[i]*radius;
-            let segment = self.test_line_opt(point, normals[i].perp(), lengths[i]);
+        RayIntersection::find_polygon_entry_exit((0..points.len()).flat_map(|i| {
+            let point  = origin + points[i];
+            let segment = self.test_line_opt(point + normals[i]*radius, normals[i].perp(), lengths[i]);
             if let Some([c_a, c_b]) = self.test_circle(point, radius) {
                 [segment, Some(c_a), Some(c_b)]
             } else {
@@ -278,9 +278,9 @@ impl RayCaster {
     }
 
     pub fn test_polygon_rounded_at_origin(&self, points: &[Vec2], normals: &[Vec2], lengths: &[f32], radius: f32) -> Option<[RayIntersection; 2]> {
-        RayIntersection::find_polygon_entry_exit_signed(self.direction, (0..points.len()).flat_map(|i| {
-            let point  = points[i] + normals[i]*radius;
-            let segment = self.test_line_opt(point, normals[i].perp(), lengths[i]);
+        RayIntersection::find_polygon_entry_exit((0..points.len()).flat_map(|i| {
+            let point  = points[i];
+            let segment = self.test_line_opt(point + normals[i]*radius, normals[i].perp(), lengths[i]);
             if let Some([c_a, c_b]) = self.test_circle(point, radius) {
                 [segment, Some(c_a), Some(c_b)]
             } else {
@@ -359,23 +359,6 @@ impl RayIntersection {
             } 
 
             if intersection.distance > exit.distance {
-                exit = intersection;
-            }
-        }
-
-        (exit.distance >= entry.distance).then_some([entry, exit])
-    }
-
-    pub fn find_polygon_entry_exit_signed(direction: Vec2, v: impl IntoIterator<Item = RayIntersection>) -> Option<[RayIntersection; 2]> {
-
-        let mut entry = RayIntersection{ distance:  f32::MAX, point: Vec2::ZERO, normal: Vec2::ZERO };
-        let mut exit  = RayIntersection{ distance: -f32::MAX, point: Vec2::ZERO, normal: Vec2::ZERO };
-        for intersection in v.into_iter() {
-            if intersection.distance < entry.distance && direction.dot(intersection.normal) > 0.0 {
-                entry = intersection;
-            } 
-
-            if intersection.distance > exit.distance && direction.dot(intersection.normal) < 0.0 {
                 exit = intersection;
             }
         }

@@ -27,16 +27,16 @@ impl RaycastTarget for BoxOriented {
 
         let normals = [
             self.direction.perp(),
-            self.direction,
+            -self.direction,
             -self.direction.perp(),
-            -self.direction
+            self.direction
         ];
 
         let lengths = [
-            self.size.x,
-            self.size.y,
-            self.size.x,
-            self.size.x
+            2.0*self.size.x,
+            2.0*self.size.y,
+            2.0*self.size.x,
+            2.0*self.size.x
         ];
 
         ray.test_polygon_at_origin(&points, &normals, &lengths)

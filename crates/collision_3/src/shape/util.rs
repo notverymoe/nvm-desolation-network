@@ -13,15 +13,15 @@ pub(crate) fn get_polygon_data_for_ramp(direction: Vec2, length: f32) -> ([Vec2;
     // Ordering for CCW polygon 
     if (size.x >= 0.0) == (size.y >= 0.0) {
         (
-            [Vec2::ZERO, Vec2::new(size.x, 0.0), Vec2::new(0.0, size.y)],
-            [       -up,                 normal,                 -right],
-            [    size.x,                 length,                 size.y],
+            [  Vec2::ZERO, Vec2::new(size.x, 0.0),       Vec2::new(0.0, size.y)],
+            [         -up,                 normal,                       -right],
+            [size.x.abs(),                 length,                 size.y.abs()],
         )
     } else {
         (
-            [Vec2::ZERO, Vec2::new(0.0, size.y),  Vec2::new(size.x, 0.0)],
-            [    -right,                -normal,                     -up],
-            [    size.y,                 length,                  size.x],
+            [      Vec2::ZERO, Vec2::new(0.0, size.y),        Vec2::new(size.x, 0.0)],
+            [          -right,                -normal,                           -up],
+            [    size.y.abs(),                 length,                  size.x.abs()],
         )
     }
 }
@@ -32,7 +32,8 @@ pub fn get_polygon_data_for_ramp_boxy(direction: Vec2, length: f32, rect_size_ab
     let    normal = direction.perp();
     let  tri_size = cross_dir * length;
     let rect_size = cross_dir * rect_size_abs;
-    let aabb_size = rect_size_abs + tri_size.abs();
+    let rect_size_abs = rect_size.abs();
+    let aabb_size     = rect_size_abs*2.0 + tri_size.abs();
 
     let origin = -rect_size*2.0;
 
@@ -42,20 +43,20 @@ pub fn get_polygon_data_for_ramp_boxy(direction: Vec2, length: f32, rect_size_ab
     let point_horz_out = Vec2::new(tri_size.x, origin.y);
     let point_horz_in  = Vec2::new(tri_size.x,      0.0);
 
-    let right = Vec2::X * tri_size.x.signum();
-    let up    = Vec2::Y * tri_size.y.signum();
+    let right = Vec2::X * cross_dir.x.signum();
+    let up    = Vec2::Y * cross_dir.y.signum();
 
-    if (tri_size.x >= 0.0) == (tri_size.y >= 0.0) {
+    if (cross_dir.x >= 0.0) == (cross_dir.y >= 0.0) {
         (
-            [     origin,  point_vert_out, point_vert_in,   point_horz_in, point_horz_out],
-            [     -right,              up,        normal,           right,            -up],
-            [aabb_size.x, rect_size_abs.y,        length, rect_size_abs.x,    aabb_size.y],
+            [     origin,      point_horz_out, point_horz_in,       point_vert_in, point_vert_out],
+            [        -up,               right,        normal,                  up,         -right],
+            [aabb_size.x, 2.0*rect_size_abs.y,        length, 2.0*rect_size_abs.x,    aabb_size.y],
         )
     } else {
         (
-            [     origin,  point_horz_out, point_horz_in,   point_vert_in, point_vert_out],
-            [        -up,           right,       -normal,              up,         -right],
-            [aabb_size.y, rect_size_abs.x,        length, rect_size_abs.y,    aabb_size.x],
+            [     origin,      point_vert_out, point_vert_in,       point_horz_in, point_horz_out],
+            [     -right,                  up,       -normal,               right,            -up],
+            [aabb_size.y, 2.0*rect_size_abs.x,        length, 2.0*rect_size_abs.y,    aabb_size.x],
         )
     }
 

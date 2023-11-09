@@ -28,16 +28,16 @@ impl RaycastTarget for BoxOrientedRound {
 
         let normals = [
             self.direction.perp(),
-            self.direction,
+            -self.direction,
             -self.direction.perp(),
-            -self.direction
+            self.direction
         ];
 
         let lengths = [
-            self.size.x,
-            self.size.y,
-            self.size.x,
-            self.size.x
+            2.0*self.size.x,
+            2.0*self.size.y,
+            2.0*self.size.x,
+            2.0*self.size.y
         ];
 
         ray.test_polygon_rounded_at_origin(&points, &normals, &lengths, self.radius)
