@@ -62,14 +62,14 @@ impl Shape {
 
 #[derive(Component)]
 pub struct RayCasterCollider {
-    origin: Vec2,
-    target: Vec2,
+    origin:    Vec2,
+    direction: Vec2,
     hits: Vec<(Entity, [RayIntersection; 2])>,
 }
 
 fn setup(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
-    commands.spawn(RayCasterCollider{origin: -Vec2::X * 200.0, target: Vec2::ZERO, hits: Vec::default()});
+    commands.spawn(RayCasterCollider{origin: -Vec2::X * 200.0, direction: Vec2::X, hits: Vec::default()});
     commands.spawn(Shape::new());
 }
 
@@ -90,8 +90,8 @@ fn update_raycaster(
     time: Res<Time>
  ) {
     let mut caster = q.get_single_mut().unwrap();
-    let mut offset_origin  = Vec2::ZERO;
-    let mut offset_target = Vec2::ZERO;
+    let mut offset_origin = Vec2::ZERO;
+    let mut offset_target = 0.0;
 
     if keys.pressed(KeyCode::W) {
         offset_origin += Vec2::Y;
@@ -109,30 +109,28 @@ fn update_raycaster(
         offset_origin += Vec2::X;
     }
 
+    if keys.pressed(KeyCode::Q) {
+        offset_target += 1.0;
+    }
+
+    if keys.pressed(KeyCode::E) {
+        offset_target -= 1.0;
+    }
+
+    if keys.pressed(KeyCode::ShiftLeft) {
+        offset_origin *= 2.0;
+        offset_target *= 2.0;
+    }
+
     if offset_origin != Vec2::ZERO {
-        offset_origin *= 200.0 * time.delta_seconds();
+        offset_origin *= 150.0 * time.delta_seconds();
         caster.origin += offset_origin;
     }
 
-    if keys.pressed(KeyCode::I) {
-        offset_target += Vec2::Y;
-    }
 
-    if keys.pressed(KeyCode::J) {
-        offset_target -= Vec2::X;
-    }
-
-    if keys.pressed(KeyCode::K) {
-        offset_target -= Vec2::Y;
-    }
-
-    if keys.pressed(KeyCode::L) {
-        offset_target += Vec2::X;
-    }
-
-    if offset_target != Vec2::ZERO {
-        offset_target *= 200.0 * time.delta_seconds();
-        caster.target += offset_target;
+    if offset_target != 0.0 {
+        offset_target *= time.delta_seconds();
+        caster.direction = caster.direction.rotate(Vec2::from_angle(offset_target)).normalize();
     }
 }
 
@@ -142,7 +140,7 @@ fn check_colliders(
 ) {
     for mut caster in q_caster.iter_mut() {
         caster.hits.clear();
-        let ray = RayCaster::new(caster.origin, (caster.target - caster.origin).normalize());
+        let ray = RayCaster::new(caster.origin, caster.direction);
         for (shape_id, Shape(shape, _)) in q_static.iter() {
             if let Some(projection) = shape.raycast(&ray) {
                 caster.hits.push((shape_id, projection));
@@ -159,7 +157,8 @@ fn render(
 ) {
 
     let caster = q_caster.single();
-    gizmos.line_2d(caster.origin, caster.target, if caster.hits.is_empty() { Color::GREEN } else { Color::LIME_GREEN });
+    gizmos.circle_2d(caster.origin, 10.0, Color::ORANGE_RED);
+    gizmos.line_2d(caster.origin, caster.origin + caster.direction * 10000.0, if caster.hits.is_empty() { Color::GREEN } else { Color::LIME_GREEN });
     for hit in caster.hits.iter() {
         gizmos.circle_2d(hit.1[0].point, 10.0, Color::PURPLE       );
         gizmos.circle_2d(hit.1[1].point, 10.0, Color::MIDNIGHT_BLUE);
