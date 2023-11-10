@@ -1,25 +1,13 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-pub mod shape;
-pub use shape::Shape;
+mod ray_caster;
+pub use ray_caster::*;
 
-mod sweep;
-pub use sweep::*;
+mod shape;
+pub use shape::*;
 
-mod candidate_axes;
-pub use candidate_axes::*;
+mod debug_shape;
+pub use debug_shape::*;
 
-mod contact;
-pub use contact::*;
-
-mod contacts;
-pub use contacts::*;
-
-mod projection;
-pub use projection::*;
-
-mod solver;
-pub use solver::*;
-
-mod vec_like;
-pub use vec_like::*;
+mod tmp;
+pub use tmp::*;

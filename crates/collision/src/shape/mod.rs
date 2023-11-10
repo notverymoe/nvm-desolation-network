@@ -1,66 +1,55 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-use bevy::prelude::Vec2;
-use enum_dispatch::enum_dispatch;
-use static_assertions::const_assert_eq;
+// // Ball // //
 
-use crate::Projection;
+mod ball;
+pub use ball::*;
 
-#[enum_dispatch(Project)]
-#[derive(Clone, Copy)]
-pub enum Shape {
-    Point(Vec2),
-    Line(Line),
-    Circle(Circle),
-    Rect(Rect),
-    Capsule(Capsule),
-    Slope(Slope),
-}
+// // Box Aligned // //
 
-// We don't want shape to grow larger than this on accident, edit to confirm size change.
-const_assert_eq!(std::mem::size_of::<Shape>(), 28);
+mod box_aligned;
+pub use box_aligned::*;
 
-pub trait NearestPointTo {
-    fn nearest_point_to(&self, v: Vec2) -> Vec2;
-}
+mod box_aligned_round;
+pub use box_aligned_round::*;
 
-#[enum_dispatch]
-pub trait Project {
-    fn offset(&self) -> Vec2;
-    fn project_aabb(&self) -> [Projection; 2];
-    fn project_on_axis(&self, axis: Vec2) -> Projection;
-    fn with_offset(&self, o: Vec2) -> Self;
-}
+// // Box Oriented // //
 
-impl Project for Vec2 {
-    fn offset(&self) -> Vec2 {
-        *self
-    }
+mod box_oriented;
+pub use box_oriented::*;
 
-    fn project_aabb(&self) -> [Projection; 2] {
-        [Projection::new(self.x), Projection::new(self.y)]
-    }
+mod box_oriented_round;
+pub use box_oriented_round::*;
 
-    fn project_on_axis(&self, axis:Vec2) -> Projection {
-        Projection::new(axis.dot(*self))
-    }
+mod box_oriented_boxy;
+pub use box_oriented_boxy::*;
 
-    fn with_offset(&self, o: Vec2) -> Self {
-        *self + o
-    }
-}
+mod box_oriented_boxy_round;
+pub use box_oriented_boxy_round::*;
 
-mod line;
-pub use line::*;
+// // Ramp // //
 
-mod circle;
-pub use circle::*;
+mod ramp;
+pub use ramp::*;
 
-mod rect;
-pub use rect::*;
+mod ramp_round;
+pub use ramp_round::*;
 
-mod capsule;
-pub use capsule::*;
+mod ramp_boxy;
+pub use ramp_boxy::*;
 
-mod slope;
-pub use slope::*;
+mod ramp_boxy_round;
+pub use ramp_boxy_round::*;
+
+// // NGon // //
+
+mod polygon_small;
+pub use polygon_small::*;
+
+mod polygon_small_round;
+pub use polygon_small_round::*;
+
+// // Misc // //
+
+mod util;
+pub(crate) use util::*;

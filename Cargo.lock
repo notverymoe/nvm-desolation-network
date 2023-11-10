@@ -1201,35 +1201,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "collision"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "enum_dispatch",
- "static_assertions",
- "tinyvec",
-]
-
-[[package]]
-name = "collision_2"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "enum_dispatch",
- "tinyvec",
-]
-
-[[package]]
-name = "collision_3"
-version = "0.1.0"
-dependencies = [
- "bevy",
- "enum-derive-2018",
- "macro-attr-2018",
- "tinyvec",
-]
-
-[[package]]
 name = "color_quant"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1482,18 +1453,6 @@ name = "enum-derive-2018"
 version = "3.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bdda1596b510968293c861d7bcce74303321b3d4db91bd4467533b7c9abc8dfe"
-
-[[package]]
-name = "enum_dispatch"
-version = "0.3.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8f33313078bb8d4d05a2733a94ac4c2d8a0df9a2b84424ebf4f33bfc224a890e"
-dependencies = [
- "once_cell",
- "proc-macro2",
- "quote",
- "syn 2.0.37",
-]
 
 [[package]]
 name = "equivalent"
@@ -2365,6 +2324,16 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.37",
+]
+
+[[package]]
+name = "nvm_collision"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "enum-derive-2018",
+ "macro-attr-2018",
+ "tinyvec",
 ]
 
 [[package]]

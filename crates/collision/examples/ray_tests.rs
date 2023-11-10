@@ -1,7 +1,7 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
 use bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
-use collision_3::{DebugShape, Ball, BoxAligned, BoxAlignedRound, Ramp, RampRound, RampBoxy, RampBoxyRound, BoxOriented, BoxOrientedRound, BoxOrientedBoxy, BoxOrientedBoxyRound, DebugShapeData, RayCaster, RaycastTarget, RayIntersection};
+use nvm_collision::*;
 
 pub fn main() {
     App::new()
@@ -9,7 +9,7 @@ pub fn main() {
         .add_plugins(LogDiagnosticsPlugin::default())
         .add_plugins(FrameTimeDiagnosticsPlugin)
         .add_systems(Startup,    setup )
-        .add_systems(Update,     (update_raycaster, check_colliders).chain())
+        .add_systems(Update,     (update_static, update_raycaster, check_colliders).chain())
         .add_systems(PostUpdate, render)
         .run();
 }
@@ -18,11 +18,45 @@ trait ShapeMarkerTrait: DebugShape + RaycastTarget + Send + Sync {}
 impl<T: DebugShape + RaycastTarget + Send + Sync + 'static> ShapeMarkerTrait for T {}
 
 #[derive(Component)]
-pub struct Shape(Box<dyn ShapeMarkerTrait>);
+pub struct Shape(Box<dyn ShapeMarkerTrait>, usize);
 
 impl Shape {
-    fn new(v: impl ShapeMarkerTrait + 'static) -> Self {
-        Self(Box::new(v))
+    fn new() -> Self {
+        Self(Self::get_shape_at_index(0), 0)
+    }
+
+    fn next(&mut self) {
+        let next = (self.1+1) % 23;
+        self.0 = Self::get_shape_at_index(next);
+        self.1 = next;
+    }
+
+    fn get_shape_at_index(idx: usize) -> Box<dyn ShapeMarkerTrait> {
+        match idx {
+             1 => Box::new(BoxAligned::new(Vec2::ZERO, Vec2::new(100.0, 50.0))),
+             2 => Box::new(BoxAlignedRound::new(Vec2::ZERO, Vec2::new(100.0, 50.0), 25.0)),
+             3 => Box::new(BoxOriented::new(Vec2::ZERO, Vec2::new(100.0, 50.0), Vec2::new(2.0, 1.0).normalize())),
+             4 => Box::new(BoxOrientedRound::new(Vec2::ZERO, Vec2::new(100.0, 50.0), Vec2::new(2.0, 1.0).normalize(), 25.0)),
+             5 => Box::new(BoxOrientedBoxy::new(Vec2::ZERO, Vec2::new(100.0, 50.0), Vec2::new(2.0, 1.0).normalize(), Vec2::new(50.0, 25.0))),
+             6 => Box::new(BoxOrientedBoxyRound::new(Vec2::ZERO, Vec2::new(100.0, 50.0), Vec2::new(2.0, 1.0).normalize(), Vec2::new(50.0, 25.0), 25.0)),
+             7 => Box::new(Ramp::new(Vec2::ZERO, Vec2::new( 2.0, -1.0).normalize(), 200.0)),
+             8 => Box::new(Ramp::new(Vec2::ZERO, Vec2::new(-2.0, -1.0).normalize(), 200.0)),
+             9 => Box::new(Ramp::new(Vec2::ZERO, Vec2::new(-2.0,  1.0).normalize(), 200.0)),
+            10 => Box::new(Ramp::new(Vec2::ZERO, Vec2::new( 2.0,  1.0).normalize(), 200.0)),
+            11 => Box::new(RampBoxy::new(Vec2::ZERO, Vec2::new( 2.0, -1.0).normalize(), 200.0, Vec2::new(50.0, 25.0))),
+            12 => Box::new(RampBoxy::new(Vec2::ZERO, Vec2::new(-2.0, -1.0).normalize(), 200.0, Vec2::new(50.0, 25.0))),
+            13 => Box::new(RampBoxy::new(Vec2::ZERO, Vec2::new(-2.0,  1.0).normalize(), 200.0, Vec2::new(50.0, 25.0))),
+            14 => Box::new(RampBoxy::new(Vec2::ZERO, Vec2::new( 2.0,  1.0).normalize(), 200.0, Vec2::new(50.0, 25.0))),
+            15 => Box::new(RampRound::new(Vec2::ZERO, Vec2::new( 2.0, -1.0).normalize(), 200.0, 25.0)),
+            16 => Box::new(RampRound::new(Vec2::ZERO, Vec2::new(-2.0, -1.0).normalize(), 200.0, 25.0)),
+            17 => Box::new(RampRound::new(Vec2::ZERO, Vec2::new(-2.0,  1.0).normalize(), 200.0, 25.0)),
+            18 => Box::new(RampRound::new(Vec2::ZERO, Vec2::new( 2.0,  1.0).normalize(), 200.0, 25.0)),
+            19 => Box::new(RampBoxyRound::new(Vec2::ZERO, Vec2::new( 2.0, -1.0).normalize(), 200.0, Vec2::new(50.0, 25.0), 25.0)),
+            20 => Box::new(RampBoxyRound::new(Vec2::ZERO, Vec2::new(-2.0, -1.0).normalize(), 200.0, Vec2::new(50.0, 25.0), 25.0)),
+            21 => Box::new(RampBoxyRound::new(Vec2::ZERO, Vec2::new(-2.0,  1.0).normalize(), 200.0, Vec2::new(50.0, 25.0), 25.0)),
+            22 => Box::new(RampBoxyRound::new(Vec2::ZERO, Vec2::new( 2.0,  1.0).normalize(), 200.0, Vec2::new(50.0, 25.0), 25.0)),
+             _ => Box::new(Ball::new(Vec2::ZERO, 50.0)),
+        }
     }
 }
 
@@ -36,37 +70,18 @@ pub struct RayCasterCollider {
 fn setup(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
     commands.spawn(RayCasterCollider{origin: -Vec2::X * 200.0, target: Vec2::ZERO, hits: Vec::default()});
+    commands.spawn(Shape::new());
+}
 
-    commands.spawn(Shape::new(Ball::new(Vec2::ZERO, 50.0)));
-
-    commands.spawn(Shape::new(BoxAligned::new(Vec2::X*-200.0, Vec2::new(100.0, 50.0))));
-    commands.spawn(Shape::new(BoxAlignedRound::new(Vec2::X*-200.0 + Vec2::Y*200.0, Vec2::new(100.0, 50.0), 25.0)));
-
-    commands.spawn(Shape::new(BoxOriented::new(Vec2::X*-500.0 + Vec2::Y*25.0, Vec2::new(100.0, 50.0), Vec2::new(2.0, 1.0).normalize())));
-    commands.spawn(Shape::new(BoxOrientedRound::new(Vec2::X*-500.0 + Vec2::Y*200.0, Vec2::new(100.0, 50.0), Vec2::new(2.0, 1.0).normalize(), 25.0)));
-    commands.spawn(Shape::new( BoxOrientedBoxy::new(Vec2::X*550.0 + Vec2::Y*350.0, Vec2::new(100.0, 50.0), Vec2::new(2.0, 1.0).normalize(), Vec2::new(50.0, 25.0))));
-    commands.spawn(Shape::new(BoxOrientedBoxyRound::new(Vec2::X*-650.0 + Vec2::Y*350.0, Vec2::new(100.0, 50.0), Vec2::new(2.0, 1.0).normalize(), Vec2::new(50.0, 25.0), 25.0)));
-
-    commands.spawn(Shape::new(Ramp::new(Vec2::X*200.0 + Vec2::Y*200.0 + Vec2::new( 20.0,  20.0), Vec2::new( 2.0, -1.0).normalize(), 200.0)));
-    commands.spawn(Shape::new(Ramp::new(Vec2::X*200.0 + Vec2::Y*200.0 + Vec2::new(-20.0,  20.0), Vec2::new(-2.0, -1.0).normalize(), 200.0)));
-    commands.spawn(Shape::new(Ramp::new(Vec2::X*200.0 + Vec2::Y*200.0 + Vec2::new(-20.0, -20.0), Vec2::new(-2.0,  1.0).normalize(), 200.0)));
-    commands.spawn(Shape::new(Ramp::new(Vec2::X*200.0 + Vec2::Y*200.0 + Vec2::new( 20.0, -20.0), Vec2::new( 2.0,  1.0).normalize(), 200.0)));
-
-    commands.spawn(Shape::new(RampBoxy::new(Vec2::X*200.0 - Vec2::Y*250.0 + Vec2::new( 110.0,  45.0), Vec2::new( 2.0, -1.0).normalize(), 200.0, Vec2::new(50.0, 25.0))));
-    commands.spawn(Shape::new(RampBoxy::new(Vec2::X*200.0 - Vec2::Y*250.0 + Vec2::new(-110.0,  45.0), Vec2::new(-2.0, -1.0).normalize(), 200.0, Vec2::new(50.0, 25.0))));
-    commands.spawn(Shape::new(RampBoxy::new(Vec2::X*200.0 - Vec2::Y*250.0 + Vec2::new(-110.0, -45.0), Vec2::new(-2.0,  1.0).normalize(), 200.0, Vec2::new(50.0, 25.0))));
-    commands.spawn(Shape::new(RampBoxy::new(Vec2::X*200.0 - Vec2::Y*250.0 + Vec2::new( 110.0, -45.0), Vec2::new( 2.0,  1.0).normalize(), 200.0, Vec2::new(50.0, 25.0))));
-
-    commands.spawn(Shape::new(RampRound::new(Vec2::X*500.0 + Vec2::new( 30.0,  30.0), Vec2::new( 2.0, -1.0).normalize(), 200.0, 25.0)));
-    commands.spawn(Shape::new(RampRound::new(Vec2::X*500.0 + Vec2::new(-30.0,  30.0), Vec2::new(-2.0, -1.0).normalize(), 200.0, 25.0)));
-    commands.spawn(Shape::new(RampRound::new(Vec2::X*500.0 + Vec2::new(-30.0, -30.0), Vec2::new(-2.0,  1.0).normalize(), 200.0, 25.0)));
-    commands.spawn(Shape::new(RampRound::new(Vec2::X*500.0 + Vec2::new( 30.0, -30.0), Vec2::new( 2.0,  1.0).normalize(), 200.0, 25.0)));
-
-    commands.spawn(Shape::new(RampBoxyRound::new(Vec2::X*-500.0 - Vec2::Y*250.0 + Vec2::new( 115.0,  50.0), Vec2::new( 2.0, -1.0).normalize(), 200.0, Vec2::new(50.0, 25.0), 25.0)));
-    commands.spawn(Shape::new(RampBoxyRound::new(Vec2::X*-500.0 - Vec2::Y*250.0 + Vec2::new(-115.0,  50.0), Vec2::new(-2.0, -1.0).normalize(), 200.0, Vec2::new(50.0, 25.0), 25.0)));
-    commands.spawn(Shape::new(RampBoxyRound::new(Vec2::X*-500.0 - Vec2::Y*250.0 + Vec2::new(-115.0, -50.0), Vec2::new(-2.0,  1.0).normalize(), 200.0, Vec2::new(50.0, 25.0), 25.0)));
-    commands.spawn(Shape::new(RampBoxyRound::new(Vec2::X*-500.0 - Vec2::Y*250.0 + Vec2::new( 115.0, -50.0), Vec2::new( 2.0,  1.0).normalize(), 200.0, Vec2::new(50.0, 25.0), 25.0)));
-
+fn update_static(
+    mut q: Query<&mut Shape>, 
+    keys: Res<Input<KeyCode>>
+) {
+    if keys.just_pressed(KeyCode::Backslash) {
+        for mut collider in q.iter_mut() {
+            collider.next();
+        }
+    }
 }
 
 fn update_raycaster(
@@ -128,7 +143,7 @@ fn check_colliders(
     for mut caster in q_caster.iter_mut() {
         caster.hits.clear();
         let ray = RayCaster::new(caster.origin, (caster.target - caster.origin).normalize());
-        for (shape_id, Shape(shape)) in q_static.iter() {
+        for (shape_id, Shape(shape, _)) in q_static.iter() {
             if let Some(projection) = shape.raycast(&ray) {
                 caster.hits.push((shape_id, projection));
             }
@@ -151,14 +166,14 @@ fn render(
         gizmos.line_2d(hit.1[0].point, hit.1[1].point, Color::BLACK);
     }
 
-    for (entity, Shape(shape)) in q_shapes.iter() {
+    for (entity, Shape(shape, _)) in q_shapes.iter() {
         let data = shape.get_debug_shape_data();
         let colour = if caster.hits.iter().any(|v| v.0 == entity) { Color::RED } else { Color::PINK };
         match data {
-            collision_3::DebugShapeData::Circle { origin, radius } => { 
+            DebugShapeData::Circle { origin, radius } => { 
                 gizmos.circle_2d(origin, radius, colour); 
             },
-            collision_3::DebugShapeData::Polygon { .. } => {
+            DebugShapeData::Polygon { .. } => {
                 let DebugShapeData::Polygon { points, .. } = &data else { unreachable!() };
                 gizmos.linestrip_2d((0..points.len()).chain(std::iter::once(0)).map(|i| points[i]), colour);
                 for ([from, to, norm], offset) in data.iter_segments() {
@@ -173,7 +188,7 @@ fn render(
                     gizmos.circle_2d(far, 5.0, Color::TEAL);
                 }
             },
-            collision_3::DebugShapeData::PolygonRound { radius, .. } => {
+            DebugShapeData::PolygonRound { radius, .. } => {
                 for ([from, to, norm], offset) in data.iter_segments() {
                     let offset = norm * offset;
                     if radius > 0.0 {
