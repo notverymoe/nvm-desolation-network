@@ -60,11 +60,21 @@ impl ShapeCombined {
             (ShapeMoving::BoxAligned(a), ShapeStatic::BoxOriented(b)     ) => BoxOrientedBoxy::new(b.origin, b.size, b.direction, a.size).into(),
             (ShapeMoving::BoxAligned(a), ShapeStatic::BoxOrientedRound(b)) => BoxOrientedBoxyRound::new(b.origin, b.size, b.direction, a.size, b.radius).into(),
 
+            // TODO do we need to "invert" ramps?
             (ShapeMoving::Ball(a),       ShapeStatic::Ramp(b)     ) => RampRound::new(b.origin, b.direction, b.length, a.radius).into(),
             (ShapeMoving::Ball(a),       ShapeStatic::RampRound(b)) => RampRound::new(b.origin, b.direction, b.length, b.radius + a.radius).into(),
             (ShapeMoving::BoxAligned(a), ShapeStatic::Ramp(b)     ) => RampBoxy::new(b.origin, b.direction, b.length, a.size).into(),
             (ShapeMoving::BoxAligned(a), ShapeStatic::RampRound(b)) => RampBoxyRound::new(b.origin, b.direction, b.length, a.size, b.radius).into(),
         } 
+    }
+
+    pub fn between_moving(a: ShapeMoving, b: ShapeMoving) -> Self {
+        match (a, b) {
+            (ShapeMoving::Ball(a),       ShapeMoving::Ball(b)      ) => Ball::new(b.origin, a.radius+b.radius).into(),
+            (ShapeMoving::Ball(a),       ShapeMoving::BoxAligned(b)) => BoxAlignedRound::new(b.origin, b.size, a.radius).into(),
+            (ShapeMoving::BoxAligned(a), ShapeMoving::Ball(b)      ) => BoxAlignedRound::new(b.origin, a.size, b.radius).into(),
+            (ShapeMoving::BoxAligned(a), ShapeMoving::BoxAligned(b)) => BoxAligned::new(b.origin, a.size + b.size).into(),
+        }
     }
 
 }
