@@ -47,6 +47,10 @@ impl RayCaster {
         self.direction
     }
 
+}
+
+impl RayCaster {
+
     pub fn test(&self, other: &impl RaycastTarget) -> Option<[RayIntersection; 2]> {
         other.raycast(self)
     }

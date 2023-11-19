@@ -9,5 +9,5 @@ pub use shape::*;
 mod debug_shape;
 pub use debug_shape::*;
 
-mod tmp;
-pub use tmp::*;
+mod combinations;
+pub use combinations::*;

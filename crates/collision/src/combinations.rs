@@ -3,7 +3,7 @@
 use macro_attr_2018::macro_attr;
 use enum_derive_2018::EnumFromInner;
 
-use crate::{BoxAligned, Ball, Ramp, BoxOriented, BoxAlignedRound, BoxOrientedRound, RampRound, RampBoxy, RampBoxyRound, BoxOrientedBoxy, BoxOrientedBoxyRound};
+use crate::{BoxAligned, Ball, Ramp, BoxOriented, BoxAlignedRound, BoxOrientedRound, RampRound, RampBoxy, RampBoxyRound, BoxOrientedBoxy, BoxOrientedBoxyRound, RaycastTarget, RayCaster, RayIntersection};
 
 macro_attr! {
     #[derive(EnumFromInner!)]
@@ -44,9 +44,25 @@ macro_attr! {
     }
 }
 
+impl RaycastTarget for ShapeCombined {
+    fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
+        match self {
+            ShapeCombined::Ball(s) => s.raycast(ray),
+            ShapeCombined::BoxAligned(s) => s.raycast(ray),
+            ShapeCombined::BoxAlignedRound(s) => s.raycast(ray),
+            ShapeCombined::BoxOrientedRound(s) => s.raycast(ray),
+            ShapeCombined::BoxOrientedBoxy(s) => s.raycast(ray),
+            ShapeCombined::BoxOrientedBoxyRound(s) =>s.raycast(ray),
+            ShapeCombined::RampRound(s) => s.raycast(ray),
+            ShapeCombined::RampBoxy(s) => s.raycast(ray),
+            ShapeCombined::RampBoxyRound(s) => s.raycast(ray),
+        }
+    }
+}
+
 impl ShapeCombined {
 
-    pub fn between_moving_and_static(a: ShapeMoving, b: ShapeStatic) -> Self {
+    pub fn between_moving_and_static(a: &ShapeMoving, b: &ShapeStatic) -> Self {
         match (a, b) {
             (ShapeMoving::Ball(a),       ShapeStatic::Ball(b)           ) => Ball::new(b.origin, a.radius+b.radius).into(),
             (ShapeMoving::Ball(a),       ShapeStatic::BoxAligned(b)     ) => BoxAlignedRound::new(b.origin, b.size, a.radius).into(),
@@ -68,7 +84,7 @@ impl ShapeCombined {
         } 
     }
 
-    pub fn between_moving(a: ShapeMoving, b: ShapeMoving) -> Self {
+    pub fn between_moving(a: &ShapeMoving, b: &ShapeMoving) -> Self {
         match (a, b) {
             (ShapeMoving::Ball(a),       ShapeMoving::Ball(b)      ) => Ball::new(b.origin, a.radius+b.radius).into(),
             (ShapeMoving::Ball(a),       ShapeMoving::BoxAligned(b)) => BoxAlignedRound::new(b.origin, b.size, a.radius).into(),

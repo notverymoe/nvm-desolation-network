@@ -18,6 +18,11 @@ impl BoxOriented {
 
 impl RaycastTarget for BoxOriented {
     fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
+
+        // TODO OPT we might be able to rotate the ray into local space, then the intersections 
+        //          out of, this would allow us to use the faster AABB check in adition to 
+        //          having less rotate calls. This should also work for the rounded variant.
+
         let points = [
             self.origin + Vec2::new( self.size.x,  self.size.y).rotate(self.direction),
             self.origin + Vec2::new(-self.size.x,  self.size.y).rotate(self.direction),
