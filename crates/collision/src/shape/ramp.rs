@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, get_polygon_data_for_ramp};
+use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, get_polygon_data_for_ramp, HasBoundingBox, BoxAligned};
 
 pub struct Ramp {
     pub origin:    Vec2,
@@ -22,6 +22,12 @@ impl Ramp {
         } else {
             -self.direction.perp()
         }
+    }
+}
+
+impl HasBoundingBox for Ramp {
+    fn bounding_box(&self) -> BoxAligned {
+        BoxAligned::new(self.origin, self.direction*self.length*0.5)
     }
 }
 

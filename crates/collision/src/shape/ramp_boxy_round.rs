@@ -2,14 +2,19 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShapeData, DebugShape, get_polygon_data_for_ramp_boxy, PolygonSmallRound, PolygonSmall};
+use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShapeData, DebugShape, get_polygon_data_for_ramp_boxy, PolygonSmallRound, PolygonSmall, BoxAligned};
 
 pub struct RampBoxyRound(PolygonSmallRound);
 
 impl RampBoxyRound {
     pub fn new(origin: Vec2, direction: Vec2, length: f32, size: Vec2, radius: f32) -> Self {
         let (points, normals, lengths) = get_polygon_data_for_ramp_boxy(direction, length, size);
-        Self(PolygonSmallRound::new(PolygonSmall::new(points.map(|v| origin + v), normals, lengths), radius))
+
+        let (min, max) = points.iter().fold((Vec2::MAX, Vec2::MIN), |p, &c| (p.0.min(c), p.0.max(c)));
+        let bound_origin = (min + max)*0.5;
+        let size         = max - bound_origin + Vec2::new(radius, radius);
+
+        Self(PolygonSmallRound::new(PolygonSmall::new(points.map(|v| origin + v), normals, lengths, BoxAligned::new(bound_origin, size)), radius))
     }
 }
 

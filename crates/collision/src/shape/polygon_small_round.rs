@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, DebugShape, RayCaster, RayIntersection, DebugShapeData, PolygonSmall};
+use crate::{RaycastTarget, DebugShape, RayCaster, RayIntersection, DebugShapeData, PolygonSmall, BoxAligned, HasBoundingBox};
 
 pub struct PolygonSmallRound {
     inner: PolygonSmall,
@@ -16,6 +16,14 @@ impl PolygonSmallRound {
 
     pub fn new_from_points(points: impl IntoIterator<Item = Vec2>, radius: f32) -> Self {
         Self::new(PolygonSmall::new_from_points(points), radius)
+    }
+}
+
+impl HasBoundingBox for PolygonSmallRound {
+    fn bounding_box(&self) -> BoxAligned {
+        let mut bounds = self.inner.bounds;
+        bounds.size += Vec2::new(self.radius, self.radius);
+        bounds
     }
 }
 

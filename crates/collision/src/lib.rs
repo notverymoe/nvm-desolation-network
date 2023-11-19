@@ -11,3 +11,6 @@ pub use debug_shape::*;
 
 mod combinations;
 pub use combinations::*;
+
+mod bounding_box;
+pub use bounding_box::*;

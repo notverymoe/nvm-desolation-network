@@ -2,13 +2,19 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, get_polygon_data_for_oriented_rect_rected, PolygonSmall};
+use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, get_polygon_data_for_oriented_rect_rected, PolygonSmall, HasBoundingBox, BoxAligned};
 
 pub struct BoxOrientedBoxy(PolygonSmall);
 
 impl BoxOrientedBoxy {
     pub fn new(origin: Vec2, size: Vec2, direction: Vec2, outer_size: Vec2) -> Self {
         Self(PolygonSmall::new_from_points(get_polygon_data_for_oriented_rect_rected(origin, size, direction, outer_size)))
+    }
+}
+
+impl HasBoundingBox for BoxOrientedBoxy {
+    fn bounding_box(&self) -> BoxAligned {
+        self.0.bounding_box()
     }
 }
 

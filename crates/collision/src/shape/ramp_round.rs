@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, get_polygon_data_for_ramp};
+use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, get_polygon_data_for_ramp, HasBoundingBox, BoxAligned};
 
 pub struct RampRound {
     pub origin:    Vec2,
@@ -23,6 +23,13 @@ impl RampRound {
         } else {
             -self.direction.perp()
         }
+    }
+}
+
+impl HasBoundingBox for RampRound {
+    fn bounding_box(&self) -> BoxAligned {
+        let size = self.direction*self.length*0.5;
+        BoxAligned::new(self.origin, Vec2::new(size.x + self.radius, size.y + self.radius))
     }
 }
 

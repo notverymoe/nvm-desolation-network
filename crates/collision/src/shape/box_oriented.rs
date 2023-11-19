@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData};
+use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, HasBoundingBox, BoxAligned};
 
 pub struct BoxOriented {
     pub origin:    Vec2,
@@ -13,6 +13,15 @@ pub struct BoxOriented {
 impl BoxOriented {
     pub fn new(origin: Vec2, size: Vec2, direction: Vec2) -> Self {
         Self{origin, size, direction}
+    }
+}
+
+impl HasBoundingBox for BoxOriented {
+    fn bounding_box(&self) -> BoxAligned {
+        let bound_x = Vec2::new( self.size.x,  self.size.y).rotate(self.direction).abs();
+        let bound_y = Vec2::new(-self.size.x,  self.size.y).rotate(self.direction).abs();
+        let size = bound_x.max(bound_y);
+        BoxAligned::new(self.origin, size)
     }
 }
 
