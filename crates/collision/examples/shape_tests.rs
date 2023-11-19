@@ -205,7 +205,6 @@ fn render(
         render_shape(&mut gizmos, &hit_shape, Color::RED);
     }
 
-
     gizmos.circle_2d(caster.origin, 10.0, Color::ORANGE_RED);
     gizmos.line_2d(caster.origin, caster.origin + caster.direction * 10000.0, if caster.hits.is_empty() { Color::GREEN } else { Color::LIME_GREEN });
     for hit in caster.hits.iter() {
@@ -219,7 +218,7 @@ fn render(
         render_shape(&mut gizmos, shape, colour);
 
         let combined = ShapeCombined::between_moving_and_static(&caster_shape, shape);
-        render_shape(&mut gizmos, &combined, colour);
+        render_shape(&mut gizmos, &combined, colour * 0.5);
     }
 
 }
