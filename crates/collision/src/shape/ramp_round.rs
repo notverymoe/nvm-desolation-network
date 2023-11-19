@@ -15,6 +15,15 @@ impl RampRound {
     pub fn new(origin: Vec2, direction: Vec2, length: f32, radius: f32) -> Self {
         Self{origin, direction, length, radius}
     }
+
+    pub fn get_normal(&self) -> Vec2 {
+        let size = Vec2::new(self.direction.x, -self.direction.y) * self.length;
+        if (size.x >= 0.0) == (size.y >= 0.0) {
+            self.direction.perp()
+        } else {
+            -self.direction.perp()
+        }
+    }
 }
 
 impl RaycastTarget for RampRound {

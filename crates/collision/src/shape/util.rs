@@ -31,7 +31,7 @@ pub fn get_polygon_data_for_ramp_boxy(direction: Vec2, length: f32, rect_size_ab
     let cross_dir = Vec2::new(direction.x, -direction.y);
     let    normal = direction.perp();
     let  tri_size = cross_dir * length;
-    let rect_size = cross_dir * rect_size_abs;
+    let rect_size = cross_dir.signum() * rect_size_abs;
     let rect_size_abs = rect_size.abs();
     let aabb_size     = rect_size_abs*2.0 + tri_size.abs();
 
