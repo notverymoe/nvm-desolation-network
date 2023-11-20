@@ -14,6 +14,13 @@ impl BoxAligned {
     pub fn new(origin: Vec2, size: Vec2) -> Self {
         Self{origin, size}
     }
+
+    pub fn bounds(&self) -> [Vec2; 2] {
+        [
+            self.origin - self.size, 
+            self.origin + self.size,
+        ]
+    }
 }
 
 impl HasBoundingBox for BoxAligned {

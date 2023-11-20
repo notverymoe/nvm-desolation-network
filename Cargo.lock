@@ -2337,6 +2337,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "nvm_platformer"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "nvm_collision",
+]
+
+[[package]]
 name = "objc"
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"

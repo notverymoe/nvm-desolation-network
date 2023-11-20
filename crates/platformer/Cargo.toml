@@ -1,0 +1,8 @@
+[package]
+name = "nvm_platformer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = { workspace = true, features=["default"] }
+nvm_collision = { path = "../collision/" }

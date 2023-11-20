@@ -15,6 +15,16 @@ impl Ramp {
         Self{origin, direction, length}
     }
 
+    pub fn new_from_size(origin: Vec2, direction: Vec2, size: Vec2) -> Self {
+        let length = size.length();
+        let direction = Vec2::new(direction.x, -direction.y)*(size/length);
+        Self{origin, direction, length}
+    }
+
+    pub fn new_from_size_centered(origin: Vec2, direction: Vec2, size: Vec2) -> Self {
+        Self::new_from_size(origin - direction*size*0.5, direction, size)
+    }
+
     pub fn get_normal(&self) -> Vec2 {
         let size = Vec2::new(self.direction.x, -self.direction.y) * self.length;
         if (size.x >= 0.0) == (size.y >= 0.0) {
