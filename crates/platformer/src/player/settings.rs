@@ -26,8 +26,8 @@ impl HorzSpeedSettings {
     ) -> Self {
         Self{
             speed,
-            accel: (speed*speed)/(2.0*accel_distance),
-            decel: (speed*speed)/(2.0*decel_distance),
+            accel: calculate_accel_from_distance_and_speed(accel_distance, speed),
+            decel: calculate_accel_from_distance_and_speed(decel_distance, speed),
         }
     }
 
@@ -46,6 +46,20 @@ impl VertSpeedSettings {
         max_jump_height: f32,
         min_jump_height: f32,
     ) -> [VertSpeedSettings; 2] {
+        let gravity = calculate_accel_from_distance_and_time(max_jump_height, max_fall_time);
+
+        // TODO ????
+        [
+            VertSpeedSettings{
+                accel: gravity,
+                limit: gravity * max_fall_time,
+            },
+            VertSpeedSettings{
+                accel: calculate_accel_from_distance_and_time(max_jump_height, max_jump_time),
+                limit: calculate_velocity_from_distance_and_accel(min_jump_height, gravity),
+            }
+
+        ]
 
     }
 
@@ -56,4 +70,16 @@ pub struct JumpSettings {
     pub count:        u8,
     pub coyote_time: f32,
     pub buffer_time: f32,
+}
+
+fn calculate_velocity_from_distance_and_accel(distance: f32, accel: f32) -> f32 {
+    (2.0*accel*distance).sqrt()
+}
+
+fn calculate_accel_from_distance_and_speed(distance: f32, speed: f32) -> f32 {
+    return (speed*speed)/(2.0*distance);
+}
+
+fn calculate_accel_from_distance_and_time(distance: f32, time: f32) -> f32 {
+    return (2.0*distance)/(time*time);
 }

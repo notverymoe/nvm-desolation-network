@@ -8,13 +8,15 @@ pub use input::*;
 mod settings;
 pub use settings::*;
 
-pub enum PlayerState {
-    Ground,
+pub enum GroundState {
+    Ground{
+        normal: Vec2,
+    },
     Air,
 }
 
 pub struct Player {
-    state: PlayerState,
+    ground_state: GroundState,
     ground_last: Option<f64>,
 
     velocity: Vec2,
