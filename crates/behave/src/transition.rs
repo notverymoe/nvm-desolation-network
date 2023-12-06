@@ -5,15 +5,15 @@ use crate::{StateId, StrId, newtype_str_id};
 newtype_str_id!(pub TransitionId);
 
 #[derive(Debug, Hash)]
-pub struct Transition<T> {
+pub struct Transition<T: 'static> {
     id:     TransitionId<T>,
-    source: Option<StateId<T>>,
+    source: &'static [StateId<T>],
     target: StateId<T>,
 }
 
-impl<T> Transition<T> {
+impl<T: 'static> Transition<T> {
 
-    pub const fn new(id: &'static str, source: Option<StateId<T>>, target: StateId<T>) -> Self {
+    pub const fn new(id: &'static str, source: &'static [StateId<T>], target: StateId<T>) -> Self {
         Self{id: TransitionId::new(id), source, target}
     }
 
@@ -25,7 +25,7 @@ impl<T> Transition<T> {
         self.id.name()
     }
 
-    pub fn source(&self) -> Option<StateId<T>> {
+    pub fn source(&self) -> &'static [StateId<T>] {
         self.source
     }
 
@@ -34,11 +34,7 @@ impl<T> Transition<T> {
     }
 
     pub fn can_transition_from(&self, source: StateId<T>) -> bool {
-        self.source.is_none() || self.source == Some(source)
-    }
-
-    pub fn resolve_source(&self, source: StateId<T>) -> Self {
-        Self{id: self.id, source: self.source.or(Some(source)), target: self.target}
+        self.source.is_empty() || self.source.contains(&source)
     }
 
 }

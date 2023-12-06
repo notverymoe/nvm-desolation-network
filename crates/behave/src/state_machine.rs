@@ -6,7 +6,8 @@ use crate::{Transition, StateId};
 
 
 #[derive(Debug, Clone, Copy, Component)]
-pub struct StateMachine<T> {
+pub struct StateMachine<T: 'static> {
+    last:    StateId<T>,
     current: Transition<T>,
     next:    Option<Transition<T>>,
 }
@@ -32,8 +33,9 @@ impl<T> StateMachine<T> {
 
     pub(crate) fn apply_transition(&mut self) -> Option<[StateId<T>; 2]> {
         if let Some(next) = std::mem::take(&mut self.next) {
-            self.current = next.resolve_source(self.current.target());
-            Some([self.current.source().unwrap(), self.current.target()])
+            self.last    = self.current.target();
+            self.current = next;
+            Some([self.last, self.current.target()])
         } else {
             None
         }

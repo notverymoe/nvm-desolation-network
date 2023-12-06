@@ -11,8 +11,7 @@ const STATE_IDLE: PlatformerState = PlatformerState::new("STATE_IDLE");
 const STATE_WALK: PlatformerState = PlatformerState::new("STATE_WALK");
 const STATE_JUMP: PlatformerState = PlatformerState::new("STATE_JUMP");
 
-// TODO: multiple froms?
-const ACTION_JUMP: PlatformerAction = PlatformerAction::new("DO_JUMP", Some(STATE_IDLE), STATE_JUMP);
+const ACTION_JUMP: PlatformerAction = PlatformerAction::new("DO_JUMP", &[STATE_IDLE, STATE_WALK], STATE_JUMP);
 
 fn main() {
 
