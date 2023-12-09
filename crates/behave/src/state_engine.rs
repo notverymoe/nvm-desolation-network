@@ -4,7 +4,7 @@ use bevy::{prelude::*, utils::HashMap};
 
 use crate::{StateId, StateMachine};
 
-#[derive(Resource)]
+#[derive(Debug, Resource)]
 pub struct StateEngine<T> {
     by_entered: HashMap<StateId<T>, Vec<Entity>>,
     by_current: HashMap<StateId<T>, Vec<Entity>>,
@@ -12,7 +12,6 @@ pub struct StateEngine<T> {
 }
 
 impl<T> StateEngine<T> {
-
     pub fn apply_transition(&mut self, entity: Entity, state_machine: &mut StateMachine<T>) -> bool {
         if let Some([leaving, entered]) = state_machine.apply_transition() {
             self.by_leaving.entry(leaving).or_default().push(entity);
@@ -24,5 +23,4 @@ impl<T> StateEngine<T> {
             false
         }
     }
-
 }

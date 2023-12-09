@@ -4,7 +4,6 @@ use bevy::prelude::*;
 
 use crate::{Transition, StateId};
 
-
 #[derive(Debug, Clone, Copy, Component)]
 pub struct StateMachine<T: 'static> {
     last:    StateId<T>,
