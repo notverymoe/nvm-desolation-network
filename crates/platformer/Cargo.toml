@@ -5,4 +5,5 @@ edition = "2021"
 
 [dependencies]
 bevy = { workspace = true, features=["default"] }
-nvm_collision = { path = "../collision/" }
+tinyvec = "1.6.0"
+nvm_collide = { path = "../collide/" }

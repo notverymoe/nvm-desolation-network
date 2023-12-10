@@ -1,7 +1,7 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
 use bevy::{math::{IVec2, Vec2}, ecs::system::Resource};
-use nvm_collision::{ShapeStatic, BoxAligned, Ramp};
+use nvm_collide::prelude::*;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum TileKind {

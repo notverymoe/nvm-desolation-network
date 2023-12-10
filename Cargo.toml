@@ -1,9 +1,9 @@
 [workspace]
 resolver="2"
 members=[
-    "crates/collision",
-    "crates/platformer",
-    "crates/behave"
+    "crates/behave",
+    "crates/collide",
+    "crates/platformer"
 ]
 
 [workspace.dependencies]

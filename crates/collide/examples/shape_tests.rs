@@ -1,7 +1,7 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
 use bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
-use nvm_collision::prelude::*;
+use nvm_collide::prelude::*;
 
 mod util;
 pub use util::*;
@@ -18,7 +18,7 @@ pub fn main() {
 }
 
 #[derive(Component)]
-pub struct Shape(Box<dyn ShapeMarkerTrait>, usize);
+pub struct Shape(ShapeStatic, usize);
 
 impl Shape {
     fn new() -> Self {
@@ -26,36 +26,26 @@ impl Shape {
     }
 
     fn next(&mut self) {
-        let next = (self.1+1) % 23;
+        let next = (self.1+1) % 13;
         self.0 = Self::get_shape_at_index(next);
         self.1 = next;
     }
 
-    fn get_shape_at_index(idx: usize) -> Box<dyn ShapeMarkerTrait> {
+    fn get_shape_at_index(idx: usize) -> ShapeStatic {
         match idx {
-             1 => Box::new(BoxAligned::new(Vec2::ZERO, Vec2::new(100.0, 50.0))),
-             2 => Box::new(BoxAlignedRound::new(Vec2::ZERO, Vec2::new(100.0, 50.0), 25.0)),
-             3 => Box::new(BoxOriented::new(Vec2::ZERO, Vec2::new(100.0, 50.0), Vec2::new(2.0, 1.0).normalize())),
-             4 => Box::new(BoxOrientedRound::new(Vec2::ZERO, Vec2::new(100.0, 50.0), Vec2::new(2.0, 1.0).normalize(), 25.0)),
-             5 => Box::new(BoxOrientedBoxy::new(Vec2::ZERO, Vec2::new(100.0, 50.0), Vec2::new(2.0, 1.0).normalize(), Vec2::new(50.0, 25.0))),
-             6 => Box::new(BoxOrientedBoxyRound::new(Vec2::ZERO, Vec2::new(100.0, 50.0), Vec2::new(2.0, 1.0).normalize(), Vec2::new(50.0, 25.0), 25.0)),
-             7 => Box::new(Ramp::new(Vec2::ZERO, Vec2::new( 2.0, -1.0).normalize(), 200.0)),
-             8 => Box::new(Ramp::new(Vec2::ZERO, Vec2::new(-2.0, -1.0).normalize(), 200.0)),
-             9 => Box::new(Ramp::new(Vec2::ZERO, Vec2::new(-2.0,  1.0).normalize(), 200.0)),
-            10 => Box::new(Ramp::new(Vec2::ZERO, Vec2::new( 2.0,  1.0).normalize(), 200.0)),
-            11 => Box::new(RampBoxy::new(Vec2::ZERO, Vec2::new( 2.0, -1.0).normalize(), 200.0, Vec2::new(50.0, 25.0))),
-            12 => Box::new(RampBoxy::new(Vec2::ZERO, Vec2::new(-2.0, -1.0).normalize(), 200.0, Vec2::new(50.0, 25.0))),
-            13 => Box::new(RampBoxy::new(Vec2::ZERO, Vec2::new(-2.0,  1.0).normalize(), 200.0, Vec2::new(50.0, 25.0))),
-            14 => Box::new(RampBoxy::new(Vec2::ZERO, Vec2::new( 2.0,  1.0).normalize(), 200.0, Vec2::new(50.0, 25.0))),
-            15 => Box::new(RampRound::new(Vec2::ZERO, Vec2::new( 2.0, -1.0).normalize(), 200.0, 25.0)),
-            16 => Box::new(RampRound::new(Vec2::ZERO, Vec2::new(-2.0, -1.0).normalize(), 200.0, 25.0)),
-            17 => Box::new(RampRound::new(Vec2::ZERO, Vec2::new(-2.0,  1.0).normalize(), 200.0, 25.0)),
-            18 => Box::new(RampRound::new(Vec2::ZERO, Vec2::new( 2.0,  1.0).normalize(), 200.0, 25.0)),
-            19 => Box::new(RampBoxyRound::new(Vec2::ZERO, Vec2::new( 2.0, -1.0).normalize(), 200.0, Vec2::new(50.0, 25.0), 25.0)),
-            20 => Box::new(RampBoxyRound::new(Vec2::ZERO, Vec2::new(-2.0, -1.0).normalize(), 200.0, Vec2::new(50.0, 25.0), 25.0)),
-            21 => Box::new(RampBoxyRound::new(Vec2::ZERO, Vec2::new(-2.0,  1.0).normalize(), 200.0, Vec2::new(50.0, 25.0), 25.0)),
-            22 => Box::new(RampBoxyRound::new(Vec2::ZERO, Vec2::new( 2.0,  1.0).normalize(), 200.0, Vec2::new(50.0, 25.0), 25.0)),
-             _ => Box::new(Ball::new(Vec2::ZERO, 50.0)),
+             1 => BoxAligned::new(Vec2::ZERO, Vec2::new(100.0, 50.0)).into(),
+             2 => BoxAlignedRound::new(Vec2::ZERO, Vec2::new(100.0, 50.0), 25.0).into(),
+             3 => BoxOriented::new(Vec2::ZERO, Vec2::new(100.0, 50.0), Vec2::new(2.0, 1.0).normalize()).into(),
+             4 => BoxOrientedRound::new(Vec2::ZERO, Vec2::new(100.0, 50.0), Vec2::new(2.0, 1.0).normalize(), 25.0).into(),
+             5 => Ramp::new(Vec2::ZERO, Vec2::new( 2.0, -1.0).normalize(), 200.0).into(),
+             6 => Ramp::new(Vec2::ZERO, Vec2::new(-2.0, -1.0).normalize(), 200.0).into(),
+             7 => Ramp::new(Vec2::ZERO, Vec2::new(-2.0,  1.0).normalize(), 200.0).into(),
+             8 => Ramp::new(Vec2::ZERO, Vec2::new( 2.0,  1.0).normalize(), 200.0).into(),
+             9 => RampRound::new(Vec2::ZERO, Vec2::new( 2.0, -1.0).normalize(), 200.0, 25.0).into(),
+            10 => RampRound::new(Vec2::ZERO, Vec2::new(-2.0, -1.0).normalize(), 200.0, 25.0).into(),
+            11 => RampRound::new(Vec2::ZERO, Vec2::new(-2.0,  1.0).normalize(), 200.0, 25.0).into(),
+            12 => RampRound::new(Vec2::ZERO, Vec2::new( 2.0,  1.0).normalize(), 200.0, 25.0).into(),
+             _ => Ball::new(Vec2::ZERO, 50.0).into(),
         }
     }
 }
@@ -65,11 +55,12 @@ pub struct RayCasterCollider {
     origin:    Vec2,
     direction: Vec2,
     hits: Vec<(Entity, [RayIntersection; 2])>,
+    is_cube: bool,
 }
 
 fn setup(mut commands: Commands) {
     commands.spawn(Camera2dBundle::default());
-    commands.spawn(RayCasterCollider{origin: -Vec2::X * 200.0, direction: Vec2::X, hits: Vec::default()});
+    commands.spawn(RayCasterCollider{origin: -Vec2::X * 200.0, direction: Vec2::X, hits: Vec::default(), is_cube: false});
     commands.spawn(Shape::new());
 }
 
@@ -117,6 +108,10 @@ fn update_raycaster(
         offset_target -= 1.0;
     }
 
+    if keys.just_pressed(KeyCode::Tab) {
+        caster.is_cube = !caster.is_cube;
+    }
+
     if keys.pressed(KeyCode::ShiftLeft) {
         offset_origin *= 2.0;
         offset_target *= 2.0;
@@ -134,6 +129,14 @@ fn update_raycaster(
     }
 }
 
+fn make_caster_shape(origin: Vec2, is_cube: bool) -> ShapeMoving {
+    if is_cube { 
+        BoxAligned::new(origin, Vec2::new(100.0, 50.0)).into() 
+    } else { 
+        Ball::new(origin, 50.0).into() 
+    }
+}
+
 fn check_colliders(
     mut q_caster:  Query<&mut RayCasterCollider>,
     q_static: Query<(Entity, &Shape)>,
@@ -141,8 +144,10 @@ fn check_colliders(
     for mut caster in q_caster.iter_mut() {
         caster.hits.clear();
         let ray = RayCaster::new(caster.origin, caster.direction);
-        for (shape_id, Shape(shape, _)) in q_static.iter() {
-            if let Some(projection) = shape.raycast(&ray) {
+        let caster_shape = make_caster_shape(caster.origin, caster.is_cube);
+        for (shape_id, Shape(target_shape, _)) in q_static.iter() {
+            let combined = ShapeCombined::between_moving_and_static(&caster_shape, target_shape);
+            if let Some(projection) = combined.raycast(&ray) {
                 caster.hits.push((shape_id, projection));
             }
         }
@@ -157,6 +162,16 @@ fn render(
 ) {
 
     let caster = q_caster.single();
+    let caster_shape: ShapeMoving = make_caster_shape(caster.origin, caster.is_cube);
+
+    render_shape(&mut gizmos, &caster_shape, Color::GREEN);
+
+    let first_hit = caster.hits.iter().reduce(|p, c| if p.1[0].distance < c.1[0].distance { p } else { c });
+    if let Some(first_hit) = first_hit {
+        let hit_shape: ShapeMoving = make_caster_shape(first_hit.1[0].point, caster.is_cube);
+        render_shape(&mut gizmos, &hit_shape, Color::RED);
+    }
+
     gizmos.circle_2d(caster.origin, 10.0, Color::ORANGE_RED);
     gizmos.line_2d(caster.origin, caster.origin + caster.direction * 10000.0, if caster.hits.is_empty() { Color::GREEN } else { Color::LIME_GREEN });
     for hit in caster.hits.iter() {
@@ -167,7 +182,10 @@ fn render(
 
     for (entity, Shape(shape, _)) in q_shapes.iter() {
         let colour = if caster.hits.iter().any(|v| v.0 == entity) { Color::RED } else { Color::PINK };
-        render_shape(&mut gizmos, shape.as_ref(), colour);
+        render_shape(&mut gizmos, shape, colour);
+
+        let combined = ShapeCombined::between_moving_and_static(&caster_shape, shape);
+        render_shape(&mut gizmos, &combined, colour * 0.5);
     }
 
 }
