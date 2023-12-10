@@ -18,7 +18,7 @@ pub mod prelude {
 #[macro_export]
 macro_rules! behave_define {
     ($marker:ident, $state:ident) => {
-        pub const $state: $crate::prelude::State<$marker> = $crate::State::from_name(stringify!($state));
+        pub const $state: $crate::prelude::State<$marker> = $crate::prelude::State::from_name(stringify!($state));
     };
 
     ($marker:ident, ($transition:ident, $target:ident, $source:expr)) => {
