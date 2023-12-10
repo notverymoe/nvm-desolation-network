@@ -1,6 +1,6 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-use crate::{State, newtype_str_id};
+use crate::{prelude::State, newtype_str_id};
 
 pub const SOURCE_MAX: usize = 4;
 

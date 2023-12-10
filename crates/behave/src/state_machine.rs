@@ -2,7 +2,9 @@
 
 use bevy::prelude::*;
 
-use crate::prelude::{Transition, State};
+use crate::{prelude::Transition, newtype_str_id};
+
+newtype_str_id!(pub State);
 
 #[derive(Debug, Clone, Copy, Component)]
 pub struct StateMachine<T: 'static> {

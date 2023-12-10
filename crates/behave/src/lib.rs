@@ -7,17 +7,13 @@ mod transition;
 
 pub(crate) mod util;
 
-newtype_str_id!(pub State);
-
 pub mod prelude {
     pub use crate::state_machine::*;
     pub use crate::state_engine::*;
     pub use crate::state_machine_update::*;
     pub use crate::transition::*;
-    pub use crate::State;
     pub use crate::behave_define;
 }
-
 
 #[macro_export]
 macro_rules! behave_define {
