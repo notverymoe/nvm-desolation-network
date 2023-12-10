@@ -2,22 +2,22 @@
 
 use bevy::prelude::*;
 
-use crate::{Transition, StateId};
+use crate::{Transition, State};
 
 #[derive(Debug, Clone, Copy, Component)]
 pub struct StateMachine<T: 'static> {
-    last:    StateId<T>,
+    last:    State<T>,
     current: Transition<T>,
     next:    Option<Transition<T>>,
 }
 
 impl<T> StateMachine<T> {
 
-    pub fn is(&self, id: StateId<T>) -> bool {
+    pub fn is(&self, id: State<T>) -> bool {
         self.current.target() == id
     }
 
-    pub fn current(&self) -> StateId<T> {
+    pub fn current(&self) -> State<T> {
         self.current.target()
     }
 
@@ -30,7 +30,7 @@ impl<T> StateMachine<T> {
         }
     }
 
-    pub(crate) fn apply_transition(&mut self) -> Option<[StateId<T>; 2]> {
+    pub(crate) fn apply_transition(&mut self) -> Option<[State<T>; 2]> {
         if let Some(next) = std::mem::take(&mut self.next) {
             self.last    = self.current.target();
             self.current = next;

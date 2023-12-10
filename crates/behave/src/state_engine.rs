@@ -2,13 +2,13 @@
 
 use bevy::{prelude::*, utils::HashMap};
 
-use crate::{StateId, StateMachine};
+use crate::{State, StateMachine};
 
 #[derive(Debug, Resource)]
 pub struct StateEngine<T> {
-    by_entered: HashMap<StateId<T>, Vec<Entity>>,
-    by_current: HashMap<StateId<T>, Vec<Entity>>,
-    by_leaving: HashMap<StateId<T>, Vec<Entity>>,
+    by_entered: HashMap<State<T>, Vec<Entity>>,
+    by_current: HashMap<State<T>, Vec<Entity>>,
+    by_leaving: HashMap<State<T>, Vec<Entity>>,
 }
 
 impl<T> StateEngine<T> {

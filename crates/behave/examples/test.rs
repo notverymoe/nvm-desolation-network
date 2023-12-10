@@ -1,17 +1,17 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-use nvm_behave::{StateId, Transition};
+use nvm_behave::behave_define;
 
-struct PlatformerStateMarker;
+struct PlatformerMarker;
 
-type PlatformerState  = StateId<PlatformerStateMarker>;
-type PlatformerAction = Transition<PlatformerStateMarker>;
-
-const STATE_IDLE: PlatformerState = PlatformerState::from_name("STATE_IDLE");
-const STATE_WALK: PlatformerState = PlatformerState::from_name("STATE_WALK");
-const STATE_JUMP: PlatformerState = PlatformerState::from_name("STATE_JUMP");
-
-const ACTION_JUMP: PlatformerAction = PlatformerAction::from_name("DO_JUMP", STATE_JUMP, &[STATE_IDLE, STATE_WALK]);
+behave_define!(
+    PlatformerMarker,
+    STATE_STAND,
+    STATE_JUMP,
+    STATE_CROUCH,
+    (TRANSITION_JUMP,   STATE_JUMP,   [STATE_STAND, STATE_CROUCH]),
+    (TRANSITION_CROUCH, STATE_CROUCH, [STATE_STAND, STATE_CROUCH])
+);
 
 fn main() {
 
