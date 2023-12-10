@@ -4,7 +4,7 @@ use bevy::prelude::Vec2;
 
 use tinyvec::ArrayVec;
 
-use crate::{RaycastTarget, DebugShape, RayCaster, RayIntersection, DebugShapeData, BoxAligned, HasBoundingBox};
+use crate::prelude::{RaycastTarget, DebugShape, RayCaster, RayIntersection, DebugShapeData, BoxAligned, HasBoundingBox};
 
 pub const POLYGON_SMALL_CAPACITY: usize = 8;
 

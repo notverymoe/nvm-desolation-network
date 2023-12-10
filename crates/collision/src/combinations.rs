@@ -1,9 +1,10 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
+use bevy::math::Vec2;
 use macro_attr_2018::macro_attr;
 use enum_derive_2018::EnumFromInner;
 
-use crate::{BoxAligned, Ball, Ramp, BoxOriented, BoxAlignedRound, BoxOrientedRound, RampRound, RampBoxy, RampBoxyRound, BoxOrientedBoxy, BoxOrientedBoxyRound, RaycastTarget, RayCaster, RayIntersection, DebugShapeData, DebugShape};
+use crate::prelude::{BoxAligned, Ball, Ramp, BoxOriented, BoxAlignedRound, BoxOrientedRound, RampRound, RampBoxy, RampBoxyRound, BoxOrientedBoxy, BoxOrientedBoxyRound, RaycastTarget, RayCaster, RayIntersection, DebugShapeData, DebugShape};
 
 macro_attr! {
     #[derive(EnumFromInner!)]
@@ -11,6 +12,17 @@ macro_attr! {
         Ball(Ball),
         BoxAligned(BoxAligned),
     }
+}
+
+impl ShapeMoving {
+
+    pub fn origin(&self) -> Vec2 {
+        match self {
+            ShapeMoving::Ball(s)       => s.origin,
+            ShapeMoving::BoxAligned(s) => s.origin,
+        }
+    }
+
 }
 
 impl DebugShape for ShapeMoving {
@@ -46,7 +58,7 @@ impl RaycastTarget for ShapeMoving {
 }
 
 macro_attr! {
-    #[derive(EnumFromInner!)]
+    #[derive(EnumFromInner!, Debug, Copy, Clone)]
     pub enum ShapeStatic {
         Ball(Ball),
         BoxAligned(BoxAligned),

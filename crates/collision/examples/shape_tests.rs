@@ -1,7 +1,7 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
 use bevy::{prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}};
-use nvm_collision::*;
+use nvm_collision::prelude::*;
 
 mod util;
 pub use util::*;

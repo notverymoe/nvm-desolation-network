@@ -1,7 +1,7 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
 use bevy::prelude::*;
-use nvm_collision::{DebugShapeData, RaycastTarget, DebugShape};
+use nvm_collision::prelude::*;
 
 pub trait ShapeMarkerTrait: DebugShape + RaycastTarget + Send + Sync {}
 impl<T: DebugShape + RaycastTarget + Send + Sync + 'static> ShapeMarkerTrait for T {}

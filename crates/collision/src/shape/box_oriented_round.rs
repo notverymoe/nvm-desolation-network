@@ -2,8 +2,9 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, BoxAligned, HasBoundingBox};
+use crate::prelude::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, BoxAligned, HasBoundingBox};
 
+#[derive(Debug, Clone, Copy)]
 pub struct BoxOrientedRound {
     pub origin:    Vec2,
     pub size:      Vec2,

@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{BoxAligned, RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, HasBoundingBox};
+use crate::prelude::{BoxAligned, RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, HasBoundingBox};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Ball {

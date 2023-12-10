@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, DebugShape, RayCaster, RayIntersection, DebugShapeData, PolygonSmall, BoxAligned, HasBoundingBox};
+use crate::prelude::{RaycastTarget, DebugShape, RayCaster, RayIntersection, DebugShapeData, PolygonSmall, BoxAligned, HasBoundingBox};
 
 pub struct PolygonSmallRound {
     inner: PolygonSmall,

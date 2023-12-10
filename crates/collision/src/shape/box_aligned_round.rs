@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShapeData, DebugShape, BoxAligned, HasBoundingBox};
+use crate::prelude::{RaycastTarget, RayCaster, RayIntersection, DebugShapeData, DebugShape, BoxAligned, HasBoundingBox};
 
 #[derive(Debug, Clone, Copy)]
 pub struct BoxAlignedRound {

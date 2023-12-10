@@ -2,8 +2,9 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, get_polygon_data_for_ramp, HasBoundingBox, BoxAligned};
+use crate::prelude::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, get_polygon_data_for_ramp, HasBoundingBox, BoxAligned};
 
+#[derive(Debug, Clone, Copy)]
 pub struct RampRound {
     pub origin:    Vec2,
     pub direction: Vec2,

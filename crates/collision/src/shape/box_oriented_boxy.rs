@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, get_polygon_data_for_oriented_rect_rected, PolygonSmall, HasBoundingBox, BoxAligned};
+use crate::prelude::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, get_polygon_data_for_oriented_rect_rected, PolygonSmall, HasBoundingBox, BoxAligned};
 
 pub struct BoxOrientedBoxy(PolygonSmall);
 
