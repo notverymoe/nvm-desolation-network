@@ -4,8 +4,8 @@ use bevy::prelude::*;
 use nvm_collide::prelude::*;
 use tinyvec::SliceVec;
 
-mod simple;
-pub use simple::*;
+mod util;
+pub use util::*;
 
 #[derive(Debug, Clone, Copy)]
 pub struct SensorHit {

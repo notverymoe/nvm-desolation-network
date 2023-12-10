@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::prelude::{RaycastTarget, DebugShape, RayCaster, RayIntersection, DebugShapeData, PolygonSmall, BoxAligned, HasBoundingBox};
+use crate::prelude::{RaycastTarget, DebugShape, RayCaster, RayIntersection, DebugShapeData, PolygonSmall, BoxAligned, ShapeCommon};
 
 pub struct PolygonSmallRound {
     inner: PolygonSmall,
@@ -19,11 +19,19 @@ impl PolygonSmallRound {
     }
 }
 
-impl HasBoundingBox for PolygonSmallRound {
+impl ShapeCommon for PolygonSmallRound {
     fn bounding_box(&self) -> BoxAligned {
         let mut bounds = self.inner.bounds;
         bounds.size += Vec2::new(self.radius, self.radius);
         bounds
+    }
+
+    fn origin(&self) -> Vec2 {
+        self.inner.origin()
+    }
+
+    fn set_origin(&mut self, origin: Vec2) {
+        self.inner.set_origin(origin);
     }
 }
 

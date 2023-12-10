@@ -4,7 +4,7 @@ use bevy::prelude::Vec2;
 
 use tinyvec::ArrayVec;
 
-use crate::prelude::{RaycastTarget, DebugShape, RayCaster, RayIntersection, DebugShapeData, BoxAligned, HasBoundingBox};
+use crate::prelude::{RaycastTarget, DebugShape, RayCaster, RayIntersection, DebugShapeData, BoxAligned, ShapeCommon};
 
 pub const POLYGON_SMALL_CAPACITY: usize = 8;
 
@@ -52,9 +52,21 @@ impl PolygonSmall {
     }
 }
 
-impl HasBoundingBox for PolygonSmall {
+impl ShapeCommon for PolygonSmall {
     fn bounding_box(&self) -> BoxAligned {
         self.bounds
+    }
+
+    fn origin(&self) -> Vec2 {
+        self.bounds.origin
+    }
+
+    fn set_origin(&mut self, origin: Vec2) {
+        let delta = self.bounds.origin - origin;
+        for point in self.points.iter_mut() {
+            *point += delta;
+        }
+        self.bounds.origin = origin;
     }
 }
 

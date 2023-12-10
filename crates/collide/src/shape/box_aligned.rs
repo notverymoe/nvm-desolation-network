@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::prelude::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, HasBoundingBox};
+use crate::prelude::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, ShapeCommon};
 
 #[derive(Debug, Clone, Copy)]
 pub struct BoxAligned {
@@ -23,9 +23,17 @@ impl BoxAligned {
     }
 }
 
-impl HasBoundingBox for BoxAligned {
+impl ShapeCommon for BoxAligned {
     fn bounding_box(&self) -> BoxAligned {
         *self
+    }
+
+    fn origin(&self) -> Vec2 {
+        self.origin
+    }
+
+    fn set_origin(&mut self, origin: Vec2) {
+        self.origin = origin;
     }
 }
 

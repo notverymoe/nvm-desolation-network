@@ -4,7 +4,7 @@ use bevy::math::Vec2;
 use macro_attr_2018::macro_attr;
 use enum_derive_2018::EnumFromInner;
 
-use crate::prelude::{BoxAligned, Ball, Ramp, BoxOriented, BoxAlignedRound, BoxOrientedRound, RampRound, RampBoxy, RampBoxyRound, BoxOrientedBoxy, BoxOrientedBoxyRound, RaycastTarget, RayCaster, RayIntersection, DebugShapeData, DebugShape};
+use crate::{prelude::{BoxAligned, Ball, Ramp, BoxOriented, BoxAlignedRound, BoxOrientedRound, RampRound, RampBoxy, RampBoxyRound, BoxOrientedBoxy, BoxOrientedBoxyRound, RaycastTarget, RayCaster, RayIntersection, DebugShapeData, DebugShape}, shape_common::ShapeCommon};
 
 macro_attr! {
     #[derive(EnumFromInner!)]
@@ -23,6 +23,29 @@ impl ShapeMoving {
         }
     }
 
+}
+
+impl ShapeCommon for ShapeMoving {
+    fn bounding_box(&self) -> BoxAligned {
+        match self {
+            ShapeMoving::Ball(s)       => s.bounding_box(),
+            ShapeMoving::BoxAligned(s) => s.bounding_box(),
+        }
+    }
+
+    fn origin(&self) -> Vec2 {
+        match self {
+            ShapeMoving::Ball(s)       => s.origin(),
+            ShapeMoving::BoxAligned(s) => s.origin(),
+        }
+    }
+
+    fn set_origin(&mut self, origin: Vec2) {
+        match self {
+            ShapeMoving::Ball(s)       => s.set_origin(origin),
+            ShapeMoving::BoxAligned(s) => s.set_origin(origin),
+        }
+    }
 }
 
 impl DebugShape for ShapeMoving {
@@ -67,6 +90,44 @@ macro_attr! {
         BoxOrientedRound(BoxOrientedRound),
         Ramp(Ramp),
         RampRound(RampRound),
+    }
+}
+
+impl ShapeCommon for ShapeStatic {
+    fn bounding_box(&self) -> BoxAligned {
+        match self {
+            ShapeStatic::Ball(s)       => s.bounding_box(),
+            ShapeStatic::BoxAligned(s) => s.bounding_box(),
+            ShapeStatic::BoxAlignedRound(s) => s.bounding_box(),
+            ShapeStatic::BoxOriented(s) => s.bounding_box(),
+            ShapeStatic::BoxOrientedRound(s) => s.bounding_box(),
+            ShapeStatic::Ramp(s) => s.bounding_box(),
+            ShapeStatic::RampRound(s) => s.bounding_box(),
+        }
+    }
+
+    fn origin(&self) -> Vec2 {
+        match self {
+            ShapeStatic::Ball(s)       => s.origin(),
+            ShapeStatic::BoxAligned(s) => s.origin(),
+            ShapeStatic::BoxAlignedRound(s) => s.origin(),
+            ShapeStatic::BoxOriented(s) => s.origin(),
+            ShapeStatic::BoxOrientedRound(s) => s.origin(),
+            ShapeStatic::Ramp(s) => s.origin(),
+            ShapeStatic::RampRound(s) => s.origin(),
+        }
+    }
+
+    fn set_origin(&mut self, origin: Vec2) {
+        match self {
+            ShapeStatic::Ball(s)       => s.set_origin(origin),
+            ShapeStatic::BoxAligned(s) => s.set_origin(origin),
+            ShapeStatic::BoxAlignedRound(s) => s.set_origin(origin),
+            ShapeStatic::BoxOriented(s) => s.set_origin(origin),
+            ShapeStatic::BoxOrientedRound(s) => s.set_origin(origin),
+            ShapeStatic::Ramp(s) => s.set_origin(origin),
+            ShapeStatic::RampRound(s) => s.set_origin(origin),
+        }
     }
 }
 
@@ -137,6 +198,50 @@ macro_attr! {
         RampRound(RampRound),
         RampBoxy(RampBoxy),
         RampBoxyRound(RampBoxyRound),
+    }
+}
+
+impl ShapeCommon for ShapeCombined {
+    fn bounding_box(&self) -> BoxAligned {
+        match self {
+            ShapeCombined::Ball(s)       => s.bounding_box(),
+            ShapeCombined::BoxAligned(s) => s.bounding_box(),
+            ShapeCombined::BoxAlignedRound(s) => s.bounding_box(),
+            ShapeCombined::BoxOrientedRound(s) => s.bounding_box(),
+            ShapeCombined::BoxOrientedBoxy(s) => s.bounding_box(),
+            ShapeCombined::BoxOrientedBoxyRound(s) =>s.bounding_box(),
+            ShapeCombined::RampRound(s) => s.bounding_box(),
+            ShapeCombined::RampBoxy(s) => s.bounding_box(),
+            ShapeCombined::RampBoxyRound(s) => s.bounding_box(),
+        }
+    }
+
+    fn origin(&self) -> Vec2 {
+        match self {
+            ShapeCombined::Ball(s)       => s.origin(),
+            ShapeCombined::BoxAligned(s) => s.origin(),
+            ShapeCombined::BoxAlignedRound(s) => s.origin(),
+            ShapeCombined::BoxOrientedRound(s) => s.origin(),
+            ShapeCombined::BoxOrientedBoxy(s) => s.origin(),
+            ShapeCombined::BoxOrientedBoxyRound(s) =>s.origin(),
+            ShapeCombined::RampRound(s) => s.origin(),
+            ShapeCombined::RampBoxy(s) => s.origin(),
+            ShapeCombined::RampBoxyRound(s) => s.origin(),
+        }
+    }
+
+    fn set_origin(&mut self, origin: Vec2) {
+        match self {
+            ShapeCombined::Ball(s)       => s.set_origin(origin),
+            ShapeCombined::BoxAligned(s) => s.set_origin(origin),
+            ShapeCombined::BoxAlignedRound(s) => s.set_origin(origin),
+            ShapeCombined::BoxOrientedRound(s) => s.set_origin(origin),
+            ShapeCombined::BoxOrientedBoxy(s) => s.set_origin(origin),
+            ShapeCombined::BoxOrientedBoxyRound(s) =>s.set_origin(origin),
+            ShapeCombined::RampRound(s) => s.set_origin(origin),
+            ShapeCombined::RampBoxy(s) => s.set_origin(origin),
+            ShapeCombined::RampBoxyRound(s) => s.set_origin(origin),
+        }
     }
 }
 

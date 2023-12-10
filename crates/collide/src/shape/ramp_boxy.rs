@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::prelude::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, get_polygon_data_for_ramp_boxy, PolygonSmall, BoxAligned};
+use crate::prelude::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, get_polygon_data_for_ramp_boxy, PolygonSmall, BoxAligned, ShapeCommon};
 
 pub struct RampBoxy(PolygonSmall);
 
@@ -15,6 +15,20 @@ impl RampBoxy {
         let size         = max - bound_origin;
 
         Self(PolygonSmall::new(points.map(|v| origin + v), normals, lengths, BoxAligned::new(bound_origin, size)))
+    }
+}
+
+impl ShapeCommon for RampBoxy {
+    fn bounding_box(&self) -> BoxAligned {
+        self.0.bounding_box()
+    }
+
+    fn origin(&self) -> Vec2 {
+        self.0.origin()
+    }
+
+    fn set_origin(&mut self, origin: Vec2) {
+        self.0.set_origin(origin);
     }
 }
 
