@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::prelude::{RaycastTarget, ShapeDebug, RayCaster, RayIntersection, ShapeDebugData, PolygonSmall, BoxAligned, ShapeCommon};
+use crate::prelude::{RayTarget, ShapeDebug, RayCaster, RayIntersection, ShapeDebugData, PolygonSmall, BoxAligned, ShapeCommon};
 
 pub struct PolygonSmallRound {
     inner: PolygonSmall,
@@ -35,7 +35,7 @@ impl ShapeCommon for PolygonSmallRound {
     }
 }
 
-impl RaycastTarget for PolygonSmallRound {
+impl RayTarget for PolygonSmallRound {
     fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         ray.test_polygon_rounded_at_origin(&self.inner.points, &self.inner.normals, &self.inner.lengths, self.radius)
     }

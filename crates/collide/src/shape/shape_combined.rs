@@ -84,7 +84,7 @@ impl ShapeDebug for ShapeCombined {
     }
 }
 
-impl RaycastTarget for ShapeCombined {
+impl RayTarget for ShapeCombined {
     fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         match self {
             ShapeCombined::Ball(s) => s.raycast(ray),

@@ -2,24 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-#[derive(Debug, Clone, Copy)]
-pub struct RayIntersection {
-    pub distance: f32,
-    pub point:    Vec2,
-    pub normal:   Vec2,
-}
-
-pub trait RaycastTarget {
-    fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]>;
-
-    fn raycast_enter(&self, ray: &RayCaster) -> Option<RayIntersection> {
-        self.raycast(ray).map(|[v, _]| v)
-    }
-
-    fn raycast_exit(&self, ray: &RayCaster) -> Option<RayIntersection>{
-        self.raycast(ray).map(|[_, v]| v)
-    }
-}
+use super::{RayTarget, RayIntersection};
 
 pub struct RayCaster {
     origin:        Vec2,
@@ -51,15 +34,15 @@ impl RayCaster {
 
 impl RayCaster {
 
-    pub fn test(&self, other: &impl RaycastTarget) -> Option<[RayIntersection; 2]> {
+    pub fn test(&self, other: &impl RayTarget) -> Option<[RayIntersection; 2]> {
         other.raycast(self)
     }
 
-    pub fn test_enter(&self, other: &impl RaycastTarget) -> Option<RayIntersection> {
+    pub fn test_enter(&self, other: &impl RayTarget) -> Option<RayIntersection> {
         other.raycast_enter(self)
     }
 
-    pub fn test_exit(&self, other: &impl RaycastTarget) -> Option<RayIntersection> {
+    pub fn test_exit(&self, other: &impl RayTarget) -> Option<RayIntersection> {
         other.raycast_exit(self)
     }
 
@@ -349,42 +332,4 @@ impl RayCaster {
         }
     }
 
-}
-
-impl RayIntersection {
-
-    pub fn find_polygon_entry_exit(v: impl IntoIterator<Item = RayIntersection>) -> Option<[RayIntersection; 2]> {
-
-        let mut entry = RayIntersection{ distance:  f32::MAX, point: Vec2::ZERO, normal: Vec2::ZERO };
-        let mut exit  = RayIntersection{ distance: -f32::MAX, point: Vec2::ZERO, normal: Vec2::ZERO };
-        for intersection in v.into_iter() {
-            if intersection.distance < entry.distance {
-                entry = intersection;
-            } 
-
-            if intersection.distance > exit.distance {
-                exit = intersection;
-            }
-        }
-
-        (exit.distance >= entry.distance).then_some([entry, exit])
-    }
-
-    pub fn find_polygon_entry_exit_pairs(v: impl IntoIterator<Item = [RayIntersection; 2]>) -> Option<[RayIntersection; 2]> {
-
-        let mut entry = RayIntersection{ distance:  f32::MAX, point: Vec2::ZERO, normal: Vec2::ZERO };
-        let mut exit  = RayIntersection{ distance: -f32::MAX, point: Vec2::ZERO, normal: Vec2::ZERO };
-        for [entry_intersection, exit_intersection] in v.into_iter() {
-            if entry_intersection.distance < entry.distance {
-                entry = entry_intersection;
-            } 
-
-            if exit_intersection.distance > exit.distance {
-                exit = exit_intersection;
-            }
-        }
-
-        (exit.distance >= entry.distance).then_some([entry, exit])
-    }
-    
 }

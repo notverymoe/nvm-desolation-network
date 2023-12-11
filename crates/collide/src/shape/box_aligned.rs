@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::prelude::{RaycastTarget, RayCaster, RayIntersection, ShapeDebug, ShapeDebugData, ShapeCommon};
+use crate::prelude::{RayTarget, RayCaster, RayIntersection, ShapeDebug, ShapeDebugData, ShapeCommon};
 
 #[derive(Debug, Clone, Copy)]
 pub struct BoxAligned {
@@ -37,7 +37,7 @@ impl ShapeCommon for BoxAligned {
     }
 }
 
-impl RaycastTarget for BoxAligned {
+impl RayTarget for BoxAligned {
     fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         ray.test_rect(self.origin, self.size)
     }

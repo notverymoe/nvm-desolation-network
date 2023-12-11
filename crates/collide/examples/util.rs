@@ -3,8 +3,8 @@
 use bevy::prelude::*;
 use nvm_collide::prelude::*;
 
-pub trait ShapeMarkerTrait: ShapeDebug + RaycastTarget + Send + Sync {}
-impl<T: ShapeDebug + RaycastTarget + Send + Sync + 'static> ShapeMarkerTrait for T {}
+pub trait ShapeMarkerTrait: ShapeDebug + RayTarget + Send + Sync {}
+impl<T: ShapeDebug + RayTarget + Send + Sync + 'static> ShapeMarkerTrait for T {}
 
 pub fn render_shape(gizmos: &mut Gizmos, shape: &dyn ShapeMarkerTrait, colour: Color) {
     let data = shape.get_debug_shape_data();

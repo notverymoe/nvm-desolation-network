@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::prelude::{RaycastTarget, RayCaster, RayIntersection, ShapeDebug, ShapeDebugData, BoxAligned, ShapeCommon};
+use crate::prelude::{RayTarget, RayCaster, RayIntersection, ShapeDebug, ShapeDebugData, BoxAligned, ShapeCommon};
 
 #[derive(Debug, Clone, Copy)]
 pub struct BoxOrientedRound {
@@ -35,7 +35,7 @@ impl ShapeCommon for BoxOrientedRound {
     }
 }
 
-impl RaycastTarget for BoxOrientedRound {
+impl RayTarget for BoxOrientedRound {
     fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         let points = [
             self.origin + Vec2::new( self.size.x,  self.size.y).rotate(self.direction),

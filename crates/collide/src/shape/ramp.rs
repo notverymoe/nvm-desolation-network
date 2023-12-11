@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::prelude::{RaycastTarget, RayCaster, RayIntersection, ShapeDebug, ShapeDebugData, get_polygon_data_for_ramp, ShapeCommon, BoxAligned};
+use crate::prelude::{RayTarget, RayCaster, RayIntersection, ShapeDebug, ShapeDebugData, get_polygon_data_for_ramp, ShapeCommon, BoxAligned};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Ramp {
@@ -50,7 +50,7 @@ impl ShapeCommon for Ramp {
     }
 }
 
-impl RaycastTarget for Ramp {
+impl RayTarget for Ramp {
     fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         let (points, normals, lengths) = get_polygon_data_for_ramp(self.direction, self.length);
         ray.test_polygon(self.origin, &points, &normals, &lengths)

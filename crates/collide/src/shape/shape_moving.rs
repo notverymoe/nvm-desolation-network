@@ -57,7 +57,7 @@ impl ShapeDebug for ShapeMoving {
     }
 }
 
-impl RaycastTarget for ShapeMoving {
+impl RayTarget for ShapeMoving {
     fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         match self {
             ShapeMoving::Ball(s) => s.raycast(ray),

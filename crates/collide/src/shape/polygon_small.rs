@@ -4,7 +4,7 @@ use bevy::prelude::Vec2;
 
 use tinyvec::ArrayVec;
 
-use crate::prelude::{RaycastTarget, ShapeDebug, RayCaster, RayIntersection, ShapeDebugData, BoxAligned, ShapeCommon};
+use crate::prelude::{RayTarget, ShapeDebug, RayCaster, RayIntersection, ShapeDebugData, BoxAligned, ShapeCommon};
 
 pub const POLYGON_SMALL_CAPACITY: usize = 8;
 
@@ -70,7 +70,7 @@ impl ShapeCommon for PolygonSmall {
     }
 }
 
-impl RaycastTarget for PolygonSmall {
+impl RayTarget for PolygonSmall {
     fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         ray.test_polygon_at_origin(&self.points, &self.normals, &self.lengths)
     }

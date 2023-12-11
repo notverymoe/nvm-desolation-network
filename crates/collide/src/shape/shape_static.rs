@@ -71,7 +71,7 @@ impl ShapeDebug for ShapeStatic {
     }
 }
 
-impl RaycastTarget for ShapeStatic {
+impl RayTarget for ShapeStatic {
     fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         match self {
             ShapeStatic::Ball(s) => s.raycast(ray),

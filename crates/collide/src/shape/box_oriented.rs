@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::prelude::{RaycastTarget, RayCaster, RayIntersection, ShapeDebug, ShapeDebugData, ShapeCommon, BoxAligned};
+use crate::prelude::{RayTarget, RayCaster, RayIntersection, ShapeDebug, ShapeDebugData, ShapeCommon, BoxAligned};
 
 #[derive(Debug, Clone, Copy)]
 pub struct BoxOriented {
@@ -34,7 +34,7 @@ impl ShapeCommon for BoxOriented {
     }
 }
 
-impl RaycastTarget for BoxOriented {
+impl RayTarget for BoxOriented {
     fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
 
         // TODO OPT we might be able to rotate the ray into local space, then the intersections 

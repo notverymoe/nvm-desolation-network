@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::prelude::{RaycastTarget, RayCaster, RayIntersection, ShapeDebugData, ShapeDebug, get_polygon_data_for_ramp_boxy, PolygonSmallRound, PolygonSmall, BoxAligned, ShapeCommon};
+use crate::prelude::{RayTarget, RayCaster, RayIntersection, ShapeDebugData, ShapeDebug, get_polygon_data_for_ramp_boxy, PolygonSmallRound, PolygonSmall, BoxAligned, ShapeCommon};
 
 pub struct RampBoxyRound(PolygonSmallRound);
 
@@ -32,7 +32,7 @@ impl ShapeCommon for RampBoxyRound {
     }
 }
 
-impl RaycastTarget for RampBoxyRound {
+impl RayTarget for RampBoxyRound {
     fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         self.0.raycast(ray)
     }

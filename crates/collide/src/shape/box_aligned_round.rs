@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::prelude::{RaycastTarget, RayCaster, RayIntersection, ShapeDebugData, ShapeDebug, BoxAligned, ShapeCommon};
+use crate::prelude::{RayTarget, RayCaster, RayIntersection, ShapeDebugData, ShapeDebug, BoxAligned, ShapeCommon};
 
 #[derive(Debug, Clone, Copy)]
 pub struct BoxAlignedRound {
@@ -31,7 +31,7 @@ impl ShapeCommon for BoxAlignedRound {
     }
 }
 
-impl RaycastTarget for BoxAlignedRound {
+impl RayTarget for BoxAlignedRound {
     fn raycast(&self, ray: &RayCaster) -> Option<[RayIntersection; 2]> {
         ray.test_rect_rounded(self.origin, self.size, self.radius)
     }
