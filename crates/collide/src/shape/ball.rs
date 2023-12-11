@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::prelude::{BoxAligned, RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, ShapeCommon};
+use crate::prelude::{BoxAligned, RaycastTarget, RayCaster, RayIntersection, ShapeDebug, ShapeDebugData, ShapeCommon};
 
 #[derive(Debug, Clone, Copy)]
 pub struct Ball {
@@ -36,8 +36,8 @@ impl RaycastTarget for Ball {
     }
 }
 
-impl DebugShape for Ball {
-    fn get_debug_shape_data(&self) -> DebugShapeData {
-        DebugShapeData::circle(self.origin, self.radius)
+impl ShapeDebug for Ball {
+    fn get_debug_shape_data(&self) -> ShapeDebugData {
+        ShapeDebugData::circle(self.origin, self.radius)
     }
 }

@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-pub enum DebugShapeData {
+pub enum ShapeDebugData {
     Circle{
         origin: Vec2,
         radius: f32,
@@ -18,7 +18,7 @@ pub enum DebugShapeData {
     }
 }
 
-impl DebugShapeData {
+impl ShapeDebugData {
 
     pub fn circle(origin: Vec2, radius: f32) -> Self {
         Self::Circle{origin, radius}
@@ -34,9 +34,9 @@ impl DebugShapeData {
 
     pub fn iter_segments(&self) -> impl Iterator<Item = ([Vec2; 3], f32)> + '_ {
         let ([points, normals], offset) = match self {
-            DebugShapeData::Circle { .. } => ([[].as_ref(), [].as_ref()], 0.0_f32),
-            DebugShapeData::Polygon { points, normals } => ([points.as_ref(), normals.as_ref()], 0.0_f32),
-            DebugShapeData::PolygonRound { points, normals, radius } => ([points.as_ref(), normals.as_ref()], *radius),
+            ShapeDebugData::Circle { .. } => ([[].as_ref(), [].as_ref()], 0.0_f32),
+            ShapeDebugData::Polygon { points, normals } => ([points.as_ref(), normals.as_ref()], 0.0_f32),
+            ShapeDebugData::PolygonRound { points, normals, radius } => ([points.as_ref(), normals.as_ref()], *radius),
         };
 
         (0..points.len()).map(move |i| {
@@ -49,6 +49,6 @@ impl DebugShapeData {
 
 }
 
-pub trait DebugShape {
-    fn get_debug_shape_data(&self) -> DebugShapeData;
+pub trait ShapeDebug {
+    fn get_debug_shape_data(&self) -> ShapeDebugData;
 }

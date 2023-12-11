@@ -2,14 +2,8 @@
 
 mod ray_caster;
 mod shape;
-mod debug_shape;
-mod combinations;
-mod shape_common;
 
 pub mod prelude {
     pub use crate::ray_caster::*;
     pub use crate::shape::*;
-    pub use crate::debug_shape::*;
-    pub use crate::combinations::*;
-    pub use crate::shape_common::*;
 }

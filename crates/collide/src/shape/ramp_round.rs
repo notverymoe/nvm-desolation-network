@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::prelude::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, get_polygon_data_for_ramp, ShapeCommon, BoxAligned};
+use crate::prelude::{RaycastTarget, RayCaster, RayIntersection, ShapeDebug, ShapeDebugData, get_polygon_data_for_ramp, ShapeCommon, BoxAligned};
 
 #[derive(Debug, Clone, Copy)]
 pub struct RampRound {
@@ -49,10 +49,10 @@ impl RaycastTarget for RampRound {
     }
 }
 
-impl DebugShape for RampRound {
-    fn get_debug_shape_data(&self) -> DebugShapeData {
+impl ShapeDebug for RampRound {
+    fn get_debug_shape_data(&self) -> ShapeDebugData {
         let (points, normals, _lengths) = get_polygon_data_for_ramp(self.direction, self.length);
-        DebugShapeData::polygon_round( 
+        ShapeDebugData::polygon_round( 
             Box::new(points.map(|v| self.origin + v)), 
             Box::new(normals),
             self.radius,

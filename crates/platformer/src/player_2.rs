@@ -1,7 +1,7 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
 use bevy::{prelude::Component, math::{Vec2, IVec2}, time::Time, ecs::system::{Query, Res}, transform::components::Transform, log::info, gizmos::gizmos::Gizmos, render::color::Color};
-use nvm_collision::{BoxAligned, RayCaster, ShapeCombined, DebugShapeData, DebugShape};
+use nvm_collision::{BoxAligned, RayCaster, ShapeCombined, ShapeDebugData, ShapeDebug};
 
 use crate::Map;
 
@@ -64,7 +64,7 @@ pub fn update_player(
                     }
 
 
-                    if let DebugShapeData::Polygon{points, ..} = tile.get_debug_shape_data() {
+                    if let ShapeDebugData::Polygon{points, ..} = tile.get_debug_shape_data() {
                         gizmos.linestrip_2d((0..points.len()).chain(std::iter::once(0)).map(|i| points[i]), colour);
                     }
                 }

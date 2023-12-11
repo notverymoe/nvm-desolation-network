@@ -49,7 +49,24 @@ pub use polygon_small::*;
 mod polygon_small_round;
 pub use polygon_small_round::*;
 
+// // Shape Types // //
+
+mod shape_static;
+pub use shape_static::*;
+
+mod shape_moving;
+pub use shape_moving::*;
+
+mod shape_combined;
+pub use shape_combined::*;
+
 // // Misc // //
+
+mod shape_common;
+pub use shape_common::*;
+
+mod shape_debug;
+pub use shape_debug::*;
 
 mod util;
 pub(crate) use util::*;

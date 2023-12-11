@@ -2,7 +2,7 @@
 
 use bevy::prelude::Vec2;
 
-use crate::prelude::{RaycastTarget, RayCaster, RayIntersection, DebugShape, DebugShapeData, BoxAligned, ShapeCommon};
+use crate::prelude::{RaycastTarget, RayCaster, RayIntersection, ShapeDebug, ShapeDebugData, BoxAligned, ShapeCommon};
 
 #[derive(Debug, Clone, Copy)]
 pub struct BoxOrientedRound {
@@ -62,9 +62,9 @@ impl RaycastTarget for BoxOrientedRound {
     }
 }
 
-impl DebugShape for BoxOrientedRound {
-    fn get_debug_shape_data(&self) -> DebugShapeData {
-        DebugShapeData::polygon_round(
+impl ShapeDebug for BoxOrientedRound {
+    fn get_debug_shape_data(&self) -> ShapeDebugData {
+        ShapeDebugData::polygon_round(
             Box::new([
                 self.origin + Vec2::new( self.size.x,  self.size.y).rotate(self.direction),
                 self.origin + Vec2::new(-self.size.x,  self.size.y).rotate(self.direction),

@@ -2,7 +2,7 @@
 
 use bevy::prelude::*;
 
-use nvm_collision::{BoxAligned, RayCaster, DebugShapeData, ShapeCombined, DebugShape, ShapeMoving};
+use nvm_collision::{BoxAligned, RayCaster, ShapeDebugData, ShapeCombined, ShapeDebug, ShapeMoving};
 
 mod input;
 pub use input::*;
@@ -106,7 +106,7 @@ fn test_motion(
                         //colour = Color::RED;
                     }
                 }
-                //if let DebugShapeData::Polygon{points, ..} = tile.get_debug_shape_data() {
+                //if let ShapeDebugData::Polygon{points, ..} = tile.get_debug_shape_data() {
                 //    gizmos.linestrip_2d((0..points.len()).chain(std::iter::once(0)).map(|i| points[i]), colour);
                 //}
             }

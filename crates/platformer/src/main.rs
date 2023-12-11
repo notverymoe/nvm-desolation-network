@@ -5,7 +5,7 @@ pub fn main() {
 }
 
 // use bevy::prelude::*;
-// use nvm_collision::{DebugShapeData, DebugShape};
+// use nvm_collision::{ShapeDebugData, ShapeDebug};
 // use nvm_platformer::{Map, update_player, PlayerController, PlayerInput, PlayerSettings, GroundState, JumpSettings, VertSpeedSettings, FacingSpeedSettings, HorzSpeedSettings};
 
 // pub fn main() {
@@ -162,7 +162,7 @@ pub fn main() {
 //         for y in 0..map.height() {
 //             let pos = IVec2::new(x, y);
 //             if let Some(shape) = map.get_shape(pos) {
-//                 if let DebugShapeData::Polygon{points, ..} = shape.get_debug_shape_data() {
+//                 if let ShapeDebugData::Polygon{points, ..} = shape.get_debug_shape_data() {
 //                     gizmos.linestrip_2d((0..points.len()).chain(std::iter::once(0)).map(|i| points[i]), Color::BLACK);
 //                 }
 //             }

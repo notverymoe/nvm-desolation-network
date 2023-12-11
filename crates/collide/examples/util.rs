@@ -3,17 +3,17 @@
 use bevy::prelude::*;
 use nvm_collide::prelude::*;
 
-pub trait ShapeMarkerTrait: DebugShape + RaycastTarget + Send + Sync {}
-impl<T: DebugShape + RaycastTarget + Send + Sync + 'static> ShapeMarkerTrait for T {}
+pub trait ShapeMarkerTrait: ShapeDebug + RaycastTarget + Send + Sync {}
+impl<T: ShapeDebug + RaycastTarget + Send + Sync + 'static> ShapeMarkerTrait for T {}
 
 pub fn render_shape(gizmos: &mut Gizmos, shape: &dyn ShapeMarkerTrait, colour: Color) {
     let data = shape.get_debug_shape_data();
     match data {
-        DebugShapeData::Circle { origin, radius } => { 
+        ShapeDebugData::Circle { origin, radius } => { 
             gizmos.circle_2d(origin, radius, colour); 
         },
-        DebugShapeData::Polygon { .. } => {
-            let DebugShapeData::Polygon { points, .. } = &data else { unreachable!() };
+        ShapeDebugData::Polygon { .. } => {
+            let ShapeDebugData::Polygon { points, .. } = &data else { unreachable!() };
             gizmos.linestrip_2d((0..points.len()).chain(std::iter::once(0)).map(|i| points[i]), colour);
             for ([from, to, norm], offset) in data.iter_segments() {
                 let off = to - from;
@@ -27,7 +27,7 @@ pub fn render_shape(gizmos: &mut Gizmos, shape: &dyn ShapeMarkerTrait, colour: C
                 gizmos.circle_2d(far, 5.0, Color::TEAL);
             }
         },
-        DebugShapeData::PolygonRound { radius, .. } => {
+        ShapeDebugData::PolygonRound { radius, .. } => {
             for ([from, to, norm], offset) in data.iter_segments() {
                 let offset = norm * offset;
                 if radius > 0.0 {
