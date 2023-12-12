@@ -21,18 +21,22 @@ macro_rules! behave_define {
         pub const $state: $crate::prelude::State<$marker> = $crate::prelude::State::from_name(stringify!($state));
     };
 
-    ($marker:ident, ($transition:ident, $target:ident, $source:expr)) => {
-        pub const $transition: $crate::prelude::Transition<$marker> = $crate::prelude::Transition::from_name(stringify!($transition), $target, &$source);
+    ($marker:ident, ($transition:ident, $target:ident, $sources:expr)) => {
+        pub const $transition: $crate::prelude::TransitionRecord<$marker> = $crate::prelude::TransitionRecord{
+            id:     $crate::prelude::Transition::from_name(stringify!($transition)),
+            target: $target,
+            sources: &$sources
+        };
     };
 
     ($marker:ident, $state:ident, $($args:tt),+) => {
-        behave_define!($marker, $state);
-        behave_define!($marker, $($args),+);
+        $crate::prelude::behave_define!($marker, $state);
+        $crate::prelude::behave_define!($marker, $($args),+);
     };
 
-    ($marker:ident, ($transition:ident, $target:ident, $source:expr), $($args:tt),+) => {
-        behave_define!($marker, ($transition, $target, $source));
-        behave_define!($marker, $($args),+);
+    ($marker:ident, ($transition:ident, $target:ident, $sources:expr), $($args:tt),+) => {
+        $crate::prelude::behave_define!($marker, ($transition, $target, $sources));
+        $crate::prelude::behave_define!($marker, $($args),+);
     };
 
 }

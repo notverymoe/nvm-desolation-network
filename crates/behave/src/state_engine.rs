@@ -1,42 +1,75 @@
 // Copyright 2023 Natalie Baker // AGPLv3 //
 
-use bevy::{prelude::*, utils::HashMap, ecs::schedule::ScheduleLabel};
+use bevy::{prelude::*, utils::{HashMap, Entry}};
 
-use crate::prelude::{State, StateMachine};
+use crate::prelude::{State, StateMachine, Transition};
+
+#[derive(Debug)]
+pub struct TransitionStore<T> {
+    sources: Vec<State<T>>,
+    target: State<T>,
+}
 
 #[derive(Debug, Resource)]
 pub struct StateEngine<T> {
-    pub(crate) label: Box<dyn ScheduleLabel>,
+    transitions: HashMap<Transition<T>, TransitionStore<T>>,
     by_entered: HashMap<State<T>, Vec<Entity>>,
     by_current: HashMap<State<T>, Vec<Entity>>,
     by_leaving: HashMap<State<T>, Vec<Entity>>,
 }
 
-impl<T> StateEngine<T> {
-
-    pub(crate) fn new(label: Box<dyn ScheduleLabel>) -> Self {
-        Self{
-            label,
-            by_current: Default::default(),
-            by_entered: Default::default(),
-            by_leaving: Default::default(),
+impl<T> Default for StateEngine<T> {
+    fn default() -> Self {
+        Self { 
+            transitions: Default::default(),
+            by_entered:  Default::default(), 
+            by_current:  Default::default(), 
+            by_leaving:  Default::default() 
         }
     }
+}
 
-    pub(crate) fn is_in_label(&self, label: &impl ScheduleLabel) -> bool {
-        self.label.as_dyn_eq().dyn_eq(label.as_dyn_eq())
+impl<T> StateEngine<T> {
+
+    pub fn add_transition(&mut self, id: impl Into<Transition<T>>, target: impl Into<State<T>>, sources: &[State<T>]) -> bool {
+        match self.transitions.entry(id.into()) {
+            Entry::Occupied(mut e) => {
+                if e.get().target == target.into() {
+                    e.get_mut().sources.extend_from_slice(sources);
+                    true
+                } else {
+                    false
+                }
+            },
+            Entry::Vacant(e) => {
+                e.insert(TransitionStore{
+                    target: target.into(),
+                    sources: sources.to_vec(),
+                });
+                true
+            }
+        }
+    }
+    
+    pub fn get_transition(&self, id: impl Into<Transition<T>>) -> Option<&TransitionStore<T>> {
+        self.transitions.get(&id.into())
     }
 
     pub fn apply_transition(&mut self, entity: Entity, state_machine: &mut StateMachine<T>) -> bool {
-        if let Some([leaving, entered]) = state_machine.apply_transition() {
-            self.by_leaving.entry(leaving).or_default().push(entity);
-            self.by_entered.entry(entered).or_default().push(entity);
-            self.by_current.entry(entered).or_default().push(entity);
-            true
-        } else {
-            self.by_current.entry(state_machine.current()).or_default().push(entity);
-            false
+        let mut did_transition = false;
+        for transition_id in state_machine.get_transitions().iter().copied() {
+            if let Some(transition) = self.get_transition(transition_id) {
+                if transition.sources.contains(&state_machine.current()) {
+                    state_machine.force_transition(transition_id, transition.target);
+                    self.by_leaving.entry(state_machine.last().0).or_default().push(entity);
+                    self.by_entered.entry(state_machine.current()).or_default().push(entity);
+                    did_transition = true;
+                    break;
+                }
+            }
         }
+        self.by_current.entry(state_machine.current()).or_default().push(entity);
+        did_transition
     }
 
     pub fn clear(&mut self) {
