@@ -13,13 +13,13 @@ pub enum StateMachineUpdate {
 }
 
 pub trait AppAddStateEngine {
-    fn add_state_engine<T: 'static>(&mut self, schedule: impl ScheduleLabel + Clone) -> &mut Self;
+    fn add_state_engine_system<T: 'static>(&mut self, schedule: impl ScheduleLabel + Clone) -> &mut Self;
     fn add_state_transitions<T: 'static>(&mut self, transitions: &[&TransitionRecord<T>]) -> &mut Self;
     fn add_state_transition<T: 'static>(&mut self, id: Transition<T>, target: State<T>, sources: &[State<T>]) -> &mut Self;
 }
 
 impl AppAddStateEngine for App {
-    fn add_state_engine<T: 'static>(&mut self, schedule: impl ScheduleLabel + Clone) -> &mut Self {
+    fn add_state_engine_system<T: 'static>(&mut self, schedule: impl ScheduleLabel + Clone) -> &mut Self {
         self.init_resource::<StateEngine<T>>();
         self.configure_sets(
             schedule.clone(),

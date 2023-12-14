@@ -29,12 +29,12 @@ macro_rules! behave_define {
         };
     };
 
-    ($marker:ident, $state:ident, $($args:tt),+) => {
+    ($marker:ident, $state:ident, $($args:tt),+ $(,)?) => {
         $crate::prelude::behave_define!($marker, $state);
         $crate::prelude::behave_define!($marker, $($args),+);
     };
 
-    ($marker:ident, ($transition:ident, $target:ident, $sources:expr), $($args:tt),+) => {
+    ($marker:ident, ($transition:ident, $target:ident, $sources:expr), $($args:tt),+ $(,)?) => {
         $crate::prelude::behave_define!($marker, ($transition, $target, $sources));
         $crate::prelude::behave_define!($marker, $($args),+);
     };

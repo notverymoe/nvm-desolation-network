@@ -30,7 +30,20 @@ impl<T> Default for StateEngine<T> {
 }
 
 impl<T> StateEngine<T> {
+    pub fn get_entering(&self, state: State<T>) -> Option<&[Entity]> {
+        self.by_entered.get(&state).map(|v| v.as_slice())
+    }
 
+    pub fn get_current(&self, state: State<T>) -> Option<&[Entity]>   {
+        self.by_current.get(&state).map(|v| v.as_slice())
+    }
+
+    pub fn get_leaving(&self, state: State<T>) -> Option<&[Entity]>   {
+        self.by_leaving.get(&state).map(|v| v.as_slice())
+    }
+}
+
+impl<T> StateEngine<T> {
     pub fn add_transition(&mut self, id: impl Into<Transition<T>>, target: impl Into<State<T>>, sources: &[State<T>]) -> bool {
         match self.transitions.entry(id.into()) {
             Entry::Occupied(mut e) => {
@@ -54,7 +67,9 @@ impl<T> StateEngine<T> {
     pub fn get_transition(&self, id: impl Into<Transition<T>>) -> Option<&TransitionStore<T>> {
         self.transitions.get(&id.into())
     }
+}
 
+impl<T> StateEngine<T> {
     pub fn apply_transition(&mut self, entity: Entity, state_machine: &mut StateMachine<T>) -> bool {
         let mut did_transition = false;
         for transition_id in state_machine.get_transitions().iter().copied() {

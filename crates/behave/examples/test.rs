@@ -18,11 +18,11 @@ behave_define!(
 
 fn main() {
     App::new()
-        .add_state_engine::<PlatformerMarker>(FixedUpdate)
-        .add_state_transitions(&[
-            &TRANSITION_JUMP,
-            &TRANSITION_CROUCH,
-            &TRANSITION_STAND
-        ]);
-        
+    .add_state_engine_system::<PlatformerMarker>(FixedUpdate)
+    .add_state_engine_system::<PlatformerMarker>(Last)
+    .add_state_transitions(&[
+        &TRANSITION_JUMP,
+        &TRANSITION_CROUCH,
+        &TRANSITION_STAND
+    ]);
 }

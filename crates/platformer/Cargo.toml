@@ -7,3 +7,4 @@ edition = "2021"
 bevy = { workspace = true, features=["default"] }
 tinyvec = "1.6.0"
 nvm_collide = { path = "../collide/" }
+nvm_behave = { path = "../behave/" }
