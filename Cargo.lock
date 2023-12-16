@@ -2448,6 +2448,7 @@ name = "nvm_platformer"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "nvm_behave",
  "nvm_collide",
  "tinyvec",
 ]

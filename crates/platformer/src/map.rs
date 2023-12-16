@@ -3,6 +3,8 @@
 use bevy::{math::{IVec2, Vec2}, ecs::system::Resource};
 use nvm_collide::prelude::*;
 
+use crate::{CollisionBroadphase, CollisionCandidate};
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum TileKind {
     Empty,
@@ -76,4 +78,32 @@ impl Map {
         self.height 
     }
 
+}
+
+impl CollisionBroadphase for Map {
+    fn find_candidates(&self, collider: &ShapeMoving, direction: Vec2, max_dist: f32, out: &mut tinyvec::SliceVec<CollisionCandidate>) -> usize {
+        let offset = direction * max_dist;
+        let [mut min, mut max] = collider.bounding_box().bounds();
+        min = min.min(min + offset);
+        max = max.max(max + offset);
+
+        let x_min = min.x.floor() as i32;
+        let x_max = min.x.ceil()  as i32;
+        let y_min = min.y.floor() as i32;
+        let y_max = max.y.ceil()  as i32;
+
+        let size = out.len();
+
+        for x in x_min..x_max {
+            for y in y_min..y_max {
+                // TODO opt check box overlap (?)
+                // TODO opt DDA (?)
+                if let Some(collider) = self.get_shape(IVec2::new(x, y)) {
+                    out.push(CollisionCandidate{ entity: None, collider });
+                }
+            }
+        }
+
+        out.len() - size
+    }
 }

@@ -9,7 +9,7 @@ pub use util::*;
 
 #[derive(Debug, Clone, Copy)]
 pub struct SensorHit {
-    pub entity:   Entity,
+    pub entity:   Option<Entity>,
     pub distance: f32,
     pub point:    Vec2,
     pub normal:   Vec2,
@@ -18,7 +18,7 @@ pub struct SensorHit {
 impl Default for SensorHit {
     fn default() -> Self {
         Self{
-            entity: Entity::PLACEHOLDER,
+            entity: None,
             distance: 0.0,
             point:  Vec2::ZERO,
             normal: Vec2::ZERO,
@@ -26,17 +26,16 @@ impl Default for SensorHit {
     }
 }
 
-
 #[derive(Debug, Copy, Clone)]
 pub struct CollisionCandidate {
-    pub entity:   Entity,
+    pub entity:   Option<Entity>,
     pub collider: ShapeStatic,
 }
 
 impl Default for CollisionCandidate {
     fn default() -> Self {
         Self{
-            entity: Entity::PLACEHOLDER,
+            entity: None,
             collider: Ball::new(Vec2::ZERO, 0.0).into(),
         }
     }
